@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonGroup renders correctly 1`] = `
+<h1
+  class="dummy__PageTitle-sc-1omcpq1-0 bKpmBB"
+>
+  Hello World
+</h1>
+`;
