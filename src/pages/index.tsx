@@ -110,20 +110,31 @@ const HomePage: FC = () => {
                     <Tile src="/Go_l.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_-.svg" />
+                    <Tile src="/Go_w.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_-.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_r.svg" />
+                </TileRow>
+                <TileRow>
+                    <Tile src="/Go_l.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_r.svg" />
+                </TileRow>
+                <TileRow>
+                    <Tile src="/Go_l.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_-.svg" />
                     <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_r.svg" />
@@ -131,18 +142,7 @@ const HomePage: FC = () => {
                 <TileRow>
                     <Tile src="/Go_l.svg" />
                     <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
+                    <Tile src="/Go_b.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
                     <Tile src="/Go_m.svg" />
