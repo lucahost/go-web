@@ -39,7 +39,7 @@
         ],
         "no-case-declarations": "off",
         "no-console": "warn",
-        "no-shadow": "error",
+        "no-shadow": "off",
         "react/display-name": "off",
         "react/jsx-boolean-value": [
             "error",

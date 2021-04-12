@@ -1,21 +1,94 @@
 import Head from 'next/head'
-import { FC } from 'react'
-import Dummy from '../components/dummy'
+import React, { FC } from 'react'
+import { GlobalStyle } from '../lib/theme'
+import styled from 'styled-components'
 
-const HomePage: FC = () => (
-    <div>
-        <Head>
-            <title>Go</title>
-            <link href="/favicon.ico" rel="icon" />
-        </Head>
+const Layout = styled.div`
+    display: flex;
+    flex-direction: column;
 
-        <main>
-            <Dummy text="Hello Go" />
-        </main>
+    width: 100%;
+    height: 100%;
+`
 
-        <footer></footer>
-    </div>
-)
+const Header = styled.div`
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+
+    background-color: #252525;
+
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+`
+
+const Content = styled.div`
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    width: 100%;
+`
+
+const Nav = styled.div`
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    height: 60px;
+    width: 100%;
+    padding: 5px 0;
+
+    background-color: white;
+`
+
+const NavButton = styled.div`
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    height: 100%;
+`
+
+const Message = styled.div`
+    height: 50px;
+`
+
+const Board = styled.div<{ image: string }>`
+    background-image: ${({ image }) => `url("${image}")`};
+    height: 500px;
+    width: 500px;
+`
+
+const HomePage: FC = () => {
+    return (
+        <Layout>
+            <Head>
+                <title>Go</title>
+                <link href="/favicon.ico" rel="icon" />
+            </Head>
+            <GlobalStyle />
+            <Header>Go</Header>
+            <Content>
+                <Message>Schwarz am Zug </Message>
+                <Board image={'/kaya.jpg'}></Board>
+            </Content>
+            <Nav>
+                <NavButton>Neues Spiel</NavButton>
+                <NavButton>Passen</NavButton>
+            </Nav>
+        </Layout>
+    )
+}
 
 /*
  * If you export an async function called getStaticProps from a page,
