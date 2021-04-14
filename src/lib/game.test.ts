@@ -37,5 +37,3 @@ describe('Prevent Suicide', () => {
         expect(isSuicide(board, move)).toBeTruthy()
     })
 })
-
-export {}
