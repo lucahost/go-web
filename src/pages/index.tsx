@@ -2,6 +2,7 @@ import Head from 'next/head'
 import React, { FC } from 'react'
 import { GlobalStyle } from '../lib/theme'
 import styled from 'styled-components'
+import Goban from '../components/goban'
 
 const Layout = styled.div`
     display: flex;
@@ -63,16 +64,6 @@ const Message = styled.div`
     height: 50px;
 `
 
-const TileRow = styled.div`
-    display: flex;
-    flex-direction: row;
-`
-
-const Tile = styled.img`
-    height: 50px;
-    width: 50px;
-`
-
 const HomePage: FC = () => {
     return (
         <Layout>
@@ -84,105 +75,7 @@ const HomePage: FC = () => {
             <Header>Go</Header>
             <Content>
                 <Message>Schwarz am Zug </Message>
-                <TileRow>
-                    <Tile src="/Go_ul.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_u.svg" />
-                    <Tile src="/Go_ur.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_w.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_b.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_-.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_l.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_m.svg" />
-                    <Tile src="/Go_r.svg" />
-                </TileRow>
-                <TileRow>
-                    <Tile src="/Go_dl.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_d.svg" />
-                    <Tile src="/Go_dr.svg" />
-                </TileRow>
+                <Goban height={9} width={9} />
             </Content>
             <Nav>
                 <NavButton>Neues Spiel</NavButton>
