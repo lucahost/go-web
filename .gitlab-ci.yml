@@ -4,10 +4,20 @@ cache:
   paths:
     - node_modules/
 
-test:
+install:
   script:
     - npm i
+
+lint:
+  script:
     - npm run lint
     - npm run stylelint
     - npm run typecheck
+
+test:
+  script:
     - npm run test:ci
+
+build:
+  script:
+    - npm run build
