@@ -51,7 +51,8 @@ export const end = (): void => {
     return
 }
 
-const isSuicide = (board: GoBoard, move: Field): boolean => {
+// TODO: separate functions below here
+export const isSuicide = (board: GoBoard, move: Field): boolean => {
     return true
 }
 
