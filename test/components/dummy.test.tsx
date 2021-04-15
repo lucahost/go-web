@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import Dummy from './dummy'
+import Dummy from '../../src/components/dummy'
 
 describe('ButtonGroup', () => {
     it('renders correctly', () => {
