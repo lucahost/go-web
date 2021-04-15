@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Field, Vertex } from '../lib/types'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 interface Props {
     field: Field
@@ -13,11 +13,19 @@ const TileContainer = styled.img`
 `
 
 const Tile = memo(({ field, clickHandler }: Props) => {
+    const [isHover, setIsHover] = useState(false)
+
     return (
         <TileContainer
             // TODO: should not use arrow functions
             onClick={() => clickHandler(field.vertex)}
-            src={`/Go_${field.location}.svg`}
+            onMouseEnter={() => {
+                setIsHover(true)
+            }}
+            onMouseLeave={() => {
+                setIsHover(false)
+            }}
+            src={`/Go_${isHover ? 'bh' : field.location}.svg`}
         />
     )
 })
