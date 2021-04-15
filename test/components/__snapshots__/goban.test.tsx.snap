@@ -1,0 +1,366 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonGroup renders correctly 1`] = `
+<div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_ul.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_u.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_ur.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_-.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_-.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_-.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_-.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_-.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_l.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_m.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_r.svg"
+    />
+  </div>
+  <div
+    class="goban__TileRow-c65plc-0 YcwaV"
+  >
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_dl.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_d.svg"
+    />
+    <img
+      class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+      src="/Go_dr.svg"
+    />
+  </div>
+</div>
+`;

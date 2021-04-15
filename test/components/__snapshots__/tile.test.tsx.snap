@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonGroup renders correctly 1`] = `
+<img
+  class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+  src="/Go_ur.svg"
+/>
+`;
+
+exports[`Tile renders correctly 1`] = `
+<img
+  class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+  src="/Go_ur.svg"
+/>
+`;

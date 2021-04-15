@@ -75,7 +75,7 @@ const HomePage: FC = () => {
             <Header>Go</Header>
             <Content>
                 <Message>Schwarz am Zug </Message>
-                <Goban height={9} width={9} />
+                <Goban size={9} />
             </Content>
             <Nav>
                 <NavButton>Neues Spiel</NavButton>
