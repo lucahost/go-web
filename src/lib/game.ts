@@ -56,29 +56,32 @@ export const isSuicide = (board: GoBoard, move: Field): boolean => {
     return true
 }
 
-const isKo = (board: GoBoard, move: Field): boolean => {
+export const isKo = (board: GoBoard, move: Field): boolean => {
     return true
 }
 
-const handleCapture = (board: GoBoard, move: Field): GoBoard => {
+export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
 
-const setStone = (board: GoBoard, move: Field): GoBoard => {
+export const setStone = (board: GoBoard, move: Field): GoBoard => {
     // Replace field with new set stone
     return board
 }
 
-const switchPlayer = (board: GoBoard): GoBoard => {
+export const switchPlayer = (board: GoBoard): GoBoard => {
     // Switch players
     return board
 }
 
-const resetPass = (board: GoBoard): GoBoard => ({ ...board, pass: false })
+export const resetPass = (board: GoBoard): GoBoard => ({
+    ...board,
+    pass: false,
+})
 
-const addHistory = (board: GoBoard, move: Field): GoBoard => {
+export const addHistory = (board: GoBoard, move: Field): GoBoard => {
     board.history.push(move)
     return board
 }
 
-const getLiberties = (board: GoBoard, field: Field): GoBoard => board
+export const getLiberties = (board: GoBoard, field: Field): Field[] => [field]
