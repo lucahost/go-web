@@ -5,3 +5,6 @@ export const chunk = <T>(input: T[], size: number) => {
             : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]]
     }, [])
 }
+
+export const arrayEquals = (a: number[], b: number[]) =>
+    a.length === b.length && a.every((v, i) => v === b[i])

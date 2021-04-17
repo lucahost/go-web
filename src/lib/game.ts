@@ -1,4 +1,5 @@
 import { Field, GameState, GoBoard, Player } from './types'
+import { arrayEquals } from './utils'
 
 export const start = (players: [Player, Player]): GoBoard => {
     const width = 9
@@ -91,9 +92,8 @@ export const isInBounds = (board: GoBoard, move: Field): boolean => {
 export const isOccupied = (board: GoBoard, move: Field): boolean => {
     if (board.fields.length == 0) return false
 
-    return (
-        board.fields.filter((field: Field) => field.vertex === move.vertex) ===
-        null
+    return board.fields.some((field: Field) =>
+        arrayEquals(field.vertex, move.vertex)
     )
 }
 

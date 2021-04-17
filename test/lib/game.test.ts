@@ -33,7 +33,7 @@ describe('Game Initialization', () => {
     })
 
     it('initialize a game after the first move', () => {
-        const goBoard = emptyBoard as GoBoard
+        const goBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const simpleMove = {
             vertex: [0, 0] as [number, number],
@@ -50,7 +50,7 @@ describe('Game Initialization', () => {
 
 describe('Move', () => {
     it('should not allow a move out of bounds', () => {
-        const initialBoard = emptyBoard as GoBoard
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const simpleMove = {
             vertex: [-1, -99] as [number, number],
@@ -64,7 +64,7 @@ describe('Move', () => {
     })
 
     it('should not allow a move on a field with a stone', () => {
-        const initialBoard = emptyBoard as GoBoard
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const initialMove = {
             vertex: [1, 1] as [number, number],
@@ -88,7 +88,7 @@ describe('Move', () => {
 
 describe('Pass', () => {
     it('should set pass and reset it correctly', () => {
-        const initialBoard = emptyBoard as GoBoard
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const boardWithOnePass = pass(initialBoard)
         expect(boardWithOnePass.pass).toBeTruthy()
@@ -98,7 +98,7 @@ describe('Pass', () => {
     })
 
     it('should reset pass after move', () => {
-        const testBoard = emptyBoard as GoBoard
+        const testBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const boardWithOnePass = pass(testBoard)
         expect(boardWithOnePass.pass).toBeTruthy()
@@ -108,15 +108,15 @@ describe('Pass', () => {
             color: PlayerColor.WHITE,
             location: FieldLocation.MIDDLE,
         }
-        const board = move(testBoard, initialMove)
+        const continuingBoard = move(testBoard, initialMove)
 
-        expect(board.pass).toBeFalsy()
+        expect(continuingBoard.pass).toBeFalsy()
     })
 })
 
 describe('Prevent Suicide', () => {
     it('should return true', () => {
-        const board = suicideBoard as GoBoard
+        const board = JSON.parse(JSON.stringify(suicideBoard)) as GoBoard
         const move = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.BLACK,
@@ -142,7 +142,7 @@ describe('Handle Capture', () => {
 
 describe('Set Stone', () => {
     it('should add the stone to the fields', () => {
-        const initialBoard = emptyBoard as GoBoard
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
         const move = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.BLACK,
@@ -161,7 +161,7 @@ describe('Switch Player', () => {
 
 describe('Add History', () => {
     it('should add the stone to the boards history', () => {
-        const initialBoard = emptyBoard as GoBoard
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
         const move = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.BLACK,
