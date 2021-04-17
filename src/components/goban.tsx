@@ -44,6 +44,7 @@ const Goban: FC<Props> = props => {
                             key={j}
                             // TODO: should not use arrow functions
                             clickHandler={() => handleTileClick(field.vertex)}
+                            currentPlayer={currentPlayer}
                             field={field}
                         />
                     ))}
