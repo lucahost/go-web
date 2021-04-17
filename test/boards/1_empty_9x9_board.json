@@ -1,0 +1,29 @@
+﻿{
+    "board": {
+        "status": 0,
+        "captures": [],
+        "currentPlayer": {
+            "identifier": "id1",
+            "name": "Yoda",
+            "color": -1
+        },
+        "fields": [],
+        "height": 9,
+        "history": [],
+        "identifier": "",
+        "pass": false,
+        "players": [
+            {
+                "identifier": "id1",
+                "name": "Yoda",
+                "color": -1
+            },
+            {
+                "identifier": "id2",
+                "name": "Darth Vader",
+                "color": 1
+            }
+        ],
+        "width": 9
+    }
+}

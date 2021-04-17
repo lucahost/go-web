@@ -19,16 +19,37 @@ export const start = (players: [Player, Player]): GoBoard => {
 }
 
 export const move = (board: GoBoard, move: Field): GoBoard => {
-    // Handle suicide
+    // Check if move is in bounds
+    if (!isInBounds(board, move)) {
+        throw new Error(`Move on location ${move.vertex} is out of bounds`)
+    }
+
+    // Check if the color of the move matches the current players color
+    if (board.currentPlayer.color !== move.color) {
+        throw new Error(`current player is not ${move.color}`)
+    }
+
+    if (isOccupied(board, move)) {
+        throw new Error(
+            `Move on location ${
+                move.vertex
+            } is not possible. Already occupied. Fields ${board.fields.map(
+                f => `${f.vertex}, `
+            )}`
+        )
+    }
     if (isSuicide(board, move)) {
+        // Handle suicide
         throw new Error()
     }
     // Handle capture
     board = handleCapture(board, move)
+
     // Handle Ko
     if (isKo(board, move)) {
         throw new Error()
     }
+
     // From here on: Valid move !
     // Add move to fields
     board = setStone(board, move)
@@ -39,12 +60,17 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     // Add history
     board = addHistory(board, move)
 
-    return board
+    // Change state to running
+    return { ...board, status: GameState.RUNNING }
 }
 
 export const pass = (board: GoBoard): GoBoard => {
-    // Handle double-pass
-    return board
+    if (board.pass) {
+        // Handle double-pass
+        return board
+    } else {
+        return { ...board, pass: true }
+    }
 }
 
 export const end = (): void => {
@@ -52,12 +78,35 @@ export const end = (): void => {
 }
 
 // TODO: separate functions below here
+
+export const isInBounds = (board: GoBoard, move: Field): boolean => {
+    return (
+        move.vertex[0] >= 0 &&
+        move.vertex[0] - 1 < board.height &&
+        move.vertex[1] >= 0 &&
+        move.vertex[1] - 1 < board.width
+    )
+}
+
+export const isOccupied = (board: GoBoard, move: Field): boolean => {
+    if (board.fields.length == 0) return false
+
+    return (
+        board.fields.filter((field: Field) => field.vertex === move.vertex) ===
+        null
+    )
+}
+
 export const isSuicide = (board: GoBoard, move: Field): boolean => {
-    return true
+    // Check Liberties on Stone
+
+    // Should be done recursively - Big Boundaries
+
+    return false
 }
 
 export const isKo = (board: GoBoard, move: Field): boolean => {
-    return true
+    return false
 }
 
 export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
@@ -65,13 +114,24 @@ export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
 }
 
 export const setStone = (board: GoBoard, move: Field): GoBoard => {
-    // Replace field with new set stone
+    board.fields.push(move)
     return board
 }
 
 export const switchPlayer = (board: GoBoard): GoBoard => {
-    // Switch players
-    return board
+    if (board.players.length !== 2) {
+        throw new Error('Incorrect count of players in game')
+    }
+
+    const nextPlayer = board.players.find(
+        p => p.identifier !== board.currentPlayer.identifier
+    )
+
+    if (!nextPlayer) {
+        throw new Error('Exception loading next player')
+    }
+
+    return { ...board, currentPlayer: nextPlayer }
 }
 
 export const resetPass = (board: GoBoard): GoBoard => ({

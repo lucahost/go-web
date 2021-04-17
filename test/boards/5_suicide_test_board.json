@@ -1,0 +1,34 @@
+﻿{
+    "board": {
+        "status": 0,
+        "captures": [],
+        "currentPlayer": {
+            "identifier": "",
+            "name": "",
+            "color": 1
+        },
+        "fields": [
+            { "vertex": [0, 1], "color": -1, "location": "m" },
+            { "vertex": [1, 0], "color": -1, "location": "m" },
+            { "vertex": [2, 1], "color": -1, "location": "m" },
+            { "vertex": [1, 2], "color": -1, "location": "m" }
+        ],
+        "height": 9,
+        "history": [],
+        "identifier": "",
+        "pass": false,
+        "players": [
+            {
+                "identifier": "",
+                "name": "",
+                "color": -1
+            },
+            {
+                "identifier": "",
+                "name": "",
+                "color": 1
+            }
+        ],
+        "width": 9
+    }
+}

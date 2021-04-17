@@ -13,7 +13,11 @@ describe('Tile', () => {
             color: PlayerColor.EMPTY,
         }
         const { container } = render(
-            <Tile clickHandler={clickHandler} field={field} />
+            <Tile
+                clickHandler={clickHandler}
+                currentPlayer={PlayerColor.BLACK}
+                field={field}
+            />
         )
         expect(container.firstChild).toMatchSnapshot()
     })
