@@ -3,6 +3,12 @@
 exports[`ButtonGroup renders correctly 1`] = `
 <div>
   <div
+    class="goban__Message-c65plc-1 kTrpyG"
+  >
+    Schwarz
+     am Zug
+  </div>
+  <div
     class="goban__TileRow-c65plc-0 YcwaV"
   >
     <img
