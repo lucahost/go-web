@@ -97,6 +97,7 @@ export const isOccupied = (board: GoBoard, move: Field): boolean => {
     )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isSuicide = (board: GoBoard, move: Field): boolean => {
     // Check Liberties on Stone
 
@@ -105,10 +106,12 @@ export const isSuicide = (board: GoBoard, move: Field): boolean => {
     return false
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isKo = (board: GoBoard, move: Field): boolean => {
     return false
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
