@@ -60,10 +60,6 @@ const NavButton = styled.div`
     height: 100%;
 `
 
-const Message = styled.div`
-    height: 50px;
-`
-
 const HomePage: FC = () => {
     return (
         <Layout>
@@ -74,7 +70,6 @@ const HomePage: FC = () => {
             <GlobalStyle />
             <Header>Go</Header>
             <Content>
-                <Message>Schwarz am Zug </Message>
                 <Goban size={9} />
             </Content>
             <Nav>

@@ -13,6 +13,9 @@ const TileRow = styled.div`
     display: flex;
     flex-direction: row;
 `
+const Message = styled.div`
+    height: 50px;
+`
 
 const Goban: FC<Props> = props => {
     const [board, setBoard] = useState(generateBoardLayout(props.size))
@@ -37,12 +40,17 @@ const Goban: FC<Props> = props => {
 
     return (
         <>
+            <Message>
+                {currentPlayer === PlayerColor.BLACK ? 'Schwarz' : 'Weiss'} am
+                Zug
+            </Message>
             {rows.map((rows, i) => (
                 <TileRow key={i}>
                     {rows.map((field, j) => (
                         <Tile
                             key={j}
                             // TODO: should not use arrow functions
+                            // eslint-disable-next-line react/jsx-no-bind
                             clickHandler={() => handleTileClick(field.vertex)}
                             currentPlayer={currentPlayer}
                             field={field}
