@@ -98,7 +98,7 @@ const HomePage: FC = () => {
                 })
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [localUser])
 
     const handleEmailInput = useCallback(
         event => setEmail(event.target.value),
@@ -159,12 +159,7 @@ const HomePage: FC = () => {
                 .post<Game>(url, { title: gameTitle, userId: localUser.id })
                 .then(r => {
                     if (r.status === 200) {
-                        setGames(() => {
-                            // TODO: there is a fancier way for this
-                            const newGames = games
-                            newGames.push(r.data)
-                            return newGames
-                        })
+                        setGames([...games, r.data])
                     }
                     setError(null)
                     setLoading(false)

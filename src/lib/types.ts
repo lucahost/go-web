@@ -22,6 +22,7 @@ export type Game = {
     title: string
     createdAt: Date
     updatedAt: Date
+    gameState: number
     authorId: number | null
 }
 
