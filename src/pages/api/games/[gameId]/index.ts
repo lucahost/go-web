@@ -1,11 +1,15 @@
+import { Game, PrismaClient } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../../lib/types'
 
-type Data = {
-    name: string
-}
+type GameResponse = Game | never
 
-export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
+const prisma = new PrismaClient()
+
+export default async (
+    req: NextApiRequest,
+    res: NextApiResponse<GameResponse>
+) => {
     const {
         query: { gameId },
         method,
@@ -13,8 +17,21 @@ export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
     switch (method) {
         case HttpMethod.GET:
-            // TODO: Return game by id
-            res.status(200).json({ name: `TODO: Show game ${gameId}` })
+            const gId = Number(gameId)
+            if (isNaN(gId)) {
+                res.status(400).end(`${gId} is not a valid gameId`)
+                return
+            }
+            const existingGame = await prisma.game.findUnique({
+                where: {
+                    id: gId,
+                },
+            })
+            if (existingGame) {
+                res.status(200).json(existingGame)
+            } else {
+                res.status(404).end()
+            }
             break
         case HttpMethod.DELETE:
             // TODO: Stop game by id
