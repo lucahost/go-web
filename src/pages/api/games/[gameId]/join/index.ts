@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../../../lib/types'
 
@@ -5,7 +6,9 @@ type Data = {
     name: string
 }
 
-export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
+const prisma = new PrismaClient()
+
+export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     const {
         query: { gameId },
         method,
@@ -13,7 +16,21 @@ export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
     switch (method) {
         case HttpMethod.POST:
-            // TODO: Join a game by game id (request param) and user id (body)
+            const gId = Number(gameId)
+            if (isNaN(gId)) {
+                res.status(400).end(`invalid gameId ${gameId}`)
+                break
+            }
+
+            const existingGame = await prisma.game.findUnique({
+                where: { id: gId },
+            })
+
+            if (!existingGame) {
+                res.status(404).end(`game with id ${gId} does not exist`)
+                break
+            }
+
             res.status(200).json({ name: `TODO: Join game ${gameId}` })
             break
         default:
