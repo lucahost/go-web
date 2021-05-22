@@ -52,7 +52,7 @@ const HomePage: FC = () => {
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
         if (localUser) {
-            const url = `http://localhost:3000/api/users/${localUser.id}`
+            const url = `/api/users/${localUser.id}`
             axios
                 .get<User>(url)
                 .then(r => {
@@ -66,7 +66,7 @@ const HomePage: FC = () => {
                 })
         }
         if (localGame) {
-            const url = `http://localhost:3000/api/games/${localGame.id}`
+            const url = `/api/games/${localGame.id}`
             axios
                 .get<Game>(url)
                 .then(r => {
@@ -84,7 +84,7 @@ const HomePage: FC = () => {
 
     useEffect(() => {
         if (localUser) {
-            const url = `http://localhost:3000/api/games`
+            const url = `/api/games`
             axios
                 .get<Game[]>(url)
                 .then(r => {
@@ -160,6 +160,7 @@ const HomePage: FC = () => {
                 .then(r => {
                     if (r.status === 200) {
                         setGames([...games, r.data])
+                        setLocalGame(r.data)
                     }
                     setError(null)
                     setLoading(false)
