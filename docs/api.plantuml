@@ -1,0 +1,42 @@
+@startuml
+
+group Onboarding [Initial]
+    group User creation
+        Client -> API: Create user POST /api/users
+        API --> DB: Create if not exists
+        API <-- DB: Return user object
+        Client <-- API: 200 OK / 201 Created / 400 Bad request
+    end
+    group Find users
+        Client -> API: Get user GET /api/users
+        API --> DB: Get users
+        API <-- DB: Return users lists
+        Client <-- API: 200 OK / 400 Bad request
+    end
+    group Get User data
+        Client -> API: Get user GET /api/users/:id
+        API --> DB: Get user with id :id
+        API <-- DB: Return user object
+        Client <-- API: 200 OK / 400 Bad request
+    end
+    group Find games
+        Client -> API: Get games GET /api/games
+        API --> DB: Get games
+        API <-- DB: Return games list
+        Client <-- API: 200 OK
+    end
+    group Create game
+        Client -> API: Create game POST /api/games
+        API --> DB: Create if not exists
+        API <-- DB: Return game object
+        Client <-- API: 200 OK / 400 Bad request
+    end
+    group Get game data
+        Client -> API: Get game GET /api/games/:id
+        API --> DB: Get game with id :id
+        API <-- DB: Return game object
+        Client <-- API: 200 OK
+    end
+end
+
+@enduml
