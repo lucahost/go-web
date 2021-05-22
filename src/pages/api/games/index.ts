@@ -1,4 +1,4 @@
-import { Game, Prisma, PrismaClient } from '.prisma/client'
+import { Game, PrismaClient } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../lib/types'
 
