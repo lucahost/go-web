@@ -11,6 +11,12 @@ export type GoBoard = {
     width: number
 }
 
+export type User = {
+    id: number
+    email: string
+    name?: string
+}
+
 export type Player = {
     identifier: string
     name: string

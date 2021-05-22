@@ -1,32 +1,10 @@
-import Head from 'next/head'
-import React, { FC } from 'react'
-import { GlobalStyle } from '../lib/theme'
-import styled from 'styled-components'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
-
-const Layout = styled.div`
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    height: 100%;
-`
-
-const Header = styled.div`
-    align-items: center;
-    display: flex;
-    justify-content: flex-start;
-
-    background-color: #252525;
-
-    font-size: 24px;
-    text-transform: uppercase;
-    font-weight: bold;
-
-    width: 100%;
-    height: 50px;
-    padding: 0 20px;
-`
+import { GetServerSideProps } from 'next'
+import styled from 'styled-components'
+import useLocalStorage from '../lib/hooks/useLocalStorage'
+import { User } from '../lib/types'
+import axios from 'axios'
 
 const Content = styled.div`
     flex: 1;
@@ -61,22 +39,95 @@ const NavButton = styled.div`
 `
 
 const HomePage: FC = () => {
+    const [user, setUser] = useLocalStorage<User | null>('user', null)
+
+    const [loading, setLoading] = useState(false)
+    const [email, setEmail] = useState<string>('')
+    const [name, setName] = useState<string>('')
+
+    /* TODO: if there is a user already in the local storage: check if it is still valid
+    useEffect(() => {
+        if (user) {
+            setLoading(true)
+            const url = `http://localhost:3000/api/users/${user.id}`
+            axios
+                .get<User>(url)
+                .then(r => {
+                    if (r.status !== 200) {
+                        setUser(null)
+                    }
+                    setLoading(false)
+                })
+                .catch(e => {
+                    console.log(e)
+                    setUser(null)
+                    setLoading(false)
+                })
+        }
+    }, [setUser, user])
+    */
+
+    const handleEmailInput = useCallback(
+        event => setEmail(event.target.value),
+        []
+    )
+
+    const handleNameInput = useCallback(
+        event => setName(event.target.value),
+        []
+    )
+
+    const handleLogin = useCallback(() => {
+        if (email !== '') {
+            const url = `http://localhost:3000/api/users`
+            setLoading(true)
+            axios
+                .post<User>(url, { name: name, email: email })
+                .then(r => {
+                    setUser(r.data)
+                    setLoading(false)
+                })
+        }
+    }, [email, name, setUser])
+
+    const handleLogout = useCallback(() => {
+        setEmail('')
+        setUser(null)
+    }, [setUser])
+
     return (
-        <Layout>
-            <Head>
-                <title>Go</title>
-                <link href="/favicon.ico" rel="icon" />
-            </Head>
-            <GlobalStyle />
-            <Header>Go</Header>
+        <>
             <Content>
-                <Goban size={9} />
+                {loading ? (
+                    <h1>Loading</h1>
+                ) : !user ? (
+                    <>
+                        <h1>Bitte anmelden</h1>
+                        <input
+                            onChange={handleNameInput}
+                            placeholder="Name eingeben"
+                        />
+                        <input
+                            onChange={handleEmailInput}
+                            placeholder="Email eingeben"
+                        />
+                        <button onClick={handleLogin}>Go</button>
+                    </>
+                ) : (
+                    <>
+                        <h1>
+                            Hello {user.name} (
+                            <a onClick={handleLogout}>Logout</a>)
+                        </h1>
+                        <Goban size={9} />
+                    </>
+                )}
             </Content>
             <Nav>
                 <NavButton>Neues Spiel</NavButton>
                 <NavButton>Passen</NavButton>
             </Nav>
-        </Layout>
+        </>
     )
 }
 
