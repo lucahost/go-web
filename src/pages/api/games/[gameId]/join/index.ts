@@ -1,14 +1,15 @@
-import { PrismaClient } from '@prisma/client'
+import { Game, PrismaClient } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../../../lib/types'
 
-type Data = {
-    name: string
-}
+type JoinGameResponseData = Game | never
 
 const prisma = new PrismaClient()
 
-export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+export default async (
+    req: NextApiRequest,
+    res: NextApiResponse<JoinGameResponseData>
+) => {
     const {
         query: { gameId },
         method,
@@ -31,7 +32,15 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                 break
             }
 
-            res.status(200).json({ name: `TODO: Join game ${gameId}` })
+            await prisma.userGames.create({
+                data: {
+                    playerColor: 'WHITE',
+                    gameId: existingGame.id,
+                    userId: existingGame.id,
+                },
+            })
+
+            res.status(200).json(existingGame)
             break
         default:
             res.setHeader('Allow', [HttpMethod.GET, HttpMethod.POST])

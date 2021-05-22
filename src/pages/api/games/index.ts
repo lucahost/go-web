@@ -38,6 +38,13 @@ const apiMethod = async (
                 title: title,
             }
             const newGame = await prisma.game.create({ data: gameData })
+            await prisma.userGames.create({
+                data: {
+                    playerColor: 'WHITE',
+                    gameId: newGame.id,
+                    userId: author.id,
+                },
+            })
             res.status(200).json(newGame)
             break
         default:
