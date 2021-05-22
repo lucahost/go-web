@@ -17,6 +17,14 @@ export type User = {
     name?: string
 }
 
+export type Game = {
+    id: number
+    title: string
+    createdAt: Date
+    updatedAt: Date
+    authorId: number | null
+}
+
 export type Player = {
     identifier: string
     name: string

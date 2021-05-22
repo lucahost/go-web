@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
 import styled from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
-import { User } from '../lib/types'
+import { Game, User } from '../lib/types'
 import axios from 'axios'
 
 const Content = styled.div`
@@ -38,26 +38,63 @@ const NavButton = styled.div`
 `
 
 const HomePage: FC = () => {
-    const [user, setUser] = useLocalStorage<User | null>('user', null)
+    const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
+
+    const [games, setGames] = useState<Game[]>([])
 
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [email, setEmail] = useState<string>('')
     const [name, setName] = useState<string>('')
+    const [gameTitle, setGameTitle] = useState<string>('')
 
-    // if there is a user already in the local storage: check if it is still valid
+    // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
-        if (user) {
-            const url = `http://localhost:3000/api/users/${user.id}`
+        if (localUser) {
+            const url = `http://localhost:3000/api/users/${localUser.id}`
             axios
                 .get<User>(url)
                 .then(r => {
                     if (r.status !== 200) {
-                        setUser(null)
+                        setLocalUser(null)
                     }
                 })
                 .catch(e => {
                     console.log(e)
+                    setLocalUser(null)
+                })
+        }
+        if (localGame) {
+            const url = `http://localhost:3000/api/games/${localGame.id}`
+            axios
+                .get<Game>(url)
+                .then(r => {
+                    if (r.status !== 200) {
+                        setLocalGame(null)
+                    }
+                })
+                .catch(e => {
+                    console.log(e)
+                    setLocalGame(null)
+                })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        if (localUser) {
+            const url = `http://localhost:3000/api/games`
+            axios
+                .get<Game[]>(url)
+                .then(r => {
+                    if (r.status === 200) {
+                        setGames(r.data)
+                    }
+                })
+                .catch(e => {
+                    console.log(e)
+                    setGames([])
                 })
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,6 +110,15 @@ const HomePage: FC = () => {
         []
     )
 
+    const handleGameTitleInput = useCallback(
+        event => setGameTitle(event.target.value),
+        []
+    )
+
+    const handleGameSelect = useCallback(game => {
+        setLocalGame(game)
+    }, [])
+
     const handleLogin = useCallback(() => {
         if (email !== '') {
             const url = `/api/users`
@@ -80,7 +126,9 @@ const HomePage: FC = () => {
             axios
                 .post<User>(url, { name: name, email: email })
                 .then(r => {
-                    setUser(r.data)
+                    if (r.status === 200 || r.status === 201) {
+                        setLocalUser(r.data)
+                    }
                     setError(null)
                     setLoading(false)
                 })
@@ -90,19 +138,47 @@ const HomePage: FC = () => {
                     setLoading(false)
                 })
         }
-    }, [email, name, setUser])
+    }, [email, name, setLocalUser])
 
     const handleLogout = useCallback(() => {
         setEmail('')
-        setUser(null)
-    }, [setUser])
+        setLocalUser(null)
+    }, [setLocalUser])
+
+    const handleCreateGame = useCallback(() => {
+        if (gameTitle !== '' && localUser) {
+            console.log('handleCreateGame')
+
+            const url = `/api/games`
+            setLoading(true)
+            axios
+                .post<Game>(url, { title: gameTitle, userId: localUser.id })
+                .then(r => {
+                    if (r.status === 200) {
+                        setGames(() => {
+                            // TODO: there is a fancier way for this
+                            const newGames = games
+                            newGames.push(r.data)
+                            return newGames
+                        })
+                    }
+                    setError(null)
+                    setLoading(false)
+                })
+                .catch(e => {
+                    console.log(e)
+                    setError('Fehler beim Spiel erstellen')
+                    setLoading(false)
+                })
+        }
+    }, [gameTitle, games, localUser])
 
     return (
         <>
             <Content>
                 {loading ? (
                     <h1>Loading</h1>
-                ) : !user ? (
+                ) : !localUser ? (
                     <>
                         <h1>Bitte anmelden</h1>
                         {error && <p>{error}</p>}
@@ -116,13 +192,35 @@ const HomePage: FC = () => {
                         />
                         <button onClick={handleLogin}>Go</button>
                     </>
-                ) : (
+                ) : localGame ? (
                     <>
                         <h1>
-                            Hello {user.name} (
+                            Hello {localUser.name} (
                             <a onClick={handleLogout}>Logout</a>)
                         </h1>
                         <Goban size={9} />
+                    </>
+                ) : (
+                    <>
+                        <h1>Games</h1>
+                        {error && <p>{error}</p>}
+                        {games.length < 1 && <p>No games</p>}
+                        {games.map(game => {
+                            return (
+                                <p
+                                    key={game.id}
+                                    onClick={() => handleGameSelect(game)}
+                                >
+                                    {game.title} {game.authorId}{' '}
+                                    {game.createdAt} {game.updatedAt}
+                                </p>
+                            )
+                        })}
+                        <input
+                            onChange={handleGameTitleInput}
+                            placeholder="Name eingeben"
+                        />
+                        <button onClick={handleCreateGame}>Create Game</button>
                     </>
                 )}
             </Content>
