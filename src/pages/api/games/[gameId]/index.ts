@@ -35,7 +35,7 @@ export default async (
             break
         case HttpMethod.DELETE:
             // TODO: Stop game by id
-            res.status(200).json({ name: `TODO: Stop game ${gameId}` })
+            res.status(200).end(`TODO: Stop game ${gameId}`)
             break
         default:
             res.setHeader('Allow', [HttpMethod.GET, HttpMethod.POST])
