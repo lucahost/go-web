@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
-import { GetServerSideProps } from 'next'
 import styled from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { User } from '../lib/types'
@@ -41,14 +40,14 @@ const NavButton = styled.div`
 const HomePage: FC = () => {
     const [user, setUser] = useLocalStorage<User | null>('user', null)
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
     const [email, setEmail] = useState<string>('')
     const [name, setName] = useState<string>('')
 
-    /* TODO: if there is a user already in the local storage: check if it is still valid
+    // if there is a user already in the local storage: check if it is still valid
     useEffect(() => {
         if (user) {
-            setLoading(true)
             const url = `http://localhost:3000/api/users/${user.id}`
             axios
                 .get<User>(url)
@@ -56,16 +55,13 @@ const HomePage: FC = () => {
                     if (r.status !== 200) {
                         setUser(null)
                     }
-                    setLoading(false)
                 })
                 .catch(e => {
                     console.log(e)
-                    setUser(null)
-                    setLoading(false)
                 })
         }
-    }, [setUser, user])
-    */
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleEmailInput = useCallback(
         event => setEmail(event.target.value),
@@ -79,12 +75,18 @@ const HomePage: FC = () => {
 
     const handleLogin = useCallback(() => {
         if (email !== '') {
-            const url = `http://localhost:3000/api/users`
+            const url = `/api/users`
             setLoading(true)
             axios
                 .post<User>(url, { name: name, email: email })
                 .then(r => {
                     setUser(r.data)
+                    setError(null)
+                    setLoading(false)
+                })
+                .catch(e => {
+                    console.log(e)
+                    setError('Fehler bei Anmeldung')
                     setLoading(false)
                 })
         }
@@ -103,6 +105,7 @@ const HomePage: FC = () => {
                 ) : !user ? (
                     <>
                         <h1>Bitte anmelden</h1>
+                        {error && <p>{error}</p>}
                         <input
                             onChange={handleNameInput}
                             placeholder="Name eingeben"
