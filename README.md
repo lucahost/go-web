@@ -21,4 +21,3 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 ## DB / Prisma
 
 To reset and seed the db with initial data run `npx prisma migrate reset`
- 

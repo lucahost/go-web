@@ -1,17 +1,31 @@
+import { Game, PrismaClient } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../lib/types'
 
-type Data = {
-    name: string
+type GameResponseData = Game[] | never
+
+type CreateGameDto = {
+    userId: string
 }
 
-const apiMethod = (req: NextApiRequest, res: NextApiResponse<Data>) => {
+type NextApiRequestWithCreateGameDto = NextApiRequest & CreateGameDto
+
+const prisma = new PrismaClient()
+
+const apiMethod = (
+    req: NextApiRequest,
+    res: NextApiResponse<GameResponseData>
+) => {
     const { method } = req
 
     switch (method) {
         case HttpMethod.GET:
-            // TODO: Return list of games
-            res.status(200).json({ name: 'Get /games' })
+            prisma.game.findMany({
+                where: {
+                    gameState: 0,
+                },
+            })
+            res.status(200).json()
             break
         case HttpMethod.POST:
             // TODO: Start new game and return game state
