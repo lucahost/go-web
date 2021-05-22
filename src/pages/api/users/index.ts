@@ -36,9 +36,7 @@ const apiMethod = async (
                 },
             })
             if (existingUser) {
-                res.status(400).end(
-                    `user with email ${body.email} already exists`
-                )
+                res.status(200).json(existingUser)
                 return
             }
 
