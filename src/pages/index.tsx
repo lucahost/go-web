@@ -115,9 +115,12 @@ const HomePage: FC = () => {
         []
     )
 
-    const handleGameSelect = useCallback(game => {
-        setLocalGame(game)
-    }, [])
+    const handleGameSelect = useCallback(
+        game => {
+            setLocalGame(game)
+        },
+        [setLocalGame]
+    )
 
     const handleLogin = useCallback(() => {
         if (email !== '') {
@@ -143,6 +146,7 @@ const HomePage: FC = () => {
     const handleLogout = useCallback(() => {
         setEmail('')
         setLocalUser(null)
+        setLocalGame(null)
     }, [setLocalUser])
 
     const handleCreateGame = useCallback(() => {
