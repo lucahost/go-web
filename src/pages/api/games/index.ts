@@ -6,17 +6,17 @@ type GameResponseData = Game[] | Game | never
 
 type CreateGameDto = {
     userId: number
+    title: string
 }
-
-type NextApiRequestWithCreateGameDto = NextApiRequest & CreateGameDto
 
 const prisma = new PrismaClient()
 
 const apiMethod = async (
-    req: NextApiRequestWithCreateGameDto,
+    req: NextApiRequest,
     res: NextApiResponse<GameResponseData>
 ) => {
-    const { method, body } = req
+    const { method } = req
+    const { userId, title } = req.body as CreateGameDto
 
     switch (method) {
         case HttpMethod.GET:
@@ -24,10 +24,18 @@ const apiMethod = async (
             res.status(200).json(games)
             break
         case HttpMethod.POST:
-            // TODO: create new game and return game state
-            const createGameDto: CreateGameDto = body
+            const author = await prisma.user.findUnique({
+                where: { id: userId },
+            })
+
+            if (!author) {
+                res.status(400).end(`user ${userId} does not exist.`)
+                break
+            }
+
             const gameData = {
-                authorId: createGameDto.userId,
+                authorId: author.id,
+                title: title,
             }
             const newGame = await prisma.game.create({ data: gameData })
             res.status(200).json(newGame)
