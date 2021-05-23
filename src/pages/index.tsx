@@ -1,9 +1,11 @@
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect } from 'react'
 import Goban from '../components/goban'
 import styled from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
+import Login from '../components/login'
+import GameList from '../components/gameList'
 
 const Content = styled.div`
     flex: 1;
@@ -37,17 +39,21 @@ const NavButton = styled.div`
     height: 100%;
 `
 
+const Header = styled.div`
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+
+    background-color: #252525;
+
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+`
+
 const HomePage: FC = () => {
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
-
-    const [games, setGames] = useState<Game[]>([])
-
-    const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
-    const [email, setEmail] = useState<string>('')
-    const [name, setName] = useState<string>('')
-    const [gameTitle, setGameTitle] = useState<string>('')
 
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
@@ -60,8 +66,7 @@ const HomePage: FC = () => {
                         setLocalUser(null)
                     }
                 })
-                .catch(e => {
-                    console.log(e)
+                .catch(() => {
                     setLocalUser(null)
                 })
         }
@@ -74,160 +79,50 @@ const HomePage: FC = () => {
                         setLocalGame(null)
                     }
                 })
-                .catch(e => {
-                    console.log(e)
+                .catch(() => {
                     setLocalGame(null)
                 })
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    useEffect(() => {
-        if (localUser) {
-            const url = `/api/games`
-            axios
-                .get<Game[]>(url)
-                .then(r => {
-                    if (r.status === 200) {
-                        setGames(r.data)
-                    }
-                })
-                .catch(e => {
-                    console.log(e)
-                    setGames([])
-                })
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [localUser])
-
-    const handleEmailInput = useCallback(
-        event => setEmail(event.target.value),
-        []
-    )
-
-    const handleNameInput = useCallback(
-        event => setName(event.target.value),
-        []
-    )
-
-    const handleGameTitleInput = useCallback(
-        event => setGameTitle(event.target.value),
-        []
-    )
-
-    const handleGameSelect = useCallback(
-        game => {
-            setLocalGame(game)
-        },
-        [setLocalGame]
-    )
-
-    const handleLogin = useCallback(() => {
-        if (email !== '') {
-            const url = `/api/users`
-            setLoading(true)
-            axios
-                .post<User>(url, { name: name, email: email })
-                .then(r => {
-                    if (r.status === 200 || r.status === 201) {
-                        setLocalUser(r.data)
-                    }
-                    setError(null)
-                    setLoading(false)
-                })
-                .catch(e => {
-                    console.log(e)
-                    setError('Fehler bei Anmeldung')
-                    setLoading(false)
-                })
-        }
-    }, [email, name, setLocalUser])
-
     const handleLogout = useCallback(() => {
-        setEmail('')
         setLocalUser(null)
         setLocalGame(null)
-    }, [setLocalUser])
+    }, [setLocalGame, setLocalUser])
 
-    const handleCreateGame = useCallback(() => {
-        if (gameTitle !== '' && localUser) {
-            console.log('handleCreateGame')
-
-            const url = `/api/games`
-            setLoading(true)
-            axios
-                .post<Game>(url, { title: gameTitle, userId: localUser.id })
-                .then(r => {
-                    if (r.status === 200) {
-                        setGames([...games, r.data])
-                        setLocalGame(r.data)
-                    }
-                    setError(null)
-                    setLoading(false)
-                })
-                .catch(e => {
-                    console.log(e)
-                    setError('Fehler beim Spiel erstellen')
-                    setLoading(false)
-                })
-        }
-    }, [gameTitle, games, localUser])
+    const handleNewGame = useCallback(() => {
+        setLocalGame(null)
+    }, [setLocalGame])
 
     return (
         <>
+            <Header>
+                <h1>Go</h1>
+                {localUser && (
+                    <h3>
+                        <a onClick={handleLogout}>Logout</a>
+                    </h3>
+                )}
+            </Header>
             <Content>
-                {loading ? (
-                    <h1>Loading</h1>
-                ) : !localUser ? (
-                    <>
-                        <h1>Bitte anmelden</h1>
-                        {error && <p>{error}</p>}
-                        <input
-                            onChange={handleNameInput}
-                            placeholder="Name eingeben"
-                        />
-                        <input
-                            onChange={handleEmailInput}
-                            placeholder="Email eingeben"
-                        />
-                        <button onClick={handleLogin}>Go</button>
-                    </>
+                {!localUser ? (
+                    <Login />
                 ) : localGame ? (
                     <>
-                        <h1>
-                            Hello {localUser.name} (
-                            <a onClick={handleLogout}>Logout</a>)
-                        </h1>
+                        <h1>Hello {localUser.name}</h1>
                         <Goban size={9} />
                     </>
                 ) : (
-                    <>
-                        <h1>Games</h1>
-                        {error && <p>{error}</p>}
-                        {games.length < 1 && <p>No games</p>}
-                        {games.map(game => {
-                            return (
-                                <p
-                                    key={game.id}
-                                    onClick={() => handleGameSelect(game)}
-                                >
-                                    {game.title} {game.authorId}{' '}
-                                    {game.createdAt} {game.updatedAt}
-                                </p>
-                            )
-                        })}
-                        <input
-                            onChange={handleGameTitleInput}
-                            placeholder="Name eingeben"
-                        />
-                        <button onClick={handleCreateGame}>Create Game</button>
-                    </>
+                    <GameList />
                 )}
             </Content>
-            <Nav>
-                <NavButton>Neues Spiel</NavButton>
-                <NavButton>Passen</NavButton>
-            </Nav>
+            {localUser && localGame && (
+                <Nav>
+                    <NavButton onClick={handleNewGame}>Neues Spiel</NavButton>
+                    <NavButton>Passen</NavButton>
+                </Nav>
+            )}
         </>
     )
 }

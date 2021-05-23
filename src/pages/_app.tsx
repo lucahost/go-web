@@ -12,22 +12,6 @@ const Layout = styled.div`
     height: 100%;
 `
 
-const Header = styled.div`
-    align-items: center;
-    display: flex;
-    justify-content: flex-start;
-
-    background-color: #252525;
-
-    font-size: 24px;
-    text-transform: uppercase;
-    font-weight: bold;
-
-    width: 100%;
-    height: 50px;
-    padding: 0 20px;
-`
-
 const App: FC<AppProps> = ({ Component, pageProps }) => {
     return (
         <Layout>
@@ -36,7 +20,6 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                 <link href="/favicon.ico" rel="icon" />
             </Head>
             <GlobalStyle />
-            <Header>Go</Header>
             <Component {...pageProps} />
         </Layout>
     )
