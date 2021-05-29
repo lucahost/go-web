@@ -17,6 +17,10 @@ const Message = styled.div`
     height: 50px;
 `
 
+const Captures = styled.div`
+    height: 50px;
+`
+
 const Goban: FC<Props> = props => {
     const [board, setBoard] = useState(generateBoardLayout(props.size))
     const [rows, setRows] = useState(chunk(board, props.size))
@@ -49,7 +53,6 @@ const Goban: FC<Props> = props => {
                     {rows.map((field, j) => (
                         <Tile
                             key={j}
-                            // TODO: should not use arrow functions
                             // eslint-disable-next-line react/jsx-no-bind
                             clickHandler={() => handleTileClick(field.vertex)}
                             currentPlayer={currentPlayer}
@@ -58,6 +61,10 @@ const Goban: FC<Props> = props => {
                     ))}
                 </TileRow>
             ))}
+            <Captures>
+                <p>White: 0</p>
+                <p>Black: 1</p>
+            </Captures>
         </>
     )
 }

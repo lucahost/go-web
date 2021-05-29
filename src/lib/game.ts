@@ -41,10 +41,8 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     }
     if (isSuicide(board, move)) {
         // Handle suicide
-        throw new Error()
+        throw new Error('Suicide')
     }
-    // Handle capture
-    board = handleCapture(board, move)
 
     // Handle Ko
     if (isKo(board, move)) {
@@ -54,6 +52,8 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     // From here on: Valid move !
     // Add move to fields
     board = setStone(board, move)
+    // Handle capture
+    board = handleCapture(board, move)
     // Switch current player
     board = switchPlayer(board)
     // Reset passes on players if not a double-pass
@@ -67,7 +67,7 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
 
 export const pass = (board: GoBoard): GoBoard => {
     if (board.pass) {
-        // Handle double-pass
+        // TODO: Handle double-pass
         return board
     } else {
         return { ...board, pass: true }
@@ -100,19 +100,24 @@ export const isOccupied = (board: GoBoard, move: Field): boolean => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isSuicide = (board: GoBoard, move: Field): boolean => {
     // Check Liberties on Stone
-
     // Should be done recursively - Big Boundaries
 
-    return false
+    return getLiberties(board, move).length === 0
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isKo = (board: GoBoard, move: Field): boolean => {
+    // if board would look the same after performing the move
+    // return true
+    // else
     return false
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
+    // get neighbors of move of opposite color
+    // check liberties of neighbors of opposite color
+    // if 0 -> remove & add to board.captures
     return board
 }
 

@@ -2,6 +2,22 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
+import styled from 'styled-components'
+import Spinner from './spinner'
+
+const Table = styled.table`
+    padding: 20px;
+`
+
+const TableHead = styled.th`
+    text-align: left;
+    padding-right: 50px;
+`
+
+const TableData = styled.td`
+    text-align: left;
+    padding-right: 50px;
+`
 
 const GameList: FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -94,25 +110,48 @@ const GameList: FC = () => {
     }, [gameTitle, games, localUser, setLocalGame])
 
     return loading ? (
-        <h1>Loading</h1>
+        <Spinner />
     ) : (
         <>
             <h1>Games</h1>
             {error && <p>{error}</p>}
             {games.length < 1 && <p>No games</p>}
-            {games.map(game => {
-                return (
-                    <p key={game.id} onClick={() => handleGameSelect(game)}>
-                        {game.title} {game.authorId} {game.createdAt}{' '}
-                        {game.updatedAt}
-                    </p>
-                )
-            })}
-            <input
-                onChange={handleGameTitleInput}
-                placeholder="Name eingeben"
-            />
-            <button onClick={handleCreateGame}>Create Game</button>
+            <Table>
+                <tr>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>State</TableHead>
+                    <TableHead>Created</TableHead>
+                </tr>
+                {games.map(game => {
+                    return (
+                        <tr
+                            key={game.id}
+                            onClick={() => handleGameSelect(game)}
+                        >
+                            <TableData>{game.id}</TableData>
+                            <TableData>{game.title}</TableData>
+                            <TableData>
+                                {game.gameState === 0
+                                    ? 'Initialized'
+                                    : game.gameState === 1
+                                    ? 'Running'
+                                    : game.gameState === 2
+                                    ? 'Ended'
+                                    : 'Unknown'}
+                            </TableData>
+                            <TableData>{game.createdAt}</TableData>
+                        </tr>
+                    )
+                })}
+            </Table>
+            <span>
+                <input
+                    onChange={handleGameTitleInput}
+                    placeholder="Name eingeben"
+                />
+                <button onClick={handleCreateGame}>Create Game</button>
+            </span>
         </>
     )
 }
