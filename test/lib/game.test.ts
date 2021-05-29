@@ -7,6 +7,8 @@ import {
 } from '../../src/lib/types'
 import {
     addHistory,
+    getDirectNeighborFields,
+    isOccupied,
     isSuicide,
     move,
     pass,
@@ -21,14 +23,16 @@ import { board as suicideBoard } from '../boards/5_suicide_test_board.json'
 
 describe('Game Initialization', () => {
     it('should return GoBoard', () => {
-        const players = [
-            createPlayer('Player1', PlayerColor.BLACK),
-            createPlayer('Player2', PlayerColor.WHITE),
-        ] as [Player, Player]
+        const player1 = createPlayer('Player1', PlayerColor.BLACK)
+        const player2 = createPlayer('Player2', PlayerColor.WHITE)
+
+        const players = [player1, player2] as [Player, Player]
 
         const startBoard = start(players)
 
-        expect(startBoard.fields).toStrictEqual([])
+        expect(startBoard.players).toContain(player1)
+        expect(startBoard.players).toContain(player2)
+        expect(startBoard.fields.length).toStrictEqual(81)
         expect(startBoard.status).toBe(GameState.INITIALIZED)
     })
 
@@ -36,7 +40,7 @@ describe('Game Initialization', () => {
         const goBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
         const simpleMove = {
-            vertex: [0, 0] as [number, number],
+            vertex: [1, 1] as [number, number],
             color: PlayerColor.WHITE,
             location: FieldLocation.DOWN_RIGHT,
         }
@@ -45,6 +49,48 @@ describe('Game Initialization', () => {
 
         expect(board.currentPlayer.color).toBe(PlayerColor.BLACK)
         expect(board.status).toBe(GameState.RUNNING)
+    })
+})
+
+describe('isOccupied', () => {
+    it('should throw for move out of bound', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const simpleMove = {
+            vertex: [0, 0] as [number, number],
+            color: PlayerColor.WHITE,
+            location: FieldLocation.UP_LEFT,
+        }
+
+        expect(() => isOccupied(initialBoard, simpleMove)).toThrowError(
+            /Move does not exist/
+        )
+    })
+
+    it('should return false for empty', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const simpleMove = {
+            vertex: [1, 1] as [number, number],
+            color: PlayerColor.WHITE,
+            location: FieldLocation.UP_LEFT,
+        }
+
+        const test = isOccupied(initialBoard, simpleMove)
+
+        expect(test).toBeFalsy()
+    })
+
+    it('should return true for occupied field', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        initialBoard.fields[0].color = PlayerColor.BLACK
+        const simpleMove = {
+            vertex: [1, 1] as [number, number],
+            color: PlayerColor.WHITE,
+            location: FieldLocation.UP_LEFT,
+        }
+
+        const test = isOccupied(initialBoard, simpleMove)
+
+        expect(test).toBeTruthy()
     })
 })
 
@@ -69,7 +115,7 @@ describe('Move', () => {
         const initialMove = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.WHITE,
-            location: FieldLocation.MIDDLE,
+            location: FieldLocation.UP_LEFT,
         }
 
         const board = move(initialBoard, initialMove)
@@ -77,7 +123,7 @@ describe('Move', () => {
         const preOccupiedMove = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.BLACK,
-            location: FieldLocation.MIDDLE,
+            location: FieldLocation.UP_LEFT,
         }
 
         expect(() => move(board, preOccupiedMove)).toThrowError(
@@ -146,10 +192,10 @@ describe('Set Stone', () => {
         const move = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.BLACK,
-            location: FieldLocation.MIDDLE,
+            location: FieldLocation.UP_LEFT,
         }
         const newBoard = setStone(initialBoard, move)
-        expect(newBoard.fields).toContain(move)
+        expect(newBoard.fields[0]).toEqual(move)
     })
 })
 
@@ -175,5 +221,90 @@ describe('Add History', () => {
 describe('Get Liberties', () => {
     it('should return free fields of a stone', () => {
         expect(true).toBeTruthy()
+    })
+})
+
+describe('Get Neighbors', () => {
+    it('corner stone should return 2 direct neighbors', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const move = {
+            vertex: [1, 1] as [number, number],
+            color: PlayerColor.BLACK,
+            location: FieldLocation.MIDDLE,
+        }
+        const boardWithMove = setStone(initialBoard, move)
+        const neighbors = getDirectNeighborFields(boardWithMove, move)
+
+        expect(neighbors.length).toEqual(2)
+        expect(neighbors).toContainEqual({
+            vertex: [1, 2] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.UP,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [2, 1] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.LEFT,
+        })
+    })
+    it('side stone should return 3 direct neighbors', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const move = {
+            vertex: [5, 9] as [number, number],
+            color: PlayerColor.BLACK,
+            location: FieldLocation.RIGHT,
+        }
+        const boardWithMove = setStone(initialBoard, move)
+        const neighbors = getDirectNeighborFields(boardWithMove, move)
+
+        //expect(neighbors.length).toEqual(3)
+        expect(neighbors).toContainEqual({
+            vertex: [4, 9] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.RIGHT,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [5, 8] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.MIDDLE,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [6, 9] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.RIGHT,
+        })
+    })
+    it('middle stone should return 4 direct neighbors', () => {
+        const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const move = {
+            vertex: [5, 5] as [number, number],
+            color: PlayerColor.BLACK,
+            location: FieldLocation.MIDDLE,
+        }
+
+        const boardWithMove = setStone(initialBoard, move)
+        const neighbors = getDirectNeighborFields(boardWithMove, move)
+
+        //expect(neighbors.length).toEqual(4)
+        expect(neighbors).toContainEqual({
+            vertex: [4, 5] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.MIDDLE,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [5, 4] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.MIDDLE,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [5, 6] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.MIDDLE,
+        })
+        expect(neighbors).toContainEqual({
+            vertex: [6, 5] as [number, number],
+            color: PlayerColor.EMPTY,
+            location: FieldLocation.MIDDLE,
+        })
     })
 })
