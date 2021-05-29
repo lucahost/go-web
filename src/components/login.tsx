@@ -2,6 +2,7 @@ import React, { FC, useCallback, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { User } from '../lib/types'
 import axios from 'axios'
+import Spinner from './spinner'
 
 const Login: FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,7 +45,7 @@ const Login: FC = () => {
     }, [email, name, setLocalUser])
 
     return loading ? (
-        <h1>Loading</h1>
+        <Spinner />
     ) : (
         <>
             <h1>Bitte anmelden</h1>

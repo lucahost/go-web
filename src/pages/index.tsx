@@ -6,6 +6,7 @@ import { Game, User } from '../lib/types'
 import axios from 'axios'
 import Login from '../components/login'
 import GameList from '../components/gameList'
+import Spinner from '../components/spinner'
 
 const Content = styled.div`
     flex: 1;
@@ -95,6 +96,10 @@ const HomePage: FC = () => {
         setLocalGame(null)
     }, [setLocalGame])
 
+    const handlePass = useCallback(() => {
+        setLocalGame(null)
+    }, [setLocalGame])
+
     return (
         <>
             <Header>
@@ -120,7 +125,7 @@ const HomePage: FC = () => {
             {localUser && localGame && (
                 <Nav>
                     <NavButton onClick={handleNewGame}>Neues Spiel</NavButton>
-                    <NavButton>Passen</NavButton>
+                    <NavButton onClick={handlePass}>Passen</NavButton>
                 </Nav>
             )}
         </>

@@ -3,6 +3,7 @@ import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
 import styled from 'styled-components'
+import Spinner from './spinner'
 
 const Table = styled.table`
     padding: 20px;
@@ -82,7 +83,7 @@ const GameList: FC = () => {
     }, [gameTitle, games, localUser, setLocalGame])
 
     return loading ? (
-        <h1>Loading</h1>
+        <Spinner />
     ) : (
         <>
             <h1>Games</h1>
