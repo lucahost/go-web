@@ -1,10 +1,10 @@
-import { Game, PrismaClient } from '.prisma/client'
+import { Game } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../../lib/types'
 
 type GameResponse = Game | never
 
-const prisma = new PrismaClient()
+import prisma from '../../../../lib/db'
 
 export default async (
     req: NextApiRequest,

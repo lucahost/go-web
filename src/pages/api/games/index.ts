@@ -1,5 +1,6 @@
-import { Game, PrismaClient } from '.prisma/client'
+import { Game } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import prisma from '../../../lib/db'
 import { HttpMethod } from '../../../lib/types'
 
 type GameResponseData = Game[] | Game | never
@@ -9,8 +10,6 @@ type CreateGameDto = {
     title: string
     subscription?: string
 }
-
-const prisma = new PrismaClient()
 
 const apiMethod = async (
     req: NextApiRequest,

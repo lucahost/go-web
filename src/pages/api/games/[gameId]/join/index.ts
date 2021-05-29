@@ -1,17 +1,18 @@
-import { Game, PrismaClient } from '@prisma/client'
+import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod } from '../../../../../lib/types'
 import webPush from 'web-push'
+import prisma from '../../../../../lib/db'
 
 type JoinGameResponseData = Game | never
-
-const prisma = new PrismaClient()
 
 webPush.setVapidDetails(
     `mailto:${process.env.WEB_PUSH_EMAIL}`,
     process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
     process.env.WEB_PUSH_PRIVATE_KEY ?? ''
 )
+
+const { log, error } = console
 
 export default async (
     req: NextApiRequest,
@@ -66,7 +67,6 @@ export default async (
             if (existingSubscriptions) {
                 existingSubscriptions.forEach(sub => {
                     const subscription = JSON.parse(sub.subscription)
-
                     webPush
                         .sendNotification(
                             subscription,
@@ -76,24 +76,18 @@ export default async (
                             })
                         )
                         .then(response => {
-                            res.writeHead(
-                                response.statusCode,
-                                response.headers
-                            ).end(response.body)
+                            log(
+                                `successfully send web push notification. res ${response}`
+                            )
                         })
                         .catch(err => {
-                            if ('statusCode' in err) {
-                                res.writeHead(err.statusCode, err.headers).end(
-                                    err.body
-                                )
-                            } else {
-                                console.error(err)
-                                res.statusCode = 500
-                                res.end()
-                            }
+                            error(
+                                `could not send push notifications. error ${err}`
+                            )
                         })
                 })
             }
+
             res.status(200).json(existingGame)
             break
         default:

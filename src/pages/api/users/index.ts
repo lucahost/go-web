@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient, User } from '@prisma/client'
+import { User } from '@prisma/client'
 import { HttpMethod } from '../../../lib/types'
 
 type UserResponseData = User | User[]
@@ -11,7 +11,7 @@ type CreateUserDto = {
 
 type NextApiRequestWithCreateUserDto = NextApiRequest & CreateUserDto
 
-const prisma = new PrismaClient()
+import prisma from '../../../lib/db'
 
 const apiMethod = async (
     req: NextApiRequestWithCreateUserDto,

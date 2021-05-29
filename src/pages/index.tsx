@@ -99,6 +99,12 @@ const HomePage: FC = () => {
                     ) {
                         setSubscription(sub)
                         setIsSubscribed(true)
+                        if (localUser) {
+                            setLocalUser({
+                                ...localUser,
+                                subscription: JSON.stringify(sub),
+                            })
+                        }
                     }
                 })
                 setRegistration(reg)
@@ -117,7 +123,6 @@ const HomePage: FC = () => {
             ),
         })
 
-        // TODO: you should call your API to save subscription data on server in order to send web push notification from server
         setSubscription(sub ?? null)
         setIsSubscribed(true)
         setLocalUser({ ...localUser, subscription: JSON.stringify(sub) })
@@ -128,27 +133,14 @@ const HomePage: FC = () => {
 
     const unsubscribeButtonOnClick = async () => {
         await subscription?.unsubscribe()
-        // TODO: you should call your API to delete or invalidate subscription data on server
         setSubscription(null)
         setIsSubscribed(false)
+        if (localUser) {
+            setLocalUser({ ...localUser, subscription: undefined })
+        }
         log('web push unsubscribed!')
     }
 
-    const sendNotificationButtonOnClick = async () => {
-        if (subscription == null) {
-            error('web push not subscribed')
-            return
-        }
-        await fetch('/api/notification', {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({
-                subscription,
-            }),
-        })
-    }
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
         if (localUser) {
