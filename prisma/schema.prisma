@@ -9,23 +9,34 @@ generator client {
 
 // enum not supported (PlayerColor as string)
 
+model Subscription {
+    id           Int    @id @default(autoincrement())
+    subscription String
+    User         User?  @relation(fields: [userId], references: [id])
+    userId       Int?
+    Game         Game?  @relation(fields: [gameId], references: [id])
+    gameId       Int?
+}
+
 model User {
-    id            Int         @id @default(autoincrement())
-    email         String      @unique
+    id            Int            @id @default(autoincrement())
+    email         String         @unique
     name          String?
     games         UserGames[]
-    authoredGames Game[]      @relation("Author")
+    authoredGames Game[]         @relation("Author")
+    Subscription  Subscription[]
 }
 
 model Game {
-    id        Int         @id @default(autoincrement())
-    title     String
-    createdAt DateTime    @default(now())
-    updatedAt DateTime    @updatedAt
-    gameState Int         @default(0)
-    users     UserGames[]
-    author    User?       @relation("Author", fields: [authorId], references: [id])
-    authorId  Int?
+    id            Int            @id @default(autoincrement())
+    title         String
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    gameState     Int            @default(0)
+    users         UserGames[]
+    author        User?          @relation("Author", fields: [authorId], references: [id])
+    authorId      Int?
+    subscriptions Subscription[]
 }
 
 model UserGames {

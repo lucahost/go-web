@@ -15,6 +15,7 @@ export type User = {
     id: number
     email: string
     name?: string
+    subscription?: string
 }
 
 export type Game = {

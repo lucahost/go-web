@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev -p ${PORT-3000}",
+        "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
         "build": "next build",
         "start": "next start",
         "lint": "eslint --ext=ts,tsx src",
@@ -15,22 +15,28 @@
         "test:e2e": "testcafe chrome:headless src/__tests__/e2e --app \"npm run dev\"",
         "test:watch": "jest --watch",
         "typecheck": "tsc",
-        "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"}"
+        "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"}",
+        "vapid": "web-push generate-vapid-keys"
     },
     "dependencies": {
+        "@types/workbox-window": "^4.3.3",
         "axios": "^0.21.1",
         "next": "10.0.8",
+        "next-pwa": "^5.2.21",
         "react": "17.0.1",
         "react-dom": "17.0.1",
-        "styled-components": "^5.2.1"
+        "styled-components": "^5.2.1",
+        "web-push": "^3.4.4"
     },
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "@prisma/client": "^2.23.0",
         "@testing-library/react": "^11.2.5",
         "@types/jest": "^26.0.20",
         "@types/node": "^14.17.0",
         "@types/react": "^17.0.3",
         "@types/styled-components": "^5.1.7",
+        "@types/web-push": "^3.3.0",
         "@typescript-eslint/eslint-plugin": "^4.17.0",
         "@typescript-eslint/parser": "^4.17.0",
         "eslint": "^7.21.0",

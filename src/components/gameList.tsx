@@ -39,7 +39,30 @@ const GameList: FC = () => {
 
     const handleGameSelect = useCallback(
         game => {
-            setLocalGame(game)
+            if (game !== '' && localUser) {
+                const url = `/api/games/${game.id}/join`
+                setLoading(true)
+                axios
+                    .post<Game>(url, {
+                        title: gameTitle,
+                        userId: localUser.id,
+                        subscription: localUser.subscription,
+                    })
+                    .then(r => {
+                        if (r.status === 200) {
+                            setGames([...games, r.data])
+                            setLocalGame(r.data)
+                        }
+                        setError(null)
+                        setLoading(false)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                        setError('Fehler beim Spiel erstellen')
+                        setLoading(false)
+                    })
+                setLocalGame(game)
+            }
         },
         [setLocalGame]
     )
@@ -49,7 +72,11 @@ const GameList: FC = () => {
             const url = `/api/games`
             setLoading(true)
             axios
-                .post<Game>(url, { title: gameTitle, userId: localUser.id })
+                .post<Game>(url, {
+                    title: gameTitle,
+                    userId: localUser.id,
+                    subscription: localUser.subscription,
+                })
                 .then(r => {
                     if (r.status === 200) {
                         setGames([...games, r.data])
