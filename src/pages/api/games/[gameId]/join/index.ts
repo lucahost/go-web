@@ -1,6 +1,11 @@
 import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { HttpMethod } from '../../../../../lib/types'
+import {
+    GameState,
+    GoBoard,
+    HttpMethod,
+    PlayerColor,
+} from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 
@@ -44,7 +49,7 @@ export default async (
 
             await prisma.userGames.create({
                 data: {
-                    playerColor: 'WHITE',
+                    playerColor: 'BLACK',
                     gameId: existingGame.id,
                     userId: userId,
                 },
@@ -58,6 +63,45 @@ export default async (
                         gameId: gId,
                     },
                 })
+            }
+
+            const currentPlayer = await prisma.user.findUnique({
+                where: { id: userId },
+            })
+
+            if (existingGame.authorId) {
+                const author = await prisma.user.findUnique({
+                    where: { id: existingGame.authorId },
+                })
+
+                const board = JSON.parse(existingGame.board) as GoBoard
+                if (author && board && currentPlayer) {
+                    board.currentPlayer = {
+                        color: PlayerColor.BLACK,
+                        identifier: userId,
+                        name: currentPlayer.name ?? '',
+                    }
+                    board.status = GameState.RUNNING
+                    board.players = [
+                        {
+                            identifier: String(author.id),
+                            color: PlayerColor.WHITE,
+                            name: author.name ?? '',
+                        },
+                        {
+                            identifier: userId,
+                            color: PlayerColor.BLACK,
+                            name: '',
+                        },
+                    ]
+                    existingGame.gameState = GameState.RUNNING
+                    existingGame.board = JSON.stringify(board)
+
+                    await prisma.game.update({
+                        where: { id: existingGame.id },
+                        data: { ...existingGame },
+                    })
+                }
             }
 
             const existingSubscriptions = await prisma.subscription.findMany({

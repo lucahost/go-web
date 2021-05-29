@@ -1,11 +1,9 @@
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { withNewFieldColor } from '../lib/board'
 import { chunk } from '../lib/utils'
 import Tile from './tile'
-import { Game, GoBoard, PlayerColor, Vertex } from '../lib/types'
-import { isOccupied, start } from '../lib/game'
-import { createPlayer } from '../lib/player'
+import { Game, GoBoard, Player, PlayerColor, User, Vertex } from '../lib/types'
+import { isOccupied } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 
@@ -40,15 +38,15 @@ const { log } = console
 
 const Goban: FC<Props> = props => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
-    const [board, setBoard] = useState<GoBoard>(
-        start([
-            createPlayer('a', PlayerColor.BLACK),
-            createPlayer('b', PlayerColor.WHITE),
-        ])
-    )
-    const [fields, setFields] = useState(board.fields)
-    const [rows, setRows] = useState(chunk(board.fields, props.size))
-    const [currentPlayer, setCurrentPlayer] = useState(PlayerColor.BLACK)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [currentPlayer, setCurrentPlayer] = useState<Player>()
+    const [userPlayer, setUserPlayer] = useState<Player>()
+    const [board, setBoard] = useState<GoBoard>()
+
+    const [fields, setFields] = useState(board?.fields)
+    const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
+
     const [error, setError] = useState<string | null>(null)
 
     const addErrorMessage = (message: string) => {
@@ -57,28 +55,39 @@ const Goban: FC<Props> = props => {
         return () => clearTimeout(timer)
     }
 
+    useEffect(() => {
+        if (localGame && localUser) {
+            const userPlayer = localGame.users?.find(
+                u => u.identifier === String(localUser.id)
+            )
+            setUserPlayer(userPlayer)
+        }
+    }, [localUser, localGame])
+
     const handleTileClick = useCallback(
         (vertex: Vertex) => {
             {
-                if (isOccupied(board, vertex)) {
+                if (!board || isOccupied(board, vertex)) {
                     addErrorMessage('Field is occupied')
                     return
                 }
-                const newBoard = withNewFieldColor(
-                    fields,
-                    vertex,
-                    currentPlayer
-                )
-                setFields(newBoard)
-                setRows(chunk(newBoard, props.size))
-                setCurrentPlayer(
-                    currentPlayer === PlayerColor.BLACK
-                        ? PlayerColor.WHITE
-                        : PlayerColor.BLACK
-                )
+                if (localGame) {
+                    const url = `/api/games/${localGame.id}/moves`
+                    axios
+                        .post<Game>(url, {
+                            vertex,
+                            userId: localUser?.id,
+                        })
+                        .then(r => {
+                            if (r.status === 200) {
+                                // eslint-disable-next-line no-debugger
+                                loadGame()
+                            }
+                        })
+                }
             }
         },
-        [fields, currentPlayer, board, props.size]
+        [fields, board, props.size]
     )
 
     const loadGame = useCallback(async () => {
@@ -88,9 +97,16 @@ const Goban: FC<Props> = props => {
                 .get<Game>(url)
                 .then(r => {
                     if (r.status === 200) {
-                        debugger
+                        // eslint-disable-next-line no-debugger
                         setLocalGame(r.data)
                         setBoard(r.data.board as GoBoard)
+                        if (r.data.board !== '') {
+                            const board = r.data.board as GoBoard
+                            setCurrentPlayer(board.currentPlayer)
+                            setBoard(board)
+                            setFields(board.fields)
+                            setRows(chunk(board?.fields, props.size))
+                        }
                     }
                 })
                 .catch(e => {
@@ -104,13 +120,17 @@ const Goban: FC<Props> = props => {
             loadGame()
             log(event.data.msg, event.data.url)
         })
+
+        loadGame()
     }, [])
 
     return (
         <>
             <Message>
-                {currentPlayer === PlayerColor.BLACK ? 'Schwarz' : 'Weiss'} am
-                Zug
+                {currentPlayer?.color === PlayerColor.BLACK
+                    ? 'Schwarz '
+                    : 'Weiss '}
+                am Zug (Sie sind {userPlayer?.color})
             </Message>
             <Board>
                 {error && (
@@ -120,17 +140,18 @@ const Goban: FC<Props> = props => {
                 )}
                 {rows.map((rows, i) => (
                     <TileRow key={i}>
-                        {rows.map((field, j) => (
-                            <Tile
-                                key={j}
-                                // eslint-disable-next-line react/jsx-no-bind
-                                clickHandler={() =>
-                                    handleTileClick(field.vertex)
-                                }
-                                currentPlayer={currentPlayer}
-                                field={field}
-                            />
-                        ))}
+                        {currentPlayer &&
+                            rows.map((field, j) => (
+                                <Tile
+                                    key={j}
+                                    // eslint-disable-next-line react/jsx-no-bind
+                                    clickHandler={() =>
+                                        handleTileClick(field.vertex)
+                                    }
+                                    currentPlayer={currentPlayer?.color}
+                                    field={field}
+                                />
+                            ))}
                     </TileRow>
                 ))}
             </Board>

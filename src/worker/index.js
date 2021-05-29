@@ -1,12 +1,15 @@
 /* eslint-disable no-undef */
 'use strict'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 self.addEventListener('push', function (event) {
-    event.waitUntil(
-        registration.showNotification('player update', {
-            body: 'refresh the page to show new data',
-        })
-    )
+    // eslint-disable-next-line no-console
+    console.log('got update from web-push')
+    // event.waitUntil(
+    //     registration.showNotification('player update', {
+    //         body: 'refresh the page to show new data',
+    //     })
+    // )
     clients
         .matchAll({ type: 'window', includeUncontrolled: true })
         .then(function (clientList) {

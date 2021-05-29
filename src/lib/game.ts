@@ -1,20 +1,18 @@
-import { Field, GameState, GoBoard, Player, PlayerColor, Vertex } from './types'
+import { Field, GameState, GoBoard, PlayerColor, Vertex } from './types'
 import { generateBoardLayout } from './board'
 
-export const start = (players: [Player, Player]): GoBoard => {
+export const start = (): GoBoard => {
     const width = 9
     const height = 9
 
     return {
         status: GameState.INITIALIZED,
         captures: [],
-        currentPlayer: players[0],
         fields: generateBoardLayout(width),
         height,
         history: [],
         identifier: '',
         pass: false,
-        players: players,
         width,
     }
 }
