@@ -22,7 +22,6 @@ self.addEventListener('notificationclick', function (event) {
                             client = clientList[i]
                         }
                     }
-                    client.postMessage('refresh')
                     client.navigate('/')
                     return client.focused
                 }

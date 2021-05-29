@@ -33,6 +33,7 @@ model Game {
     createdAt     DateTime       @default(now())
     updatedAt     DateTime       @updatedAt
     gameState     Int            @default(0)
+    board         String         @default("")
     users         UserGames[]
     author        User?          @relation("Author", fields: [authorId], references: [id])
     authorId      Int?

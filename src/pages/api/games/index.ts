@@ -29,8 +29,6 @@ const apiMethod = async (
                 where: { id: userId },
             })
 
-            debugger
-
             if (!author) {
                 res.status(400).end(`user ${userId} does not exist.`)
                 break
