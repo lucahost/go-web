@@ -1,6 +1,5 @@
-import { Game } from '.prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { HttpMethod } from '../../../../lib/types'
+import { HttpMethod, Game, GoBoard } from '../../../../lib/types'
 
 type GameResponse = Game | never
 
@@ -27,8 +26,12 @@ export default async (
                     id: gId,
                 },
             })
+
             if (existingGame) {
-                res.status(200).json(existingGame)
+                res.status(200).json({
+                    ...existingGame,
+                    board: JSON.parse(existingGame.board) as GoBoard,
+                })
             } else {
                 res.status(404).end()
             }

@@ -96,10 +96,7 @@ self.addEventListener('push', function (event) {
   event.waitUntil(registration.showNotification('player update', {
     body: 'refresh the page to show new data'
   }));
-});
-self.addEventListener('notificationclick', function (event) {
-  event.notification.close();
-  event.waitUntil(clients.matchAll({
+  clients.matchAll({
     type: 'window',
     includeUncontrolled: true
   }).then(function (clientList) {
@@ -112,12 +109,15 @@ self.addEventListener('notificationclick', function (event) {
         }
       }
 
-      client.navigate('/');
+      client.postMessage('game update');
       return client.focused;
     }
 
     return clients.openWindow('/');
-  }));
+  });
+});
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
 });
 
 /***/ })

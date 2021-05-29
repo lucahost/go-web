@@ -1,8 +1,8 @@
 export type GoBoard = {
     identifier: string
     fields: Field[]
-    currentPlayer: Player
-    players: [Player, Player]
+    currentPlayer?: Player
+    players?: [Player, Player]
     history: Field[]
     captures: Field[]
     status: GameState
@@ -25,6 +25,7 @@ export type Game = {
     updatedAt: Date
     gameState: number
     authorId: number | null
+    board: GoBoard
 }
 
 export type Player = {
