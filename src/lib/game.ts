@@ -1,5 +1,5 @@
-import { Field, GameState, GoBoard, Player } from './types'
-import { arrayEquals } from './utils'
+import { Field, GameState, GoBoard, Player, PlayerColor } from './types'
+import { generateBoardLayout } from './board'
 
 export const start = (players: [Player, Player]): GoBoard => {
     const width = 9
@@ -9,7 +9,7 @@ export const start = (players: [Player, Player]): GoBoard => {
         status: GameState.INITIALIZED,
         captures: [],
         currentPlayer: players[0],
-        fields: [],
+        fields: generateBoardLayout(width),
         height,
         history: [],
         identifier: '',
@@ -92,8 +92,8 @@ export const isInBounds = (board: GoBoard, move: Field): boolean => {
 export const isOccupied = (board: GoBoard, move: Field): boolean => {
     if (board.fields.length == 0) return false
 
-    return board.fields.some((field: Field) =>
-        arrayEquals(field.vertex, move.vertex)
+    return (
+        findFieldOnBoardByMoveVertices(board, move).color !== PlayerColor.EMPTY
     )
 }
 
@@ -117,7 +117,8 @@ export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
 }
 
 export const setStone = (board: GoBoard, move: Field): GoBoard => {
-    board.fields.push(move)
+    const boardField = findFieldOnBoardByMoveVertices(board, move)
+    boardField.color = move.color
     return board
 }
 
@@ -147,4 +148,59 @@ export const addHistory = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
 
-export const getLiberties = (board: GoBoard, field: Field): Field[] => [field]
+export const findFieldOnBoardByMoveVertices = (
+    board: GoBoard,
+    move: Field
+): Field => {
+    const boardField = board.fields.find(
+        field =>
+            field.vertex[0] === move.vertex[0] &&
+            field.vertex[1] === move.vertex[1]
+    )
+
+    if (!boardField) {
+        throw new Error('Move does not exist in board')
+    }
+
+    return boardField
+}
+
+export const getLiberties = (board: GoBoard, field: Field): Field[] => {
+    const directNeighborFields = getDirectNeighborFields(board, field)
+
+    return directNeighborFields.filter(
+        field => field.color === PlayerColor.EMPTY
+    )
+}
+
+export const getDirectNeighborFields = (
+    board: GoBoard,
+    field: Field
+): Field[] => {
+    const row = field.vertex[0]
+    const col = field.vertex[1]
+    const maxRow = board.height
+    const maxCol = board.width
+
+    // Walk rows up if not at max
+    return board.fields.filter(field => {
+        return (
+            // Walk rows up if not out of board
+            (row - 1 >= 1 &&
+                field.vertex[0] === row - 1 &&
+                field.vertex[1] === col) ||
+            // Walk rows down if not at max
+            (row + 1 <= maxRow &&
+                field.vertex[0] === row + 1 &&
+                field.vertex[1] === col) ||
+            // Walk cols left if not out of board
+            (col - 1 >= 1 &&
+                field.vertex[1] === col - 1 &&
+                field.vertex[0] === row) ||
+            // Walk cols right if not at max
+            (col + 1 <= maxCol &&
+                field.vertex[1] === col + 1 &&
+                field.vertex[0] === row)
+        )
+    })
+}

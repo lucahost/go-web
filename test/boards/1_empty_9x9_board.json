@@ -7,7 +7,656 @@
             "name": "Yoda",
             "color": -1
         },
-        "fields": [],
+        "fields": [
+            {
+                "vertex": [
+                    1,
+                    1
+                ],
+                "location": "ul",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    2
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    3
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    4
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    5
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    6
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    7
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    8
+                ],
+                "location": "u",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    1,
+                    9
+                ],
+                "location": "ur",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    3
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    7
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    2,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    3
+                ],
+                "location": "-",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    7
+                ],
+                "location": "-",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    3,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    3
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    7
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    4,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    3
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    5
+                ],
+                "location": "-",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    7
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    5,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    3
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    7
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    6,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    3
+                ],
+                "location": "-",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    7
+                ],
+                "location": "-",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    7,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    1
+                ],
+                "location": "l",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    2
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    3
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    4
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    5
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    6
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    7
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    8
+                ],
+                "location": "m",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    8,
+                    9
+                ],
+                "location": "r",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    1
+                ],
+                "location": "dl",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    2
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    3
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    4
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    5
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    6
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    7
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    8
+                ],
+                "location": "d",
+                "color": 0
+            },
+            {
+                "vertex": [
+                    9,
+                    9
+                ],
+                "location": "dr",
+                "color": 0
+            }
+        ],
         "height": 9,
         "history": [],
         "identifier": "",
