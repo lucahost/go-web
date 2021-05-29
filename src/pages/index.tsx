@@ -7,9 +7,8 @@ import { Game, User } from '../lib/types'
 import axios from 'axios'
 import Login from '../components/login'
 import GameList from '../components/gameList'
-import Spinner from '../components/spinner'
 
-const { log, error } = console
+const { log } = console
 
 const Content = styled.div`
     flex: 1;
@@ -225,12 +224,6 @@ const HomePage: FC = () => {
                 onClick={() => unsubscribeButtonOnClick()}
             >
                 Unsubscribe
-            </button>
-            <button
-                disabled={!isSubscribed}
-                onClick={() => sendNotificationButtonOnClick()}
-            >
-                Send Notification
             </button>
         </>
     )

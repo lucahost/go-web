@@ -25,7 +25,7 @@ export type Game = {
     updatedAt: Date
     gameState: number
     authorId: number | null
-    board: GoBoard
+    board?: GoBoard | string
 }
 
 export type Player = {

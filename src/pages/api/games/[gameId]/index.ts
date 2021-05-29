@@ -28,10 +28,13 @@ export default async (
             })
 
             if (existingGame) {
-                res.status(200).json({
+                const resObject = {
                     ...existingGame,
-                    board: JSON.parse(existingGame.board) as GoBoard,
-                })
+                } as Game
+                if (resObject.board) {
+                    resObject.board = JSON.parse(existingGame.board) as GoBoard
+                }
+                res.status(200).json(resObject)
             } else {
                 res.status(404).end()
             }

@@ -1,4 +1,4 @@
-import { Field, GameState, GoBoard, Player, PlayerColor } from './types'
+import { Field, GameState, GoBoard, Player, PlayerColor, Vertex } from './types'
 import { generateBoardLayout } from './board'
 
 export const start = (players: [Player, Player]): GoBoard => {
@@ -26,11 +26,11 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     }
 
     // Check if the color of the move matches the current players color
-    if (board.currentPlayer.color !== move.color) {
+    if (board?.currentPlayer?.color !== move.color) {
         throw new Error(`current player is not ${move.color}`)
     }
 
-    if (isOccupied(board, move)) {
+    if (isOccupied(board, move.vertex)) {
         throw new Error(
             `Move on location ${
                 move.vertex
@@ -89,12 +89,10 @@ export const isInBounds = (board: GoBoard, move: Field): boolean => {
     )
 }
 
-export const isOccupied = (board: GoBoard, move: Field): boolean => {
+export const isOccupied = (board: GoBoard, vertex: Vertex): boolean => {
     if (board.fields.length == 0) return false
 
-    return (
-        findFieldOnBoardByMoveVertices(board, move).color !== PlayerColor.EMPTY
-    )
+    return findFieldOnBoardByVertex(board, vertex).color !== PlayerColor.EMPTY
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -122,18 +120,18 @@ export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
 }
 
 export const setStone = (board: GoBoard, move: Field): GoBoard => {
-    const boardField = findFieldOnBoardByMoveVertices(board, move)
+    const boardField = findFieldOnBoardByVertex(board, move.vertex)
     boardField.color = move.color
     return board
 }
 
 export const switchPlayer = (board: GoBoard): GoBoard => {
-    if (board.players.length !== 2) {
+    if (board?.players?.length !== 2) {
         throw new Error('Incorrect count of players in game')
     }
 
-    const nextPlayer = board.players.find(
-        p => p.identifier !== board.currentPlayer.identifier
+    const nextPlayer = board?.players?.find(
+        p => p.identifier !== board?.currentPlayer?.identifier
     )
 
     if (!nextPlayer) {
@@ -153,14 +151,12 @@ export const addHistory = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
 
-export const findFieldOnBoardByMoveVertices = (
+export const findFieldOnBoardByVertex = (
     board: GoBoard,
-    move: Field
+    vertex: Vertex
 ): Field => {
     const boardField = board.fields.find(
-        field =>
-            field.vertex[0] === move.vertex[0] &&
-            field.vertex[1] === move.vertex[1]
+        field => field.vertex[0] === vertex[0] && field.vertex[1] === vertex[1]
     )
 
     if (!boardField) {
@@ -171,7 +167,7 @@ export const findFieldOnBoardByMoveVertices = (
 }
 
 export const getLiberties = (board: GoBoard, field: Field): Field[] => {
-    const directNeighborFields = getDirectNeighborFields(board, field)
+    const directNeighborFields = getDirectNeighborFields(board, field.vertex)
 
     return directNeighborFields.filter(
         field => field.color === PlayerColor.EMPTY
@@ -180,10 +176,10 @@ export const getLiberties = (board: GoBoard, field: Field): Field[] => {
 
 export const getDirectNeighborFields = (
     board: GoBoard,
-    field: Field
+    vertex: Vertex
 ): Field[] => {
-    const row = field.vertex[0]
-    const col = field.vertex[1]
+    const row = vertex[0]
+    const col = vertex[1]
     const maxRow = board.height
     const maxCol = board.width
 

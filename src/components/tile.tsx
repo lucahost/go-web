@@ -18,7 +18,6 @@ const Tile = memo(({ field, clickHandler, currentPlayer }: Props) => {
 
     return (
         <TileContainer
-            // TODO: should not use arrow functions
             // eslint-disable-next-line react/jsx-no-bind
             onClick={() => clickHandler(field.vertex)}
             // eslint-disable-next-line react/jsx-no-bind
