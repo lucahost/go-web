@@ -32,7 +32,7 @@ const gameData: Prisma.GameCreateInput[] = [
     },
 ]
 
-const userGameMapping: Prisma.UserGamesCreateInput[] = [
+const userGameMapping: Prisma.UserGameCreateInput[] = [
     {
         game: {
             connect: {
@@ -105,7 +105,7 @@ async function main() {
     }
 
     for (const ugMapping of userGameMapping) {
-        const ug = await prisma.userGames.create({
+        const ug = await prisma.userGame.create({
             data: ugMapping,
         })
         console.log(

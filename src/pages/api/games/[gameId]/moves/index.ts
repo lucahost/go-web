@@ -23,56 +23,40 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
             if (gId) {
                 const game = await prisma.game.findUnique({
                     where: { id: gId },
+                    include: {
+                        currentPlayer: true,
+                        players: true,
+                    },
                 })
                 if (game) {
                     const goBoard = JSON.parse(game.board) as GoBoard
                     // TODO: Process move and return move
                     // const newGoBoard = move(goBoard, vertex)
-                    if (goBoard.currentPlayer) {
+                    if (game.currentPlayer) {
                         goBoard.fields = withNewFieldColor(
                             goBoard.fields,
                             vertex,
-                            goBoard.currentPlayer?.color
+                            game.currentPlayer?.playerColor == 'WHITE'
+                                ? PlayerColor.WHITE
+                                : PlayerColor.BLACK
                         )
 
-                        const gamePlayers = await prisma.userGames.findMany({
-                            where: {
-                                gameId: gId,
-                            },
-                        })
-
-                        if (gamePlayers) {
-                            const nextPlayer = gamePlayers.find(
+                        if (game.players) {
+                            const nextPlayer = game.players.find(
                                 p => p.userId !== userId
                             )
 
                             if (!nextPlayer) {
                                 throw 'next player not found'
                             }
-                            const nextPlayerUser = await prisma.user.findUnique(
-                                {
-                                    where: {
-                                        id: nextPlayer.userId,
-                                    },
-                                }
-                            )
-                            if (!nextPlayerUser || !nextPlayerUser.name) {
-                                throw 'next player user not found'
-                            }
-
-                            goBoard.currentPlayer = {
-                                color:
-                                    nextPlayer?.playerColor == 'WHITE'
-                                        ? PlayerColor.WHITE
-                                        : PlayerColor.BLACK,
-                                identifier: String(nextPlayer?.userId) ?? '',
-                                name: nextPlayerUser.name,
-                            }
-                            game.board = JSON.stringify(goBoard)
 
                             await prisma.game.update({
                                 where: { id: game.id },
-                                data: { ...game },
+                                data: {
+                                    board: JSON.stringify(goBoard),
+                                    currentPlayerColor: nextPlayer.playerColor,
+                                    currentPlayerId: nextPlayer.userId,
+                                },
                             })
 
                             const existingSubscriptions = await prisma.subscription.findMany(

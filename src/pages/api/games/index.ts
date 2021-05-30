@@ -35,30 +35,44 @@ const apiMethod = async (
             }
 
             const gameData = {
-                authorId: author.id,
                 title: title,
                 board: JSON.stringify(start()),
             }
-            const newGame = await prisma.game.create({ data: gameData })
-            await prisma.userGames.create({
-                data: {
-                    playerColor: 'WHITE',
-                    gameId: newGame.id,
-                    userId: author.id,
-                },
-            })
-
-            if (subscription) {
-                await prisma.subscription.create({
+            try {
+                const newGame = await prisma.game.create({
                     data: {
-                        subscription: subscription,
-                        userId: author.id,
-                        gameId: newGame.id,
+                        ...gameData,
+                        author: { connect: { id: author.id } },
+                        players: {
+                            create: [
+                                {
+                                    userId: author.id,
+                                    playerColor: 'WHITE',
+                                },
+                            ],
+                        },
+                    },
+                    include: {
+                        author: true,
+                        players: true,
                     },
                 })
+
+                if (subscription) {
+                    await prisma.subscription.create({
+                        data: {
+                            subscription: subscription,
+                            userId: author.id,
+                            gameId: newGame.id,
+                        },
+                    })
+                }
+
+                res.status(200).json(newGame)
+            } catch (err) {
+                console.error(err)
             }
 
-            res.status(200).json(newGame)
             break
         default:
             res.setHeader('Allow', [HttpMethod.GET, HttpMethod.POST])

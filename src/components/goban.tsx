@@ -57,8 +57,8 @@ const Goban: FC<Props> = props => {
 
     useEffect(() => {
         if (localGame && localUser) {
-            const userPlayer = localGame.users?.find(
-                u => u.identifier === String(localUser.id)
+            const userPlayer = localGame.players?.find(
+                u => u.userId === localUser.id
             )
             setUserPlayer(userPlayer)
         }
@@ -102,7 +102,7 @@ const Goban: FC<Props> = props => {
                         setBoard(r.data.board as GoBoard)
                         if (r.data.board !== '') {
                             const board = r.data.board as GoBoard
-                            setCurrentPlayer(board.currentPlayer)
+                            setCurrentPlayer(r.data.currentPlayer)
                             setBoard(board)
                             setFields(board.fields)
                             setRows(chunk(board?.fields, props.size))
@@ -127,10 +127,14 @@ const Goban: FC<Props> = props => {
     return (
         <>
             <Message>
-                {currentPlayer?.color === PlayerColor.BLACK
+                {currentPlayer?.playerColor === PlayerColor.BLACK
                     ? 'Schwarz '
                     : 'Weiss '}
-                am Zug (Sie sind {userPlayer?.color})
+                am Zug (Sie sind{' '}
+                {userPlayer?.playerColor === PlayerColor.BLACK
+                    ? 'Schwarz'
+                    : 'Weiss'}
+                )
             </Message>
             <Board>
                 {error && (
@@ -148,7 +152,7 @@ const Goban: FC<Props> = props => {
                                     clickHandler={() =>
                                         handleTileClick(field.vertex)
                                     }
-                                    currentPlayer={currentPlayer?.color}
+                                    currentPlayer={currentPlayer?.playerColor}
                                     field={field}
                                 />
                             ))}

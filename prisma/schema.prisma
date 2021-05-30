@@ -1,51 +1,55 @@
 datasource db {
-    provider = "sqlite"
-    url      = "file:./db/go.db"
+  provider = "sqlite"
+  url      = "file:./db/go.db"
 }
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 // enum not supported (PlayerColor as string)
 
 model Subscription {
-    id           Int    @id @default(autoincrement())
-    subscription String
-    User         User?  @relation(fields: [userId], references: [id])
-    userId       Int?
-    Game         Game?  @relation(fields: [gameId], references: [id])
-    gameId       Int?
+  id           Int    @id @default(autoincrement())
+  subscription String
+  User         User?  @relation(fields: [userId], references: [id])
+  userId       Int?
+  Game         Game?  @relation(fields: [gameId], references: [id])
+  gameId       Int?
 }
 
 model User {
-    id            Int            @id @default(autoincrement())
-    email         String         @unique
-    name          String?
-    games         UserGames[]
-    authoredGames Game[]         @relation("Author")
-    Subscription  Subscription[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String?
+  games         UserGame[]
+  authoredGames Game[]         @relation("author")
+  Subscription  Subscription[]
 }
 
 model Game {
-    id            Int            @id @default(autoincrement())
-    title         String
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    gameState     Int            @default(0)
-    board         String         @default("")
-    users         UserGames[]
-    author        User?          @relation("Author", fields: [authorId], references: [id])
-    authorId      Int?
-    subscriptions Subscription[]
+  id                 Int            @id @default(autoincrement())
+  title              String
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  gameState          Int            @default(0)
+  board              String         @default("")
+  players            UserGame[]
+  currentPlayer      UserGame?      @relation("currentPlayer", fields: [id, currentPlayerId, currentPlayerColor], references: [gameId, userId, playerColor])
+  currentPlayerId    Int?
+  currentPlayerColor String?
+  author             User?          @relation("author", fields: [authorId], references: [id])
+  authorId           Int?
+  subscriptions      Subscription[]
 }
 
-model UserGames {
-    user        User   @relation(fields: [userId], references: [id])
-    userId      Int
-    game        Game   @relation(fields: [gameId], references: [id])
-    gameId      Int
-    playerColor String
+model UserGame {
+  user        User   @relation(fields: [userId], references: [id])
+  userId      Int
+  game        Game   @relation(fields: [gameId], references: [id])
+  gameId      Int
+  playerColor String
 
-    @@id([userId, gameId, playerColor])
+  Game Game[] @relation("currentPlayer")
+  @@id([userId, gameId, playerColor])
 }

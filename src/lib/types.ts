@@ -1,11 +1,7 @@
 export type GoBoard = {
-    identifier: string
     fields: Field[]
-    currentPlayer?: Player
-    players?: [Player, Player]
     history: Field[]
     captures: Field[]
-    status: GameState
     pass: boolean
     height: number
     width: number
@@ -24,15 +20,16 @@ export type Game = {
     createdAt: Date
     updatedAt: Date
     gameState: number
-    authorId: number | null
-    users: Player[]
+    author: User | null
+    currentPlayer?: Player
+    players?: Player[]
     board?: GoBoard | string
 }
 
 export type Player = {
-    identifier: string
-    name: string
-    color: PlayerColor
+    userId: number
+    gameId: number
+    playerColor: PlayerColor
 }
 
 export type Vertex = [number, number]
