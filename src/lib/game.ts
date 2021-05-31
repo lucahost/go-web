@@ -93,12 +93,22 @@ export const isOccupied = (board: GoBoard, vertex: Vertex): boolean => {
     return findFieldOnBoardByVertex(board, vertex).color !== PlayerColor.EMPTY
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const isSuicide = (board: GoBoard, move: Field): boolean => {
+export const isSuicide = (
+    board: GoBoard,
+    vertex: Vertex,
+    playerColor: PlayerColor
+): boolean => {
     // Check Liberties on Stone
     // Should be done recursively - Big Boundaries
-
-    return getLiberties(board, move).length === 0
+    const libs = getLiberties(board, vertex)
+    // Get direct neighbors of stone
+    const directNeighborFields = getDirectNeighborFields(board, vertex)
+    // Suicide: zero liberties and no direct neighbor is of my color
+    return (
+        libs.length === 0 &&
+        directNeighborFields.filter(field => field.color === playerColor)
+            .length === 0
+    )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -164,8 +174,8 @@ export const findFieldOnBoardByVertex = (
     return boardField
 }
 
-export const getLiberties = (board: GoBoard, field: Field): Field[] => {
-    const directNeighborFields = getDirectNeighborFields(board, field.vertex)
+export const getLiberties = (board: GoBoard, vertex: Vertex): Field[] => {
+    const directNeighborFields = getDirectNeighborFields(board, vertex)
 
     return directNeighborFields.filter(
         field => field.color === PlayerColor.EMPTY

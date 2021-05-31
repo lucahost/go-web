@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { chunk } from '../lib/utils'
 import Tile from './tile'
 import { Game, GoBoard, Player, PlayerColor, User, Vertex } from '../lib/types'
-import { isOccupied } from '../lib/game'
+import { isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 
@@ -44,6 +44,7 @@ const Goban: FC<Props> = props => {
     const [userPlayer, setUserPlayer] = useState<Player>()
     const [board, setBoard] = useState<GoBoard>()
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [fields, setFields] = useState(board?.fields)
     const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
 
@@ -64,32 +65,6 @@ const Goban: FC<Props> = props => {
         }
     }, [localUser, localGame])
 
-    const handleTileClick = useCallback(
-        (vertex: Vertex) => {
-            {
-                if (!board || isOccupied(board, vertex)) {
-                    addErrorMessage('Field is occupied')
-                    return
-                }
-                if (localGame) {
-                    const url = `/api/games/${localGame.id}/moves`
-                    axios
-                        .post<Game>(url, {
-                            vertex,
-                            userId: localUser?.id,
-                        })
-                        .then(r => {
-                            if (r.status === 200) {
-                                // eslint-disable-next-line no-debugger
-                                loadGame()
-                            }
-                        })
-                }
-            }
-        },
-        [fields, board, props.size]
-    )
-
     const loadGame = useCallback(async () => {
         if (localGame) {
             const url = `/api/games/${localGame.id}`
@@ -97,7 +72,6 @@ const Goban: FC<Props> = props => {
                 .get<Game>(url)
                 .then(r => {
                     if (r.status === 200) {
-                        // eslint-disable-next-line no-debugger
                         setLocalGame(r.data)
                         setBoard(r.data.board as GoBoard)
                         if (r.data.board !== '') {
@@ -113,28 +87,84 @@ const Goban: FC<Props> = props => {
                     console.error(e)
                 })
         }
-    }, [])
+    }, [localGame, props.size, setLocalGame])
+
+    const handleTileClick = useCallback(
+        (vertex: Vertex) => {
+            {
+                if (currentPlayer?.playerColor != userPlayer?.playerColor) {
+                    addErrorMessage('Not your turn')
+                    return
+                }
+                if (!board || isOccupied(board, vertex)) {
+                    addErrorMessage('Field is occupied')
+                    return
+                }
+                if (
+                    !currentPlayer ||
+                    !board ||
+                    isSuicide(board, vertex, currentPlayer.playerColor)
+                ) {
+                    addErrorMessage('Suicide')
+                    return
+                }
+                if (localGame) {
+                    const url = `/api/games/${localGame.id}/moves`
+                    axios
+                        .post<Game>(url, {
+                            vertex,
+                            userId: localUser?.id,
+                        })
+                        .then(async r => {
+                            if (r.status === 200) {
+                                // eslint-disable-next-line no-debugger
+                                await loadGame()
+                            }
+                        })
+                }
+            }
+        },
+        [
+            currentPlayer,
+            userPlayer?.playerColor,
+            board,
+            localGame,
+            localUser?.id,
+            loadGame,
+        ]
+    )
 
     useEffect(() => {
-        navigator.serviceWorker.addEventListener('message', event => {
-            loadGame()
-            log(event.data.msg, event.data.url)
-        })
+        // run only in browser
+        if (
+            typeof window !== 'undefined' &&
+            'serviceWorker' in navigator &&
+            window.workbox !== undefined
+        ) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                loadGame()
+                log(event.data.msg, event.data.url)
+            })
+        }
 
         loadGame()
     }, [])
 
     return (
         <>
+            <h1>{localGame?.title}</h1>
             <Message>
-                {currentPlayer?.playerColor === PlayerColor.BLACK
-                    ? 'Schwarz '
-                    : 'Weiss '}
-                am Zug (Sie sind{' '}
-                {userPlayer?.playerColor === PlayerColor.BLACK
-                    ? 'Schwarz'
-                    : 'Weiss'}
-                )
+                {userPlayer?.playerColor === currentPlayer?.playerColor
+                    ? `Du bist am Zug (${
+                          userPlayer?.playerColor === PlayerColor.BLACK
+                              ? 'Schwarz'
+                              : 'Weiss'
+                      })`
+                    : `Gegner am Zug (${
+                          currentPlayer?.playerColor === PlayerColor.BLACK
+                              ? 'Schwarz'
+                              : 'Weiss'
+                      })`}
             </Message>
             <Board>
                 {error && (

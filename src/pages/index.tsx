@@ -199,7 +199,6 @@ const HomePage: FC = () => {
                     <Login />
                 ) : localGame ? (
                     <>
-                        <h1>Hello {localUser.name}</h1>
                         <Goban size={9} />
                     </>
                 ) : (
