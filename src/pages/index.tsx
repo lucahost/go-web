@@ -179,8 +179,20 @@ const HomePage: FC = () => {
     }, [setLocalGame])
 
     const handlePass = useCallback(() => {
-        setLocalGame(null)
-    }, [setLocalGame])
+        if (localGame) {
+            const url = `/api/games/${localGame.id}/pass`
+            axios
+                .post<Game>(url, { userId: localUser?.id })
+                .then(r => {
+                    if (r.status !== 200) {
+                        setLocalGame(null)
+                    }
+                })
+                .catch(() => {
+                    setLocalGame(null)
+                })
+        }
+    }, [setLocalGame, localGame])
 
     return (
         <>

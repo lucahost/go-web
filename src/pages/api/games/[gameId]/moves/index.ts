@@ -4,13 +4,9 @@ import prisma from '../../../../../lib/db'
 import webPush from 'web-push'
 import { GoBoard, HttpMethod, PlayerColor } from '../../../../../lib/types'
 
-type Data = {
-    name: string
-}
-
 const { log, error } = console
 
-export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {
         query: { gameId },
         method,
@@ -93,7 +89,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                     }
                 }
             }
-            res.status(200).json({ name: `POST /games/${gameId}/move` })
+            res.status(200)
             break
         default:
             res.setHeader('Allow', [HttpMethod.POST])

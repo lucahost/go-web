@@ -153,6 +153,7 @@ const Goban: FC<Props> = props => {
     return (
         <>
             <h1>{localGame?.title}</h1>
+            {(localGame?.board as GoBoard).pass && <h2>PASS</h2>}
             <Message>
                 {userPlayer?.playerColor === currentPlayer?.playerColor
                     ? `Du bist am Zug (${
