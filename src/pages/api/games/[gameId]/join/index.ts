@@ -1,8 +1,8 @@
-import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { GameState, HttpMethod } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
+import { Game } from '@prisma/client'
 
 type JoinGameResponseData = Game | never
 
@@ -79,7 +79,7 @@ export default async (
             })
 
             if (existingSubscriptions) {
-                existingSubscriptions.forEach(sub => {
+                existingSubscriptions.forEach((sub: any) => {
                     const subscription = JSON.parse(sub.subscription)
                     webPush
                         .sendNotification(
@@ -89,12 +89,12 @@ export default async (
                                 message: `${userId} just joined your game, click this message to start it!`,
                             })
                         )
-                        .then(response => {
+                        .then((response: any) => {
                             log(
                                 `successfully send web push notification. res ${response}`
                             )
                         })
-                        .catch(err => {
+                        .catch((err: any) => {
                             error(
                                 `could not send push notifications. error ${err}`
                             )

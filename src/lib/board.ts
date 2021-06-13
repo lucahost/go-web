@@ -2,7 +2,7 @@ import { Field, FieldLocation, PlayerColor, Vertex } from './types'
 import { createField } from './field'
 
 export const generateBoardLayout = (size: number): Field[] => {
-    const board = []
+    const board = new Array<Field>()
 
     // Iterate n rows
     for (let row = 1; row <= size; row++) {
