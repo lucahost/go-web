@@ -1,11 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import {
-    HttpMethod,
-    Game,
-    GoBoard,
-    PlayerColor,
-    Player,
-} from '../../../../lib/types'
+import { HttpMethod, Game, GoBoard, Player } from '../../../../lib/types'
 
 type GameResponse = Game | never
 
@@ -41,28 +35,19 @@ export default async (
             if (existingGame) {
                 const mappedPlayers = existingGame.players.map(
                     (player: Player) => {
-                        const newColor =
-                            player.playerColor == 'WHITE'
-                                ? PlayerColor.WHITE
-                                : PlayerColor.BLACK
                         return {
                             ...player,
-                            playerColor: newColor,
+                            playerColor: player.playerColor,
                         }
                     }
                 )
-
-                const currentPlayerColor =
-                    existingGame.currentPlayerColor == 'WHITE'
-                        ? PlayerColor.WHITE
-                        : PlayerColor.BLACK
 
                 const resObject = {
                     ...existingGame,
                     players: mappedPlayers,
                     currentPlayer: {
                         ...existingGame.currentPlayer,
-                        playerColor: currentPlayerColor,
+                        playerColor: existingGame.currentPlayerColor,
                     },
                 } as Game
 

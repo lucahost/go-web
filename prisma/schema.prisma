@@ -37,7 +37,7 @@ model Game {
   players            UserGame[]
   currentPlayer      UserGame?      @relation("currentPlayer", fields: [id, currentPlayerId, currentPlayerColor], references: [gameId, userId, playerColor])
   currentPlayerId    Int?
-  currentPlayerColor String?
+  currentPlayerColor Int?
   author             User?          @relation("author", fields: [authorId], references: [id])
   authorId           Int?
   subscriptions      Subscription[]
@@ -48,7 +48,7 @@ model UserGame {
   userId      Int
   game        Game   @relation(fields: [gameId], references: [id])
   gameId      Int
-  playerColor String
+  playerColor Int
 
   Game Game[] @relation("currentPlayer")
   @@id([userId, gameId, playerColor])

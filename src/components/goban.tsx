@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { chunk } from '../lib/utils'
 import Tile from './tile'
-import { Game, GoBoard, Player, PlayerColor, User, Vertex } from '../lib/types'
+import { Field, Game, GoBoard, Player, PlayerColor, User } from '../lib/types'
 import { isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
@@ -45,7 +45,6 @@ const Goban: FC<Props> = props => {
     const [board, setBoard] = useState<GoBoard>()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [fields, setFields] = useState(board?.fields)
     const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
 
     const [error, setError] = useState<string | null>(null)
@@ -74,11 +73,13 @@ const Goban: FC<Props> = props => {
                     if (r.status === 200) {
                         setLocalGame(r.data)
                         setBoard(r.data.board as GoBoard)
-                        if (r.data.board !== '') {
+                        if (
+                            r.data.board !== '' &&
+                            r.data.currentPlayer !== null
+                        ) {
                             const board = r.data.board as GoBoard
                             setCurrentPlayer(r.data.currentPlayer)
                             setBoard(board)
-                            setFields(board.fields)
                             setRows(chunk(board?.fields, props.size))
                         }
                     }
@@ -90,20 +91,20 @@ const Goban: FC<Props> = props => {
     }, [localGame, props.size, setLocalGame])
 
     const handleTileClick = useCallback(
-        (vertex: Vertex) => {
+        (field: Field) => {
             {
                 if (currentPlayer?.playerColor != userPlayer?.playerColor) {
                     addErrorMessage('Not your turn')
                     return
                 }
-                if (!board || isOccupied(board, vertex)) {
+                if (!board || isOccupied(board, field.vertex)) {
                     addErrorMessage('Field is occupied')
                     return
                 }
                 if (
                     !currentPlayer ||
                     !board ||
-                    isSuicide(board, vertex, currentPlayer.playerColor)
+                    isSuicide(board, field.vertex, currentPlayer.playerColor)
                 ) {
                     addErrorMessage('Suicide')
                     return
@@ -112,7 +113,10 @@ const Goban: FC<Props> = props => {
                     const url = `/api/games/${localGame.id}/moves`
                     axios
                         .post<Game>(url, {
-                            vertex,
+                            field: {
+                                ...field,
+                                color: currentPlayer.playerColor,
+                            },
                             userId: localUser?.id,
                         })
                         .then(async r => {
@@ -180,10 +184,9 @@ const Goban: FC<Props> = props => {
                                 <Tile
                                     key={j}
                                     // eslint-disable-next-line react/jsx-no-bind
-                                    clickHandler={() =>
-                                        handleTileClick(field.vertex)
-                                    }
+                                    clickHandler={() => handleTileClick(field)}
                                     currentPlayer={currentPlayer?.playerColor}
+                                    userPlayer={userPlayer?.playerColor}
                                     field={field}
                                 />
                             ))}

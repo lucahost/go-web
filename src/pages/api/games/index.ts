@@ -2,7 +2,7 @@ import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/db'
 import { start } from '../../../lib/game'
-import { HttpMethod } from '../../../lib/types'
+import { HttpMethod, PlayerColor } from '../../../lib/types'
 
 type GameResponseData = Game[] | Game | never
 
@@ -47,7 +47,7 @@ const apiMethod = async (
                             create: [
                                 {
                                     userId: author.id,
-                                    playerColor: 'WHITE',
+                                    playerColor: PlayerColor.WHITE,
                                 },
                             ],
                         },

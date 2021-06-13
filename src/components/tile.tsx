@@ -5,7 +5,8 @@ import { memo, useState } from 'react'
 interface Props {
     field: Field
     clickHandler: (vertex: Vertex) => void
-    currentPlayer: PlayerColor | string
+    currentPlayer?: PlayerColor
+    userPlayer?: PlayerColor
 }
 
 const TileContainer = styled.img`
@@ -13,30 +14,34 @@ const TileContainer = styled.img`
     width: 50px;
 `
 
-const Tile = memo(({ field, clickHandler, currentPlayer }: Props) => {
-    const [isHover, setIsHover] = useState(false)
+const Tile = memo(
+    ({ field, clickHandler, currentPlayer, userPlayer }: Props) => {
+        const [isHover, setIsHover] = useState(false)
 
-    return (
-        <TileContainer
-            // eslint-disable-next-line react/jsx-no-bind
-            onClick={() => clickHandler(field.vertex)}
-            // eslint-disable-next-line react/jsx-no-bind
-            onMouseEnter={() => {
-                setIsHover(true)
-            }}
-            // eslint-disable-next-line react/jsx-no-bind
-            onMouseLeave={() => {
-                setIsHover(false)
-            }}
-            src={`/Go_${
-                isHover
-                    ? currentPlayer == PlayerColor.BLACK
-                        ? 'bh'
-                        : 'wh'
-                    : field.location
-            }.svg`}
-        />
-    )
-})
+        return (
+            <TileContainer
+                // eslint-disable-next-line react/jsx-no-bind
+                onClick={() => clickHandler(field.vertex)}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseEnter={() => {
+                    if (currentPlayer === userPlayer) {
+                        setIsHover(true)
+                    }
+                }}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseLeave={() => {
+                    setIsHover(false)
+                }}
+                src={`/Go_${
+                    isHover
+                        ? currentPlayer == PlayerColor.BLACK
+                            ? 'bh'
+                            : 'wh'
+                        : field.location
+                }.svg`}
+            />
+        )
+    }
+)
 
 export default Tile

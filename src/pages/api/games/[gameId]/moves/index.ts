@@ -1,17 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { withNewFieldColor } from '../../../../../lib/board'
 import prisma from '../../../../../lib/db'
 import webPush from 'web-push'
-import { GoBoard, HttpMethod, PlayerColor } from '../../../../../lib/types'
+import { GoBoard, HttpMethod } from '../../../../../lib/types'
+import { move } from '../../../../../lib/game'
 
-const { log, error } = console
+const { error } = console
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {
         query: { gameId },
         method,
     } = req
-    const { vertex, userId } = req.body
+    const { field, userId } = req.body
 
     switch (method) {
         case HttpMethod.POST:
@@ -22,69 +22,52 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     include: {
                         currentPlayer: true,
                         players: true,
+                        author: true,
                     },
                 })
-                if (game) {
-                    const goBoard = JSON.parse(game.board) as GoBoard
-                    // TODO: Process move and return move
-                    // const newGoBoard = move(goBoard, vertex)
-                    if (game.currentPlayer) {
-                        goBoard.fields = withNewFieldColor(
-                            goBoard.fields,
-                            vertex,
-                            game.currentPlayer?.playerColor == 'WHITE'
-                                ? PlayerColor.WHITE
-                                : PlayerColor.BLACK
-                        )
+                if (game && game.author !== null) {
+                    let goBoard = JSON.parse(game.board) as GoBoard
+                    goBoard = move(game, field)
 
-                        if (game.players) {
-                            const nextPlayer = game.players.find(
-                                p => p.userId !== userId
-                            )
+                    if (
+                        goBoard.currentPlayer &&
+                        game.currentPlayer?.userId !==
+                            goBoard.currentPlayer?.userId
+                    ) {
+                        await prisma.game.update({
+                            where: { id: game.id },
+                            data: {
+                                board: JSON.stringify(goBoard),
+                                currentPlayerColor:
+                                    goBoard.currentPlayer.playerColor,
+                                currentPlayerId: goBoard.currentPlayer.userId,
+                            },
+                        })
 
-                            if (!nextPlayer) {
-                                throw 'next player not found'
-                            }
-
-                            await prisma.game.update({
-                                where: { id: game.id },
-                                data: {
-                                    board: JSON.stringify(goBoard),
-                                    currentPlayerColor: nextPlayer.playerColor,
-                                    currentPlayerId: nextPlayer.userId,
-                                },
+                        const existingSubscriptions =
+                            await prisma.subscription.findMany({
+                                where: { gameId: gId },
                             })
 
-                            const existingSubscriptions =
-                                await prisma.subscription.findMany({
-                                    where: { gameId: gId },
-                                })
-
-                            if (existingSubscriptions) {
-                                existingSubscriptions.forEach(sub => {
-                                    const subscription = JSON.parse(
-                                        sub.subscription
+                        if (existingSubscriptions) {
+                            existingSubscriptions.forEach(sub => {
+                                const subscription = JSON.parse(
+                                    sub.subscription
+                                )
+                                webPush
+                                    .sendNotification(
+                                        subscription,
+                                        JSON.stringify({
+                                            title: 'A move in your game was made!',
+                                            message: `${userId} just set a stone!`,
+                                        })
                                     )
-                                    webPush
-                                        .sendNotification(
-                                            subscription,
-                                            JSON.stringify({
-                                                title: 'A move in your game was made!',
-                                                message: `${userId} just set a stone!`,
-                                            })
+                                    .catch(err => {
+                                        error(
+                                            `could not send push notifications. error ${err}`
                                         )
-                                        .then(response => {
-                                            log(
-                                                `successfully send web push notification. res ${response}`
-                                            )
-                                        })
-                                        .catch(err => {
-                                            error(
-                                                `could not send push notifications. error ${err}`
-                                            )
-                                        })
-                                })
-                            }
+                                    })
+                            })
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { GameState, HttpMethod } from '../../../../../lib/types'
+import { GameState, HttpMethod, PlayerColor } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { Game } from '@prisma/client'
@@ -12,7 +12,7 @@ webPush.setVapidDetails(
     process.env.WEB_PUSH_PRIVATE_KEY ?? ''
 )
 
-const { log, error } = console
+const { error } = console
 
 export default async (
     req: NextApiRequest,
@@ -48,7 +48,7 @@ export default async (
 
             await prisma.userGame.create({
                 data: {
-                    playerColor: 'BLACK',
+                    playerColor: PlayerColor.BLACK,
                     userId: uId,
                     gameId: existingGame.id,
                 },
@@ -59,7 +59,7 @@ export default async (
                 data: {
                     ...existingGame,
                     gameState: GameState.RUNNING,
-                    currentPlayerColor: 'BLACK',
+                    currentPlayerColor: PlayerColor.BLACK,
                     currentPlayerId: uId,
                 },
             })
@@ -89,11 +89,6 @@ export default async (
                                 message: `${userId} just joined your game, click this message to start it!`,
                             })
                         )
-                        .then((response: any) => {
-                            log(
-                                `successfully send web push notification. res ${response}`
-                            )
-                        })
                         .catch((err: any) => {
                             error(
                                 `could not send push notifications. error ${err}`

@@ -1,10 +1,12 @@
+import { UserGame } from '@prisma/client'
+
 export type GoBoard = {
     status: GameState
     fields: Field[]
     history: Field[]
     captures: Field[]
     identifier: string
-    currentPlayer: Player
+    currentPlayer: Player | UserGame | null
     pass: boolean
     height: number
     width: number
@@ -13,7 +15,7 @@ export type GoBoard = {
 export type User = {
     id: number
     email: string
-    name?: string
+    name: string | null
     subscription?: string
 }
 
@@ -24,7 +26,7 @@ export type Game = {
     updatedAt: Date
     gameState: number
     author: User | null
-    currentPlayer?: Player
+    currentPlayer: Player | UserGame | null
     players?: Player[]
     board?: GoBoard | string
 }
@@ -32,7 +34,7 @@ export type Game = {
 export type Player = {
     userId: number
     gameId: number
-    playerColor: PlayerColor | string
+    playerColor: PlayerColor | number
 }
 
 export type Vertex = [number, number]

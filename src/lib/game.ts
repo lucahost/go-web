@@ -1,5 +1,13 @@
-import { Field, Game, GameState, GoBoard, PlayerColor, Vertex } from './types'
-import { generateBoardLayout } from './board'
+import {
+    Field,
+    Game,
+    GameState,
+    GoBoard,
+    Player,
+    PlayerColor,
+    Vertex,
+} from './types'
+import { generateBoardLayout, withNewFieldColor } from './board'
 
 export const start = (): GoBoard => {
     const width = 9
@@ -24,8 +32,16 @@ export const start = (): GoBoard => {
 
 export const move = (game: Game, move: Field): GoBoard => {
     let board = game.board as GoBoard
-    // Check if move is in bounds
+    if (typeof game.board === 'string') {
+        board = JSON.parse(game.board) as GoBoard
+    }
+
+    if (game.players == undefined) {
+        throw 'no players on game'
+    }
+
     if (!isInBounds(board, move)) {
+        // Check if move is in bounds
         throw new Error(`Move on location ${move.vertex} is out of bounds`)
     }
     // Check if the color of the move matches the current players color
@@ -59,7 +75,7 @@ export const move = (game: Game, move: Field): GoBoard => {
     board = handleCapture(board, move)
 
     // Switch current player
-    board = switchPlayer(game)
+    board = switchPlayer(board, game.players)
 
     // Reset passes on players if not a double-pass
     board = resetPass(board)
@@ -137,18 +153,18 @@ export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
 export const setStone = (board: GoBoard, move: Field): GoBoard => {
     const boardField = findFieldOnBoardByVertex(board, move.vertex)
     boardField.color = move.color
+
+    board.fields = withNewFieldColor(board.fields, move.vertex, move.color)
     return board
 }
 
-export const switchPlayer = (game: Game): GoBoard => {
-    const board = game.board as GoBoard
-
-    if (game?.players?.length !== 2) {
+export const switchPlayer = (board: GoBoard, players: Player[]): GoBoard => {
+    if (players?.length !== 2) {
         throw new Error('Incorrect count of players in game')
     }
 
-    const nextPlayer = game?.players?.find(
-        p => p.userId !== game?.currentPlayer?.userId
+    const nextPlayer = players?.find(
+        p => p.userId !== board?.currentPlayer?.userId
     )
 
     if (!nextPlayer) {

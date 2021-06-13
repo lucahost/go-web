@@ -4,7 +4,7 @@ import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { pass } from '../../../../../lib/game'
 
-const { log, error } = console
+const { error } = console
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const {

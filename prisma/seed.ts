@@ -39,7 +39,7 @@ const userGameMapping: Prisma.UserGameCreateInput[] = [
                 id: 1,
             },
         },
-        playerColor: 'BLACK',
+        playerColor: 1,
         user: {
             connect: {
                 email: 'alice@go.io',
@@ -52,7 +52,7 @@ const userGameMapping: Prisma.UserGameCreateInput[] = [
                 id: 1,
             },
         },
-        playerColor: 'WHITE',
+        playerColor: -1,
         user: {
             connect: {
                 email: 'bob@go.io',
@@ -65,7 +65,7 @@ const userGameMapping: Prisma.UserGameCreateInput[] = [
                 id: 2,
             },
         },
-        playerColor: 'WHITE',
+        playerColor: -1,
         user: {
             connect: {
                 email: 'alice@go.io',
@@ -78,7 +78,7 @@ const userGameMapping: Prisma.UserGameCreateInput[] = [
                 id: 2,
             },
         },
-        playerColor: 'BLACK',
+        playerColor: 1,
         user: {
             connect: {
                 email: 'bob@go.io',
