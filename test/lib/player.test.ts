@@ -3,13 +3,9 @@ import { createPlayer } from '../../src/lib/player'
 
 describe('generate a player', () => {
     it('should generate a valid player', () => {
-        const object = {
-            name: 'Foo Bar',
-            color: PlayerColor.BLACK,
-        }
-        const player = createPlayer(object.name, object.color)
-        expect(player.identifier).toStrictEqual('uuid')
-        expect(player.name).toStrictEqual(object.name)
-        expect(player.color).toStrictEqual(object.color)
+        const player = createPlayer(0, 1, PlayerColor.BLACK)
+        expect(player.userId).toStrictEqual(0)
+        expect(player.gameId).toStrictEqual(1)
+        expect(player.playerColor).toStrictEqual(PlayerColor.BLACK)
     })
 })

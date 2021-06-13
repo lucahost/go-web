@@ -2,7 +2,7 @@
 
 exports[`Tile renders correctly 1`] = `
 <img
-  class="tile__TileContainer-sc-34hp8n-0 QdBAb"
+  class="tile__TileContainer-sc-34hp8n-0 gHojGP"
   src="/Go_ur.svg"
 />
 `;

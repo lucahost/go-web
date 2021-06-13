@@ -1,4 +1,4 @@
-import { Field, GameState, GoBoard, PlayerColor, Vertex } from './types'
+import { Field, Game, GameState, GoBoard, PlayerColor, Vertex } from './types'
 import { generateBoardLayout } from './board'
 
 export const start = (): GoBoard => {
@@ -22,12 +22,12 @@ export const start = (): GoBoard => {
     }
 }
 
-export const move = (board: GoBoard, move: Field): GoBoard => {
+export const move = (game: Game, move: Field): GoBoard => {
+    let board = game.board as GoBoard
     // Check if move is in bounds
     if (!isInBounds(board, move)) {
         throw new Error(`Move on location ${move.vertex} is out of bounds`)
     }
-
     // Check if the color of the move matches the current players color
     if (board?.currentPlayer?.playerColor !== move.color) {
         throw new Error(`current player is not ${move.color}`)
@@ -57,8 +57,9 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     board = setStone(board, move)
     // Handle capture
     board = handleCapture(board, move)
+
     // Switch current player
-    // board = switchPlayer(board)
+    board = switchPlayer(game)
 
     // Reset passes on players if not a double-pass
     board = resetPass(board)
@@ -139,21 +140,22 @@ export const setStone = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
 
-// export const switchPlayer = (board: GoBoard): GoBoard => {
-//     if (board?.players?.length !== 2) {
-//         throw new Error('Incorrect count of players in game')
-//     }
+export const switchPlayer = (game: Game): GoBoard => {
+    const board = game.board as GoBoard
 
-//     const nextPlayer = board?.players?.find(
-//         p => p.identifier !== board?.currentPlayer?.identifier
-//     )
+    if (game?.players?.length !== 2) {
+        throw new Error('Incorrect count of players in game')
+    }
 
-//     if (!nextPlayer) {
-//         throw new Error('Exception loading next player')
-//     }
+    const nextPlayer = game?.players?.find(
+        p => p.userId !== game?.currentPlayer?.userId
+    )
 
-//     return { ...board, currentPlayer: nextPlayer }
-// }
+    if (!nextPlayer) {
+        throw new Error('Exception loading next player')
+    }
+    return { ...board, currentPlayer: nextPlayer }
+}
 
 export const resetPass = (board: GoBoard): GoBoard => ({
     ...board,

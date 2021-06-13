@@ -1,5 +1,6 @@
 import {
     FieldLocation,
+    Game,
     GameState,
     GoBoard,
     Player,
@@ -21,33 +22,54 @@ import { createPlayer } from '../../src/lib/player'
 import { board as emptyBoard } from '../boards/1_empty_9x9_board.json'
 import { board as suicideBoard } from '../boards/5_suicide_test_board.json'
 
+const newGame = (board: GoBoard): Game => {
+    const player1 = createPlayer(0, 1, PlayerColor.BLACK)
+    const player2 = createPlayer(1, 1, PlayerColor.WHITE)
+
+    const players = [player1, player2] as [Player, Player]
+
+    const game = {
+        id: 1,
+        title: 'Test Game',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        board,
+        players,
+        currentPlayer: {
+            playerColor: PlayerColor.WHITE,
+            userId: 1,
+            gameId: 1,
+        },
+        gameState: GameState.INITIALIZED,
+        author: { email: 'test', id: 1 },
+    } as Game
+    return game
+}
+
 describe('Game Initialization', () => {
     it('should return GoBoard', () => {
-        const player1 = createPlayer('Player1', PlayerColor.BLACK)
-        const player2 = createPlayer('Player2', PlayerColor.WHITE)
-
-        const players = [player1, player2] as [Player, Player]
-
-        const startBoard = start(players)
-
-        expect(startBoard.players).toContain(player1)
-        expect(startBoard.players).toContain(player2)
+        const startBoard = start()
         expect(startBoard.fields.length).toStrictEqual(81)
         expect(startBoard.status).toBe(GameState.INITIALIZED)
     })
 
     it('initialize a game after the first move', () => {
         const goBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        goBoard.currentPlayer = {
+            playerColor: PlayerColor.BLACK,
+            userId: 0,
+            gameId: 1,
+        }
+        const game = newGame(goBoard)
 
         const simpleMove = {
             vertex: [1, 1] as [number, number],
-            color: PlayerColor.WHITE,
+            color: PlayerColor.BLACK,
             location: FieldLocation.DOWN_RIGHT,
         }
 
-        const board = move(goBoard, simpleMove)
-
-        expect(board.currentPlayer.color).toBe(PlayerColor.BLACK)
+        const board = move(game, simpleMove)
+        expect(board.currentPlayer.playerColor).toBe(PlayerColor.BLACK)
         expect(board.status).toBe(GameState.RUNNING)
     })
 })
@@ -82,28 +104,26 @@ describe('isOccupied', () => {
 describe('Move', () => {
     it('should not allow a move out of bounds', () => {
         const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
-
+        const game = newGame(initialBoard)
         const simpleMove = {
             vertex: [-1, -99] as [number, number],
             color: PlayerColor.BLACK,
             location: FieldLocation.DOWN_RIGHT,
         }
 
-        expect(() => move(initialBoard, simpleMove)).toThrowError(
-            /out of bounds/
-        )
+        expect(() => move(game, simpleMove)).toThrowError(/out of bounds/)
     })
 
     it('should not allow a move on a field with a stone', () => {
         const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
-
+        const game = newGame(initialBoard)
         const initialMove = {
             vertex: [1, 1] as [number, number],
             color: PlayerColor.WHITE,
             location: FieldLocation.UP_LEFT,
         }
 
-        const board = move(initialBoard, initialMove)
+        game.board = move(game, initialMove)
 
         const preOccupiedMove = {
             vertex: [1, 1] as [number, number],
@@ -111,7 +131,7 @@ describe('Move', () => {
             location: FieldLocation.UP_LEFT,
         }
 
-        expect(() => move(board, preOccupiedMove)).toThrowError(
+        expect(() => move(game, preOccupiedMove)).toThrowError(
             /Already occupied/
         )
     })
@@ -130,6 +150,7 @@ describe('Pass', () => {
 
     it('should reset pass after move', () => {
         const testBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const game = newGame(testBoard)
 
         const boardWithOnePass = pass(testBoard)
         expect(boardWithOnePass.pass).toBeTruthy()
@@ -139,9 +160,12 @@ describe('Pass', () => {
             color: PlayerColor.WHITE,
             location: FieldLocation.MIDDLE,
         }
-        const continuingBoard = move(testBoard, initialMove)
 
-        expect(continuingBoard.pass).toBeFalsy()
+        testBoard.currentPlayer.playerColor = PlayerColor.WHITE
+
+        game.board = move(game, initialMove)
+
+        expect(game.board.pass).toBeFalsy()
     })
 })
 
@@ -154,7 +178,7 @@ describe('Prevent Suicide', () => {
             location: FieldLocation.MIDDLE,
         }
 
-        expect(isSuicide(board, move)).toBeTruthy()
+        expect(isSuicide(board, move.vertex, PlayerColor.BLACK)).toBeTruthy()
     })
 })
 

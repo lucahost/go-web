@@ -3,9 +3,9 @@
         "status": 0,
         "captures": [],
         "currentPlayer": {
-            "identifier": "id1",
-            "name": "Yoda",
-            "color": -1
+            "userId": 0,
+            "gameId": 1,
+            "playerColor": -1
         },
         "fields": [
             {
@@ -663,14 +663,14 @@
         "pass": false,
         "players": [
             {
-                "identifier": "id1",
-                "name": "Yoda",
-                "color": -1
+                "userId": 0,
+                "gameId": 1,
+                "playerColor": -1
             },
             {
-                "identifier": "id2",
-                "name": "Darth Vader",
-                "color": 1
+                "userId": 1,
+                "gameId": 1,
+                "playerColor": -1
             }
         ],
         "width": 9
