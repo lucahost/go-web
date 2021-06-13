@@ -5,7 +5,7 @@
         "currentPlayer": {
             "userId": 0,
             "gameId": 1,
-            "playerColor": -1
+            "playerColor": 1
         },
         "fields": [
             {

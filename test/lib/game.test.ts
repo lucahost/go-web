@@ -36,12 +36,12 @@ const newGame = (board: GoBoard): Game => {
         board,
         players,
         currentPlayer: {
-            playerColor: PlayerColor.WHITE,
-            userId: 1,
+            playerColor: PlayerColor.BLACK,
+            userId: 0,
             gameId: 1,
         },
         gameState: GameState.INITIALIZED,
-        author: { email: 'test', id: 1 },
+        author: { email: 'test', id: 1, name: 'author-name' },
     } as Game
     return game
 }
@@ -69,7 +69,8 @@ describe('Game Initialization', () => {
         }
 
         const board = move(game, simpleMove)
-        expect(board.currentPlayer.playerColor).toBe(PlayerColor.BLACK)
+
+        expect(board.currentPlayer.playerColor).toBe(PlayerColor.WHITE)
         expect(board.status).toBe(GameState.RUNNING)
     })
 })
@@ -119,15 +120,21 @@ describe('Move', () => {
         const game = newGame(initialBoard)
         const initialMove = {
             vertex: [1, 1] as [number, number],
-            color: PlayerColor.WHITE,
+            color: PlayerColor.BLACK,
             location: FieldLocation.UP_LEFT,
         }
 
         game.board = move(game, initialMove)
 
+        game.currentPlayer = {
+            playerColor: PlayerColor.WHITE,
+            userId: 0,
+            gameId: 1,
+        }
+
         const preOccupiedMove = {
             vertex: [1, 1] as [number, number],
-            color: PlayerColor.BLACK,
+            color: PlayerColor.WHITE,
             location: FieldLocation.UP_LEFT,
         }
 
@@ -203,7 +210,7 @@ describe('Set Stone', () => {
             location: FieldLocation.UP_LEFT,
         }
         const newBoard = setStone(initialBoard, move)
-        expect(newBoard.fields[0]).toEqual(move)
+        expect(newBoard.fields[0].location).toEqual(FieldLocation.BLACK_STONE)
     })
 })
 
