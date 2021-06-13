@@ -78,7 +78,8 @@ const Goban: FC<Props> = props => {
                             r.data.currentPlayer !== null
                         ) {
                             const board = r.data.board as GoBoard
-                            setCurrentPlayer(r.data.currentPlayer)
+                            const currentPlayer = r.data.currentPlayer as Player
+                            setCurrentPlayer(currentPlayer)
                             setBoard(board)
                             setRows(chunk(board?.fields, props.size))
                         }
