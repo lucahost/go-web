@@ -55,20 +55,20 @@ export const generateBoardLayout = (size: number): Field[] => {
 }
 
 export const withNewFieldColor = (
-    board: Field[],
+    fields: Field[],
     vertex: Vertex,
     color: PlayerColor
 ): Field[] => {
-    const index = board.findIndex(
+    const index = fields.findIndex(
         field => field.vertex[0] === vertex[0] && field.vertex[1] === vertex[1]
     )
-    board[index] = {
-        ...board[index],
+    fields[index] = {
+        ...fields[index],
         color,
         location:
             color === PlayerColor.BLACK
                 ? FieldLocation.BLACK_STONE
                 : FieldLocation.WHITE_STONE,
     }
-    return board
+    return fields
 }
