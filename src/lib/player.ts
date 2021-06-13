@@ -1,7 +1,7 @@
 import { Player, PlayerColor } from './types'
 
 export const createPlayer = (name: string, color: PlayerColor): Player => ({
-    identifier: 'uuid',
-    name,
-    color: color,
+    userId: 1,
+    gameId: 1,
+    playerColor: color,
 })

@@ -75,10 +75,8 @@ const HomePage: FC = () => {
     const [subscription, setSubscription] = useState<PushSubscription | null>(
         null
     )
-    const [
-        registration,
-        setRegistration,
-    ] = useState<ServiceWorkerRegistration | null>(null)
+    const [registration, setRegistration] =
+        useState<ServiceWorkerRegistration | null>(null)
 
     useEffect(() => {
         if (

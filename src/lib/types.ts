@@ -1,7 +1,10 @@
 export type GoBoard = {
+    status: GameState
     fields: Field[]
     history: Field[]
     captures: Field[]
+    identifier: string
+    currentPlayer: Player
     pass: boolean
     height: number
     width: number
@@ -29,7 +32,7 @@ export type Game = {
 export type Player = {
     userId: number
     gameId: number
-    playerColor: PlayerColor
+    playerColor: PlayerColor | string
 }
 
 export type Vertex = [number, number]

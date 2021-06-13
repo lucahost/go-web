@@ -59,11 +59,10 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                                 },
                             })
 
-                            const existingSubscriptions = await prisma.subscription.findMany(
-                                {
+                            const existingSubscriptions =
+                                await prisma.subscription.findMany({
                                     where: { gameId: gId },
-                                }
-                            )
+                                })
 
                             if (existingSubscriptions) {
                                 existingSubscriptions.forEach(sub => {
@@ -74,8 +73,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
                                         .sendNotification(
                                             subscription,
                                             JSON.stringify({
-                                                title:
-                                                    'A move in your game was made!',
+                                                title: 'A move in your game was made!',
                                                 message: `${userId} just set a stone!`,
                                             })
                                         )

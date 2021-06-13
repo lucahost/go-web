@@ -5,7 +5,7 @@ import { memo, useState } from 'react'
 interface Props {
     field: Field
     clickHandler: (vertex: Vertex) => void
-    currentPlayer: PlayerColor
+    currentPlayer: PlayerColor | string
 }
 
 const TileContainer = styled.img`

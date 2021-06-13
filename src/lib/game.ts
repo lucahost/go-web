@@ -10,6 +10,11 @@ export const start = (): GoBoard => {
         captures: [],
         fields: generateBoardLayout(width),
         height,
+        currentPlayer: {
+            playerColor: PlayerColor.BLACK,
+            gameId: 0,
+            userId: 1,
+        },
         history: [],
         identifier: '',
         pass: false,
@@ -24,7 +29,7 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     }
 
     // Check if the color of the move matches the current players color
-    if (board?.currentPlayer?.color !== move.color) {
+    if (board?.currentPlayer?.playerColor !== move.color) {
         throw new Error(`current player is not ${move.color}`)
     }
 
@@ -37,7 +42,7 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
             )}`
         )
     }
-    if (isSuicide(board, move)) {
+    if (isSuicide(board, move.vertex, move.color)) {
         // Handle suicide
         throw new Error('Suicide')
     }
@@ -53,7 +58,8 @@ export const move = (board: GoBoard, move: Field): GoBoard => {
     // Handle capture
     board = handleCapture(board, move)
     // Switch current player
-    board = switchPlayer(board)
+    // board = switchPlayer(board)
+
     // Reset passes on players if not a double-pass
     board = resetPass(board)
     // Add history
@@ -96,7 +102,7 @@ export const isOccupied = (board: GoBoard, vertex: Vertex): boolean => {
 export const isSuicide = (
     board: GoBoard,
     vertex: Vertex,
-    playerColor: PlayerColor
+    playerColor: PlayerColor | string
 ): boolean => {
     // Check Liberties on Stone
     // Should be done recursively - Big Boundaries
@@ -133,21 +139,21 @@ export const setStone = (board: GoBoard, move: Field): GoBoard => {
     return board
 }
 
-export const switchPlayer = (board: GoBoard): GoBoard => {
-    if (board?.players?.length !== 2) {
-        throw new Error('Incorrect count of players in game')
-    }
+// export const switchPlayer = (board: GoBoard): GoBoard => {
+//     if (board?.players?.length !== 2) {
+//         throw new Error('Incorrect count of players in game')
+//     }
 
-    const nextPlayer = board?.players?.find(
-        p => p.identifier !== board?.currentPlayer?.identifier
-    )
+//     const nextPlayer = board?.players?.find(
+//         p => p.identifier !== board?.currentPlayer?.identifier
+//     )
 
-    if (!nextPlayer) {
-        throw new Error('Exception loading next player')
-    }
+//     if (!nextPlayer) {
+//         throw new Error('Exception loading next player')
+//     }
 
-    return { ...board, currentPlayer: nextPlayer }
-}
+//     return { ...board, currentPlayer: nextPlayer }
+// }
 
 export const resetPass = (board: GoBoard): GoBoard => ({
     ...board,
