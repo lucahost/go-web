@@ -12,6 +12,7 @@ import {
     getGroupLiberties,
     getLiberties,
     handleCapture,
+    isKo,
     isOccupied,
     isSuicide,
     move,
@@ -220,8 +221,48 @@ describe('Prevent Suicide', () => {
 })
 
 describe('Prevent Ko', () => {
-    it('should prevent a Ko move', () => {
-        expect(true).toBeTruthy()
+    const boardAtari = JSON.parse(JSON.stringify(atariBoard)) as GoBoard
+    it('should not prevent white move', () => {
+        const whiteMove = {
+            vertex: [4, 5] as [number, number],
+            color: PlayerColor.WHITE,
+        }
+        expect(boardAtari.history.length).toEqual(7)
+        expect(isKo(boardAtari, whiteMove)).toBeFalsy()
+    })
+    it('should prevent black move after white move', () => {
+        // Simulate white move and black capture
+        const whiteMoveIndex = boardAtari.fields.findIndex(
+            field => field.vertex[0] === 4 && field.vertex[1] === 5
+        )
+        const blackCaptureIndex = boardAtari.fields.findIndex(
+            field => field.vertex[0] === 5 && field.vertex[1] === 5
+        )
+        boardAtari.fields[whiteMoveIndex] = {
+            ...boardAtari.fields[whiteMoveIndex],
+            color: PlayerColor.WHITE,
+        }
+        boardAtari.fields[blackCaptureIndex] = {
+            ...boardAtari.fields[blackCaptureIndex],
+            color: PlayerColor.EMPTY,
+        }
+        boardAtari.history.push({ vertex: [4, 5], color: PlayerColor.WHITE })
+        boardAtari.captures.push({ vertex: [5, 5], color: PlayerColor.BLACK })
+        expect(boardAtari.history.length).toEqual(8)
+        expect(boardAtari.captures.length).toEqual(1)
+        expect(boardAtari.fields[whiteMoveIndex].color).toEqual(
+            PlayerColor.WHITE
+        )
+        expect(boardAtari.fields[blackCaptureIndex].color).toEqual(
+            PlayerColor.EMPTY
+        )
+
+        // Test black move ko
+        const blackMove = {
+            vertex: [5, 5] as [number, number],
+            color: PlayerColor.BLACK,
+        }
+        expect(isKo(boardAtari, blackMove)).toBeTruthy()
     })
 })
 

@@ -11,7 +11,7 @@ import {
     PlayerColor,
     User,
 } from '../lib/types'
-import { isOccupied, isSuicide } from '../lib/game'
+import { isKo, isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { getFieldLocationByVertex } from '../lib/board'
@@ -132,6 +132,17 @@ const Goban: FC<Props> = props => {
                     isSuicide(board, field.vertex, currentPlayer.playerColor)
                 ) {
                     addErrorMessage('Suicide')
+                    return
+                }
+                if (
+                    currentPlayer &&
+                    board &&
+                    isKo(board, {
+                        vertex: field.vertex,
+                        color: currentPlayer.playerColor,
+                    })
+                ) {
+                    addErrorMessage('Infinity / Ko')
                     return
                 }
                 clickSound()

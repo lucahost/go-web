@@ -148,12 +148,30 @@ export const isSuicide = (
     return getGroupLiberties(boardAfterMove, vertex).length === 0
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isKo = (board: GoBoard, move: Field): boolean => {
-    // if board would look the same after performing the move
-    // return true
-    // else
-    return false
+    // Check if the move would capture something
+    // To not pass references to the original board around we need to
+    // perform a deep copy of the board
+    const boardDeepCopy = JSON.parse(JSON.stringify(board)) as GoBoard
+    const boardAfterHandleCapture = handleCapture(
+        boardDeepCopy,
+        move.vertex,
+        move.color
+    )
+    const lastMove = board.history[board.history.length - 1]
+    const secondLastMove = board.history[board.history.length - 2]
+    const lastCapture = board.captures[board.captures.length - 1]
+    const newCaptures = boardAfterHandleCapture.captures
+    return (
+        lastCapture &&
+        secondLastMove &&
+        lastCapture.color === move.color &&
+        lastCapture.vertex[0] === move.vertex[0] &&
+        lastCapture.vertex[1] === move.vertex[1] &&
+        secondLastMove.color === move.color &&
+        secondLastMove.vertex[0] === move.vertex[0] &&
+        secondLastMove.vertex[1] === move.vertex[1]
+    )
 }
 
 export const handleCapture = (
