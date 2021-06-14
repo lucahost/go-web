@@ -2,10 +2,19 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { chunk } from '../lib/utils'
 import Tile from './tile'
-import { Field, Game, GoBoard, Player, PlayerColor, User } from '../lib/types'
+import {
+    Field,
+    FieldLocation,
+    Game,
+    GoBoard,
+    Player,
+    PlayerColor,
+    User,
+} from '../lib/types'
 import { isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
+import { getFieldLocationByVertex } from '../lib/board'
 
 interface Props {
     size: number
@@ -43,6 +52,8 @@ const Goban: FC<Props> = props => {
     const [currentPlayer, setCurrentPlayer] = useState<Player>()
     const [userPlayer, setUserPlayer] = useState<Player>()
     const [board, setBoard] = useState<GoBoard>()
+    const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
+    const [blackCaptures, setBlackCaptures] = useState<number>(0)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
@@ -81,7 +92,17 @@ const Goban: FC<Props> = props => {
                             const currentPlayer = r.data.currentPlayer as Player
                             setCurrentPlayer(currentPlayer)
                             setBoard(board)
-                            setRows(chunk(board?.fields, props.size))
+                            setRows(chunk(board.fields, props.size))
+                            setWhiteCaptures(
+                                board.captures.filter(
+                                    field => field.color === PlayerColor.WHITE
+                                ).length
+                            )
+                            setBlackCaptures(
+                                board.captures.filter(
+                                    field => field.color === PlayerColor.BLACK
+                                ).length
+                            )
                         }
                     }
                 })
@@ -122,7 +143,6 @@ const Goban: FC<Props> = props => {
                         })
                         .then(async r => {
                             if (r.status === 200) {
-                                // eslint-disable-next-line no-debugger
                                 await loadGame()
                             }
                         })
@@ -187,16 +207,26 @@ const Goban: FC<Props> = props => {
                                     // eslint-disable-next-line react/jsx-no-bind
                                     clickHandler={() => handleTileClick(field)}
                                     currentPlayer={currentPlayer?.playerColor}
-                                    userPlayer={userPlayer?.playerColor}
                                     field={field}
+                                    location={
+                                        field.color === PlayerColor.EMPTY
+                                            ? getFieldLocationByVertex(
+                                                  field.vertex,
+                                                  props.size
+                                              )
+                                            : field.color === PlayerColor.BLACK
+                                            ? FieldLocation.BLACK_STONE
+                                            : FieldLocation.WHITE_STONE
+                                    }
+                                    userPlayer={userPlayer?.playerColor}
                                 />
                             ))}
                     </TileRow>
                 ))}
             </Board>
             <Captures>
-                <p>White: 0</p>
-                <p>Black: 1</p>
+                <p>{`White: ${whiteCaptures}`}</p>
+                <p>{`Black: ${blackCaptures}`}</p>
             </Captures>
         </>
     )

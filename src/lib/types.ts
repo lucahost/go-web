@@ -41,7 +41,6 @@ export type Vertex = [number, number]
 
 export type Field = {
     vertex: Vertex
-    location: string
     color: PlayerColor
 }
 
@@ -60,7 +59,9 @@ export enum PlayerColor {
 
 export enum FieldLocation {
     BLACK_STONE = 'b',
+    BLACK_STONE_HOVER = 'bh',
     WHITE_STONE = 'w',
+    WHITE_STONE_HOVER = 'wh',
     MARKER = '-',
     MIDDLE = 'm',
     DOWN = 'd',

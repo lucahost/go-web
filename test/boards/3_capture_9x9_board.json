@@ -8,15 +8,14 @@
                     1,
                     1
                 ],
-                "location": "ul",
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     1,
                     2
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
@@ -30,28 +29,28 @@
                     1,
                     4
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     1,
                     5
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     1,
                     6
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     1,
                     7
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -65,8 +64,7 @@
                     1,
                     9
                 ],
-                "location": "ur",
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
@@ -101,7 +99,7 @@
                     2,
                     5
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -115,7 +113,7 @@
                     2,
                     7
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -150,7 +148,7 @@
                     3,
                     3
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -185,14 +183,14 @@
                     3,
                     8
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     3,
                     9
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -206,35 +204,35 @@
                     4,
                     2
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     4,
                     3
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     4,
                     4
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
                     4,
                     5
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
                     4,
                     6
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
@@ -276,35 +274,35 @@
                     5,
                     3
                 ],
-                "color": -1
+                "color": 1
             },
             {
                 "vertex": [
                     5,
                     4
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
                     5,
                     5
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
                     5,
                     6
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
                     5,
                     7
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
@@ -325,42 +323,42 @@
                     6,
                     1
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     6,
                     2
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     6,
                     3
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
                     6,
                     4
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
                     6,
                     5
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
                     6,
                     6
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -388,28 +386,28 @@
                     7,
                     1
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     7,
                     2
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     7,
                     3
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     7,
                     4
                 ],
-                "color": -1
+                "color": 0
             },
             {
                 "vertex": [
@@ -423,21 +421,21 @@
                     7,
                     6
                 ],
-                "color": 1
+                "color": -1
             },
             {
                 "vertex": [
                     7,
                     7
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     7,
                     8
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -451,21 +449,21 @@
                     8,
                     1
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     8,
                     2
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     8,
                     3
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
@@ -486,43 +484,42 @@
                     8,
                     6
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     8,
                     7
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     8,
                     8
                 ],
-                "color": 0
+                "color": 1
             },
             {
                 "vertex": [
                     8,
                     9
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
                     9,
                     1
                 ],
-                "location": "dl",
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
                     9,
                     2
                 ],
-                "color": 0
+                "color": -1
             },
             {
                 "vertex": [
@@ -564,7 +561,7 @@
                     9,
                     8
                 ],
-                "color": 1
+                "color": 0
             },
             {
                 "vertex": [
@@ -577,9 +574,9 @@
         ],
         "height": 9,
         "currentPlayer": {
-            "userId": 3,
-            "gameId": 14,
-            "playerColor": -1
+            "userId": 4,
+            "gameId": 16,
+            "playerColor": 1
         },
         "history": [
             {
@@ -587,147 +584,208 @@
                     2,
                     1
                 ],
+                "location": "l",
                 "color": 1
             },
             {
                 "vertex": [
-                    4,
-                    5
+                    1,
+                    1
                 ],
+                "location": "ul",
                 "color": -1
             },
             {
                 "vertex": [
-                    1,
+                    4,
                     2
                 ],
+                "location": "m",
                 "color": 1
             },
             {
                 "vertex": [
                     4,
-                    4
-                ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    5,
-                    5
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    4,
-                    6
-                ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    5,
-                    6
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    5,
-                    7
-                ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    5,
-                    4
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    5,
                     3
                 ],
+                "location": "m",
                 "color": -1
             },
             {
                 "vertex": [
-                    6,
-                    4
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    6,
+                    3,
                     3
                 ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    7,
-                    5
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    6,
-                    5
-                ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    7,
-                    6
-                ],
-                "color": 1
-            },
-            {
-                "vertex": [
-                    7,
-                    4
-                ],
-                "color": -1
-            },
-            {
-                "vertex": [
-                    6,
-                    7
-                ],
+                "location": "-",
                 "color": 1
             },
             {
                 "vertex": [
                     1,
-                    8
+                    5
                 ],
+                "location": "u",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    1,
+                    4
+                ],
+                "location": "u",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    1,
+                    6
+                ],
+                "location": "u",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    1,
+                    7
+                ],
+                "location": "u",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    7,
+                    6
+                ],
+                "location": "m",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    5,
+                    3
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    7,
+                    7
+                ],
+                "location": "-",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    7,
+                    5
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    9,
+                    1
+                ],
+                "location": "dl",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    2,
+                    5
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    9,
+                    2
+                ],
+                "location": "d",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    6,
+                    6
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    8,
+                    1
+                ],
+                "location": "l",
                 "color": -1
             },
             {
                 "vertex": [
                     8,
-                    9
+                    6
                 ],
+                "location": "m",
                 "color": 1
             },
             {
                 "vertex": [
-                    2,
-                    9
+                    7,
+                    1
                 ],
+                "location": "l",
                 "color": -1
             },
             {
                 "vertex": [
-                    9,
+                    6,
+                    7
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    8,
+                    2
+                ],
+                "location": "m",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    7,
                     8
                 ],
+                "location": "m",
                 "color": 1
+            },
+            {
+                "vertex": [
+                    8,
+                    7
+                ],
+                "location": "m",
+                "color": -1
+            },
+            {
+                "vertex": [
+                    8,
+                    8
+                ],
+                "location": "m",
+                "color": 1
+            },
+            {
+                "vertex": [
+                    7,
+                    2
+                ],
+                "location": "m",
+                "color": -1
             }
         ],
         "identifier": "",

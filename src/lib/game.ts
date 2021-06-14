@@ -69,10 +69,11 @@ export const move = (game: Game, move: Field): GoBoard => {
     }
 
     // From here on: Valid move !
+    // Handle capture
+    board = handleCapture(board, move.vertex, move.color)
+
     // Add move to fields
     board = setStone(board, move)
-    // Handle capture
-    board = handleCapture(board, move)
 
     // Switch current player
     board = switchPlayer(board, game.players)
@@ -116,22 +117,34 @@ export const isOccupied = (board: GoBoard, vertex: Vertex): boolean => {
     return findFieldOnBoardByVertex(board, vertex).color !== PlayerColor.EMPTY
 }
 
+/*
+ * A stone that would have no liberties (or fill the last liberty of your group)
+ * must not be placed unless the move captures something. In that case it is
+ * allowed (because the capture gives you at least one liberty).
+ */
 export const isSuicide = (
     board: GoBoard,
     vertex: Vertex,
-    playerColor: PlayerColor | string
+    playerColor: PlayerColor
 ): boolean => {
-    // Check Liberties on Stone
-    // Should be done recursively - Big Boundaries
-    const libs = getLiberties(board, vertex)
-    // Get direct neighbors of stone
-    const directNeighborFields = getDirectNeighborFields(board, vertex)
-    // Suicide: zero liberties and no direct neighbor is of my color
-    return (
-        libs.length === 0 &&
-        directNeighborFields.filter(field => field.color === playerColor)
-            .length === 0
+    // Check if the move would capture something
+    // To not pass references to the original board around we need to
+    // perform a deep copy of the board
+    const boardDeepCopy = JSON.parse(JSON.stringify(board)) as GoBoard
+    const boardAfterHandleCapture = handleCapture(
+        boardDeepCopy,
+        vertex,
+        playerColor
     )
+    if (board.captures < boardAfterHandleCapture.captures) {
+        return false
+    }
+    // Check Liberties on move
+    const boardAfterMove = setStone(boardDeepCopy, {
+        vertex,
+        color: playerColor,
+    })
+    return getGroupLiberties(boardAfterMove, vertex).length === 0
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -142,11 +155,47 @@ export const isKo = (board: GoBoard, move: Field): boolean => {
     return false
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const handleCapture = (board: GoBoard, move: Field): GoBoard => {
-    // get neighbors of move of opposite color
-    // check liberties of neighbors of opposite color
-    // if 0 -> remove & add to board.captures
+export const handleCapture = (
+    board: GoBoard,
+    vertex: Vertex,
+    playerColor: PlayerColor
+): GoBoard => {
+    // get neighbors of move that are of opposite color
+    // if the direct neighbor group only has a single liberty
+    // which is exactly the current move
+    // then move the whole group to captures
+    for (const neighbor of getDirectNeighborFieldsOfOppositeColor(
+        board,
+        vertex,
+        playerColor
+    )) {
+        // get group
+        const group = getGroupByVertex(board, neighbor.vertex)
+        // check group liberties of neighbors of opposite color
+        const groupLiberties = getGroupLiberties(board, neighbor.vertex)
+        // if 0 -> remove & add to board.captures
+        if (
+            groupLiberties.length === 1 &&
+            groupLiberties[0].vertex[0] === vertex[0] &&
+            groupLiberties[0].vertex[1] === vertex[1]
+        ) {
+            return boardWithGroupToCaptures(board, group)
+        }
+    }
+    return board
+}
+
+const getOppositeColor = (color: PlayerColor) =>
+    color === PlayerColor.BLACK ? PlayerColor.WHITE : PlayerColor.BLACK
+
+const boardWithGroupToCaptures = (board: GoBoard, group: Field[]): GoBoard => {
+    for (const field of group) {
+        board.captures.push({
+            vertex: field.vertex,
+            color: field.color,
+        })
+        findFieldOnBoardByVertex(board, field.vertex).color = PlayerColor.EMPTY
+    }
     return board
 }
 
@@ -205,6 +254,72 @@ export const getLiberties = (board: GoBoard, vertex: Vertex): Field[] => {
         field => field.color === PlayerColor.EMPTY
     )
 }
+
+export const getGroupLiberties = (board: GoBoard, vertex: Vertex): Field[] => {
+    const liberties: Field[] = []
+    const group = getGroupByVertex(board, vertex)
+
+    for (const field of group) {
+        liberties.push(...getLiberties(board, field.vertex))
+    }
+
+    // only unique fields
+    return liberties.filter((field, index) => {
+        const _field = JSON.stringify(field)
+        return (
+            index === liberties.findIndex(obj => JSON.stringify(obj) === _field)
+        )
+    })
+}
+
+export const getGroupByVertex = (
+    board: GoBoard,
+    vertex: Vertex,
+    group: Field[] = []
+): Field[] => {
+    // find the current field on the board by it's vertex
+    const field = findFieldOnBoardByVertex(board, vertex)
+    // find the direct neighbors of the same color of the current field
+    const directNeighborFields = getDirectNeighborFields(board, vertex).filter(
+        neighborField => neighborField.color === field.color
+    )
+    // only consider yet unknown neighbors and the current field itself
+    const newDirectNeighborFields = getNewUniqueFields(group, [
+        ...directNeighborFields,
+        field,
+    ])
+    // set the yet known group
+    group.push(...newDirectNeighborFields)
+    // for each of the new neighbors recursively add any newly identified fields
+    for (const neighbor of newDirectNeighborFields) {
+        group.push(
+            ...getNewUniqueFields(
+                group,
+                getGroupByVertex(board, neighbor.vertex, group)
+            )
+        )
+    }
+    return group
+}
+
+const getNewUniqueFields = (fields: Field[], newFields: Field[]): Field[] => {
+    const newUniqueFields: Field[] = []
+    for (const newField of newFields) {
+        if (!fields.includes(newField)) {
+            newUniqueFields.push(newField)
+        }
+    }
+    return newUniqueFields
+}
+
+const getDirectNeighborFieldsOfOppositeColor = (
+    board: GoBoard,
+    vertex: Vertex,
+    playerColor: PlayerColor
+): Field[] =>
+    getDirectNeighborFields(board, vertex).filter(
+        field => field.color === getOppositeColor(playerColor)
+    )
 
 export const getDirectNeighborFields = (
     board: GoBoard,

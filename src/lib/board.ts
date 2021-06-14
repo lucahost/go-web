@@ -8,47 +8,7 @@ export const generateBoardLayout = (size: number): Field[] => {
     for (let row = 1; row <= size; row++) {
         // Iterate n columns
         for (let col = 1; col <= size; col++) {
-            if (row === 1 && col === 1) {
-                // Up left
-                board.push(createField([row, col], FieldLocation.UP_LEFT))
-            } else if (row === size && col === 1) {
-                // Up right
-                board.push(createField([row, col], FieldLocation.DOWN_LEFT))
-            } else if (row === 1 && col === size) {
-                // Down left
-                board.push(createField([row, col], FieldLocation.UP_RIGHT))
-            } else if (row === size && col === size) {
-                // Down right
-                board.push(createField([row, col], FieldLocation.DOWN_RIGHT))
-            } else if (row === 1) {
-                // Left
-                board.push(createField([row, col], FieldLocation.UP))
-            } else if (row === size) {
-                // Right
-                board.push(createField([row, col], FieldLocation.DOWN))
-            } else if (col === 1) {
-                // Up
-                board.push(createField([row, col], FieldLocation.LEFT))
-            } else if (col === size) {
-                // Right
-                board.push(createField([row, col], FieldLocation.RIGHT))
-            } else {
-                // Markers for 9x9 goban
-                if (
-                    size === 9 &&
-                    ((row === 5 && col === 5) ||
-                        (row === 3 && col === 3) ||
-                        (row === 3 && col === 7) ||
-                        (row === 7 && col === 3) ||
-                        (row === 7 && col === 7))
-                ) {
-                    // Middle marked
-                    board.push(createField([row, col], FieldLocation.MARKER))
-                } else {
-                    // Middle unmarked
-                    board.push(createField([row, col], FieldLocation.MIDDLE))
-                }
-            }
+            board.push(createField([row, col]))
         }
     }
     return board
@@ -65,10 +25,45 @@ export const withNewFieldColor = (
     fields[index] = {
         ...fields[index],
         color,
-        location:
-            color === PlayerColor.BLACK
-                ? FieldLocation.BLACK_STONE
-                : FieldLocation.WHITE_STONE,
     }
     return fields
+}
+
+export const getFieldLocationByVertex = (
+    vertex: Vertex,
+    size: number
+): FieldLocation => {
+    const row = vertex[0]
+    const col = vertex[1]
+    if (row === 1 && col === 1) {
+        return FieldLocation.UP_LEFT
+    } else if (row === size && col === 1) {
+        return FieldLocation.DOWN_LEFT
+    } else if (row === 1 && col === size) {
+        return FieldLocation.UP_RIGHT
+    } else if (row === size && col === size) {
+        return FieldLocation.DOWN_RIGHT
+    } else if (row === 1) {
+        return FieldLocation.UP
+    } else if (row === size) {
+        return FieldLocation.DOWN
+    } else if (col === 1) {
+        return FieldLocation.LEFT
+    } else if (col === size) {
+        return FieldLocation.RIGHT
+    } else {
+        // Markers for 9x9 goban
+        if (
+            size === 9 &&
+            ((row === 5 && col === 5) ||
+                (row === 3 && col === 3) ||
+                (row === 3 && col === 7) ||
+                (row === 7 && col === 3) ||
+                (row === 7 && col === 7))
+        ) {
+            return FieldLocation.MARKER
+        } else {
+            return FieldLocation.MIDDLE
+        }
+    }
 }

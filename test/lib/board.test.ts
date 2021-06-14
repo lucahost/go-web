@@ -1,4 +1,8 @@
-import { generateBoardLayout, withNewFieldColor } from '../../src/lib/board'
+import {
+    generateBoardLayout,
+    getFieldLocationByVertex,
+    withNewFieldColor,
+} from '../../src/lib/board'
 import { Field, FieldLocation, PlayerColor } from '../../src/lib/types'
 
 describe('generate a 9x9 board', () => {
@@ -9,17 +13,6 @@ describe('generate a 9x9 board', () => {
         expect(generateBoardLayout(9)[0].vertex).toStrictEqual([1, 1])
         expect(generateBoardLayout(9)[80].vertex).toStrictEqual([9, 9])
     })
-    it('should generate correct locations', () => {
-        expect(generateBoardLayout(9)[0].location).toStrictEqual(
-            FieldLocation.UP_LEFT
-        )
-        expect(generateBoardLayout(9)[40].location).toStrictEqual(
-            FieldLocation.MARKER
-        )
-        expect(generateBoardLayout(9)[80].location).toStrictEqual(
-            FieldLocation.DOWN_RIGHT
-        )
-    })
 })
 
 describe('set new field color', () => {
@@ -27,12 +20,10 @@ describe('set new field color', () => {
         const board: Field[] = [
             {
                 vertex: [0, 0],
-                location: FieldLocation.UP_RIGHT,
                 color: PlayerColor.EMPTY,
             },
             {
                 vertex: [0, 1],
-                location: FieldLocation.UP,
                 color: PlayerColor.EMPTY,
             },
         ]
@@ -45,5 +36,53 @@ describe('set new field color', () => {
         expect(
             withNewFieldColor(board, [0, 1], PlayerColor.WHITE)[1].color
         ).toBe(PlayerColor.WHITE)
+    })
+})
+
+describe('get field location string by vertex', () => {
+    it('should generate correct corner locations', () => {
+        expect(getFieldLocationByVertex([1, 1], 9)).toStrictEqual(
+            FieldLocation.UP_LEFT
+        )
+        expect(getFieldLocationByVertex([1, 9], 9)).toStrictEqual(
+            FieldLocation.UP_RIGHT
+        )
+        expect(getFieldLocationByVertex([9, 1], 9)).toStrictEqual(
+            FieldLocation.DOWN_LEFT
+        )
+        expect(getFieldLocationByVertex([9, 9], 9)).toStrictEqual(
+            FieldLocation.DOWN_RIGHT
+        )
+    })
+    it('should generate correct side locations', () => {
+        expect(getFieldLocationByVertex([1, 2], 9)).toStrictEqual(
+            FieldLocation.UP
+        )
+        expect(getFieldLocationByVertex([2, 1], 9)).toStrictEqual(
+            FieldLocation.LEFT
+        )
+        expect(getFieldLocationByVertex([9, 2], 9)).toStrictEqual(
+            FieldLocation.DOWN
+        )
+        expect(getFieldLocationByVertex([2, 9], 9)).toStrictEqual(
+            FieldLocation.RIGHT
+        )
+    })
+    it('should generate correct marker locations', () => {
+        expect(getFieldLocationByVertex([3, 3], 9)).toStrictEqual(
+            FieldLocation.MARKER
+        )
+        expect(getFieldLocationByVertex([3, 7], 9)).toStrictEqual(
+            FieldLocation.MARKER
+        )
+        expect(getFieldLocationByVertex([5, 5], 9)).toStrictEqual(
+            FieldLocation.MARKER
+        )
+        expect(getFieldLocationByVertex([7, 3], 9)).toStrictEqual(
+            FieldLocation.MARKER
+        )
+        expect(getFieldLocationByVertex([7, 7], 9)).toStrictEqual(
+            FieldLocation.MARKER
+        )
     })
 })

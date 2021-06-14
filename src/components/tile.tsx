@@ -1,9 +1,10 @@
 import styled from 'styled-components'
-import { Field, PlayerColor, Vertex } from '../lib/types'
+import { Field, FieldLocation, PlayerColor, Vertex } from '../lib/types'
 import { memo, useState } from 'react'
 
 interface Props {
     field: Field
+    location: FieldLocation
     clickHandler: (vertex: Vertex) => void
     currentPlayer?: PlayerColor
     userPlayer?: PlayerColor
@@ -15,7 +16,7 @@ const TileContainer = styled.img`
 `
 
 const Tile = memo(
-    ({ field, clickHandler, currentPlayer, userPlayer }: Props) => {
+    ({ field, location, clickHandler, currentPlayer, userPlayer }: Props) => {
         const [isHover, setIsHover] = useState(false)
 
         return (
@@ -35,9 +36,9 @@ const Tile = memo(
                 src={`/Go_${
                     isHover
                         ? currentPlayer == PlayerColor.BLACK
-                            ? 'bh'
-                            : 'wh'
-                        : field.location
+                            ? FieldLocation.BLACK_STONE_HOVER
+                            : FieldLocation.WHITE_STONE_HOVER
+                        : location
                 }.svg`}
             />
         )
