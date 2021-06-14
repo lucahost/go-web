@@ -15,6 +15,7 @@ import { isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { getFieldLocationByVertex } from '../lib/board'
+import useSoundEffect from '../lib/hooks/useSoundEffect'
 
 interface Props {
     size: number
@@ -49,6 +50,8 @@ const Goban: FC<Props> = props => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [clickSound] = useSoundEffect('click.mp3')
+
     const [currentPlayer, setCurrentPlayer] = useState<Player>()
     const [userPlayer, setUserPlayer] = useState<Player>()
     const [board, setBoard] = useState<GoBoard>()
@@ -131,6 +134,7 @@ const Goban: FC<Props> = props => {
                     addErrorMessage('Suicide')
                     return
                 }
+                clickSound()
                 if (localGame) {
                     const url = `/api/games/${localGame.id}/moves`
                     axios
