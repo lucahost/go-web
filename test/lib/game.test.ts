@@ -25,6 +25,7 @@ import { createPlayer } from '../../src/lib/player'
 import { board as emptyBoard } from '../boards/1_empty_9x9_board.json'
 import { board as atariBoard } from '../boards/2_atari_9x9_board.json'
 import { board as captureBoard } from '../boards/3_capture_9x9_board.json'
+import { board as multiCaptureBoard } from '../boards/4_multi_capture_9x9_board.json'
 import { board as suicideBoard } from '../boards/5_suicide_test_board.json'
 
 const newGame = (board: GoBoard): Game => {
@@ -181,6 +182,9 @@ describe('Prevent Suicide', () => {
     const board = JSON.parse(JSON.stringify(suicideBoard)) as GoBoard
     const boardAtari = JSON.parse(JSON.stringify(atariBoard)) as GoBoard
     const boardCapture = JSON.parse(JSON.stringify(captureBoard)) as GoBoard
+    const boardMultiCapture = JSON.parse(
+        JSON.stringify(multiCaptureBoard)
+    ) as GoBoard
     it('upper left corner', () => {
         expect(isSuicide(board, [1, 1], PlayerColor.WHITE)).toBeTruthy()
         expect(isSuicide(board, [1, 1], PlayerColor.BLACK)).toBeFalsy()
@@ -204,6 +208,14 @@ describe('Prevent Suicide', () => {
     it('group in upper right corner', () => {
         expect(isSuicide(boardCapture, [2, 8], PlayerColor.WHITE)).toBeTruthy()
         expect(isSuicide(boardCapture, [2, 8], PlayerColor.BLACK)).toBeFalsy()
+    })
+    it('on multi capture situation', () => {
+        expect(
+            isSuicide(boardMultiCapture, [5, 5], PlayerColor.WHITE)
+        ).toBeTruthy()
+        expect(
+            isSuicide(boardMultiCapture, [5, 5], PlayerColor.BLACK)
+        ).toBeFalsy()
     })
 })
 
@@ -356,6 +368,40 @@ describe('Handle Capture', () => {
             color: PlayerColor.BLACK,
             vertex: [6, 4],
         })
+    })
+})
+
+describe('Handle Multi-Capture', () => {
+    it('of four separate stone', () => {
+        const initialBoard = JSON.parse(
+            JSON.stringify(multiCaptureBoard)
+        ) as GoBoard
+        const boardAfterHandleCapture = handleCapture(
+            initialBoard,
+            [5, 5],
+            PlayerColor.BLACK
+        )
+        const fieldOnBoardAfterCapture = boardAfterHandleCapture.fields.find(
+            field => field.vertex[0] === 5 && field.vertex[1] === 5
+        )
+        //expect(boardAfterHandleCapture.captures.length).toStrictEqual(4)
+        expect(boardAfterHandleCapture.captures).toContainEqual({
+            color: PlayerColor.WHITE,
+            vertex: [4, 5],
+        })
+        expect(boardAfterHandleCapture.captures).toContainEqual({
+            color: PlayerColor.WHITE,
+            vertex: [5, 4],
+        })
+        expect(boardAfterHandleCapture.captures).toContainEqual({
+            color: PlayerColor.WHITE,
+            vertex: [5, 6],
+        })
+        expect(boardAfterHandleCapture.captures).toContainEqual({
+            color: PlayerColor.WHITE,
+            vertex: [6, 5],
+        })
+        expect(fieldOnBoardAfterCapture?.color).toStrictEqual(PlayerColor.EMPTY)
     })
 })
 

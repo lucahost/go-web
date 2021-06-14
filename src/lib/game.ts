@@ -8,6 +8,7 @@ import {
     Vertex,
 } from './types'
 import { generateBoardLayout, withNewFieldColor } from './board'
+import { withoutDuplicates } from './utils'
 
 export const start = (): GoBoard => {
     const width = 9
@@ -164,6 +165,7 @@ export const handleCapture = (
     // if the direct neighbor group only has a single liberty
     // which is exactly the current move
     // then move the whole group to captures
+    const captures: Field[] = []
     for (const neighbor of getDirectNeighborFieldsOfOppositeColor(
         board,
         vertex,
@@ -179,17 +181,17 @@ export const handleCapture = (
             groupLiberties[0].vertex[0] === vertex[0] &&
             groupLiberties[0].vertex[1] === vertex[1]
         ) {
-            return boardWithGroupToCaptures(board, group)
+            captures.push(...group)
         }
     }
-    return board
+    return boardWithGroupToCaptures(board, captures)
 }
 
 const getOppositeColor = (color: PlayerColor) =>
     color === PlayerColor.BLACK ? PlayerColor.WHITE : PlayerColor.BLACK
 
 const boardWithGroupToCaptures = (board: GoBoard, group: Field[]): GoBoard => {
-    for (const field of group) {
+    for (const field of withoutDuplicates(group)) {
         board.captures.push({
             vertex: field.vertex,
             color: field.color,
@@ -264,12 +266,7 @@ export const getGroupLiberties = (board: GoBoard, vertex: Vertex): Field[] => {
     }
 
     // only unique fields
-    return liberties.filter((field, index) => {
-        const _field = JSON.stringify(field)
-        return (
-            index === liberties.findIndex(obj => JSON.stringify(obj) === _field)
-        )
-    })
+    return withoutDuplicates(liberties)
 }
 
 export const getGroupByVertex = (

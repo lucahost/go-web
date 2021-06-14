@@ -8,3 +8,9 @@ export const chunk = <T>(input: T[], size: number) => {
 
 export const arrayEquals = (a: number[], b: number[]) =>
     a.length === b.length && a.every((v, i) => v === b[i])
+
+export const withoutDuplicates = <T>(list: T[]) =>
+    list.filter((obj, index) => {
+        const _obj = JSON.stringify(obj)
+        return index === list.findIndex(obj => JSON.stringify(obj) === _obj)
+    })
