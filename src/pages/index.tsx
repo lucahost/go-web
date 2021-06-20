@@ -137,10 +137,6 @@ const HomePage: FC = () => {
         if (localUser && localUser?.subscription === undefined) {
             onLogin()
         }
-
-        if (localUser) {
-            log('user changed')
-        }
     }, [localUser, setLocalUser, registration?.pushManager])
 
     // if there is a user/game already in the local storage: check if it is still valid
