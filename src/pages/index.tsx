@@ -109,34 +109,34 @@ const HomePage: FC = () => {
         }
     }, [])
 
-    const subscribeButtonOnClick = async () => {
-        if (!localUser) {
-            return
+    useEffect(() => {
+        const onLogin = async () => {
+            if (!localUser) {
+                return
+            }
+            const sub = await registration?.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: base64ToUint8Array(
+                    process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? ''
+                ),
+            })
+
+            setSubscription(sub ?? null)
+            setIsSubscribed(true)
+            setLocalUser({ ...localUser, subscription: JSON.stringify(sub) })
+
+            log('web push subscribed!')
+            log(sub)
         }
-        const sub = await registration?.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: base64ToUint8Array(
-                process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? ''
-            ),
-        })
 
-        setSubscription(sub ?? null)
-        setIsSubscribed(true)
-        setLocalUser({ ...localUser, subscription: JSON.stringify(sub) })
+        if (localUser && localUser?.subscription === undefined) {
+            onLogin()
+        }
 
-        log('web push subscribed!')
-        log(sub)
-    }
-
-    const unsubscribeButtonOnClick = async () => {
-        await subscription?.unsubscribe()
-        setSubscription(null)
-        setIsSubscribed(false)
         if (localUser) {
-            setLocalUser({ ...localUser, subscription: undefined })
+            log('user changed')
         }
-        log('web push unsubscribed!')
-    }
+    }, [localUser, setLocalUser, registration?.pushManager])
 
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
@@ -169,10 +169,13 @@ const HomePage: FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const handleLogout = useCallback(() => {
+    const handleLogout = async () => {
+        await subscription?.unsubscribe()
+        setSubscription(null)
+        setIsSubscribed(false)
         setLocalUser(null)
         setLocalGame(null)
-    }, [setLocalGame, setLocalUser])
+    }
 
     const handleNewGame = useCallback(() => {
         setLocalGame(null)
@@ -221,19 +224,6 @@ const HomePage: FC = () => {
                     <NavButton onClick={handlePass}>Passen</NavButton>
                 </Nav>
             )}
-
-            <button
-                disabled={isSubscribed}
-                onClick={() => subscribeButtonOnClick()}
-            >
-                Subscribe
-            </button>
-            <button
-                disabled={!isSubscribed}
-                onClick={() => unsubscribeButtonOnClick()}
-            >
-                Unsubscribe
-            </button>
         </>
     )
 }

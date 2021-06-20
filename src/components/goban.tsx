@@ -78,7 +78,7 @@ const Goban: FC<Props> = props => {
         }
     }, [localUser, localGame])
 
-    const loadGame = useCallback(async () => {
+    const loadGame = async () => {
         if (localGame) {
             const url = `/api/games/${localGame.id}`
             axios
@@ -113,7 +113,7 @@ const Goban: FC<Props> = props => {
                     console.error(e)
                 })
         }
-    }, [localGame, props.size, setLocalGame])
+    }
 
     const handleTileClick = useCallback(
         (field: Field) => {
@@ -175,19 +175,23 @@ const Goban: FC<Props> = props => {
     )
 
     useEffect(() => {
-        // run only in browser
         if (
             typeof window !== 'undefined' &&
             'serviceWorker' in navigator &&
             window.workbox !== undefined
         ) {
-            navigator.serviceWorker.addEventListener('message', event => {
-                loadGame()
-                log(event.data.msg, event.data.url)
-            })
+            // run only in browser
+            navigator.serviceWorker.addEventListener('message', loadGame, true)
         }
-
         loadGame()
+
+        return () => {
+            navigator.serviceWorker.removeEventListener(
+                'message',
+                loadGame,
+                true
+            )
+        }
     }, [])
 
     return (

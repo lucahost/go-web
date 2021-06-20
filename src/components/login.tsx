@@ -29,7 +29,7 @@ const Login: FC = () => {
             setLoading(true)
             axios
                 .post<User>(url, { name: name, email: email })
-                .then(r => {
+                .then(async r => {
                     if (r.status === 200 || r.status === 201) {
                         setLocalUser(r.data)
                     }
