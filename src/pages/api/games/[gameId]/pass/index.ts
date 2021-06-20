@@ -1,5 +1,5 @@
 ﻿import { NextApiRequest, NextApiResponse } from 'next'
-import { GoBoard, HttpMethod } from '../../../../../lib/types'
+import { GameState, GoBoard, HttpMethod } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { pass } from '../../../../../lib/game'
@@ -22,6 +22,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     include: {
                         currentPlayer: true,
                         players: true,
+                        author: true,
                     },
                 })
 
@@ -31,7 +32,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
                 let goBoard = JSON.parse(game.board) as GoBoard
 
-                goBoard = pass(goBoard)
+                goBoard = pass(game, goBoard)
 
                 game.board = JSON.stringify(goBoard)
                 if (game.currentPlayer) {
@@ -44,14 +45,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                             throw 'next player not found'
                         }
 
-                        await prisma.game.update({
-                            where: { id: game.id },
-                            data: {
-                                board: JSON.stringify(goBoard),
-                                currentPlayerColor: nextPlayer.playerColor,
-                                currentPlayerId: nextPlayer.userId,
-                            },
-                        })
+                        if (game.gameState === GameState.ENDED) {
+                            await prisma.game.update({
+                                where: { id: game.id },
+                                data: {
+                                    gameState: game.gameState,
+                                    board: JSON.stringify(goBoard),
+                                    currentPlayerColor: null,
+                                    currentPlayerId: null,
+                                },
+                            })
+                        } else {
+                            await prisma.game.update({
+                                where: { id: game.id },
+                                data: {
+                                    gameState: game.gameState,
+                                    board: JSON.stringify(goBoard),
+                                    currentPlayerColor: nextPlayer.playerColor,
+                                    currentPlayerId: nextPlayer.userId,
+                                },
+                            })
+                        }
                     }
                 }
 

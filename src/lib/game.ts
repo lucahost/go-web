@@ -88,10 +88,10 @@ export const move = (game: Game, move: Field): GoBoard => {
     return { ...board, status: GameState.RUNNING }
 }
 
-export const pass = (board: GoBoard): GoBoard => {
+export const pass = (game: Game, board: GoBoard): GoBoard => {
     if (board.pass) {
-        // TODO: Handle double-pass
-        return board
+        game.gameState = GameState.ENDED
+        return { ...board, pass: false }
     } else {
         return { ...board, pass: true }
     }

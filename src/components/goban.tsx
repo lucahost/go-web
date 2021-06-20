@@ -6,6 +6,7 @@ import {
     Field,
     FieldLocation,
     Game,
+    GameState,
     GoBoard,
     Player,
     PlayerColor,
@@ -118,6 +119,10 @@ const Goban: FC<Props> = props => {
     const handleTileClick = useCallback(
         (field: Field) => {
             {
+                if (localGame?.gameState === GameState.ENDED) {
+                    addErrorMessage('Game finished')
+                    return
+                }
                 if (currentPlayer?.playerColor != userPlayer?.playerColor) {
                     addErrorMessage('Not your turn')
                     return
@@ -197,20 +202,31 @@ const Goban: FC<Props> = props => {
     return (
         <>
             <h1>{localGame?.title}</h1>
-            {(localGame?.board as GoBoard)?.pass && <h2>PASS</h2>}
-            <Message>
-                {userPlayer?.playerColor === currentPlayer?.playerColor
-                    ? `Du bist am Zug (${
-                          userPlayer?.playerColor === PlayerColor.BLACK
-                              ? 'Schwarz'
-                              : 'Weiss'
-                      })`
-                    : `Gegner am Zug (${
-                          currentPlayer?.playerColor === PlayerColor.BLACK
-                              ? 'Schwarz'
-                              : 'Weiss'
-                      })`}
-            </Message>
+            {userPlayer?.playerColor === currentPlayer?.playerColor &&
+                (localGame?.board as GoBoard)?.pass && (
+                    <h2>Der andere Spieler hat gepasst</h2>
+                )}
+
+            {localGame?.gameState === GameState.RUNNING && (
+                <Message>
+                    {userPlayer?.playerColor === currentPlayer?.playerColor
+                        ? `Du bist am Zug (${
+                              userPlayer?.playerColor === PlayerColor.BLACK
+                                  ? 'Schwarz'
+                                  : 'Weiss'
+                          })`
+                        : `Gegner am Zug (${
+                              currentPlayer?.playerColor === PlayerColor.BLACK
+                                  ? 'Schwarz'
+                                  : 'Weiss'
+                          })`}
+                </Message>
+            )}
+
+            {localGame?.gameState === GameState.ENDED && (
+                <Message>GAME OVER</Message>
+            )}
+
             <Board>
                 {error && (
                     <Error>

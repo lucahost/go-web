@@ -20,6 +20,11 @@ const Content = styled.div`
     width: 100%;
 `
 
+const Link = styled.a`
+    text-decoration: none;
+    color: whitesmoke;
+`
+
 const Nav = styled.div`
     display: flex;
     justify-content: space-around;
@@ -201,11 +206,12 @@ const HomePage: FC = () => {
         <>
             <Header>
                 <h1>Go</h1>
-                {localUser && (
-                    <h3>
-                        <a onClick={handleLogout}>Logout</a>
-                    </h3>
-                )}
+                <h2>
+                    <Link href="https://www.learn-go.net/" target="_blank">
+                        Visit learn-go
+                    </Link>
+                </h2>
+                <h3>{localUser && <a onClick={handleLogout}>Logout</a>}</h3>
             </Header>
             <Content>
                 {!localUser ? (

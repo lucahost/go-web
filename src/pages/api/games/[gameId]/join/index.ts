@@ -46,6 +46,15 @@ export default async (
                 break
             }
 
+            // test if user is already in game, return game
+            const existingUserGame = await prisma.userGame.findFirst({
+                where: { userId: uId, gameId: gId },
+            })
+            if (existingUserGame) {
+                res.status(200).json(existingGame)
+                return
+            }
+
             await prisma.userGame.create({
                 data: {
                     playerColor: PlayerColor.BLACK,
