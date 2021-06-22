@@ -4,6 +4,16 @@ import { Game, User } from '../lib/types'
 import axios from 'axios'
 import styled from 'styled-components'
 import Spinner from './spinner'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+    faCheckCircle,
+    faHourglassHalf,
+    faPlayCircle,
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(fab, faCheckCircle, faHourglassHalf, faPlayCircle)
 
 const Table = styled.table`
     padding: 20px;
@@ -17,6 +27,40 @@ const TableHead = styled.th`
 const TableData = styled.td`
     text-align: left;
     padding-right: 50px;
+`
+
+// TODO spacings, statusicon grösser / neutraler, heading datum switchen, datum konstrast verringern und kleiner, ort für id, border gradient
+
+const GameCard = styled.div`
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    // background: gray;
+    padding: 10px 32px 10px 20px;
+    margin: 10px 0px;
+    border: white 1px solid;
+    border-radius: 5px;
+    width: 350px;
+`
+
+const GameDetails = styled.div`
+    margin-left: 20px;
+`
+const GameId = styled.div`
+    position: absolute;
+    top: 0px;
+    right: 15px;
+    padding: 5px;
+`
+
+const GameStatus = styled.h2``
+
+const GameTitle = styled.h2`
+    margin: 0;
+`
+const GameDate = styled.h4`
+    margin: 0;
 `
 
 const GameList: FC = () => {
@@ -114,6 +158,42 @@ const GameList: FC = () => {
     ) : (
         <>
             <h1>Games</h1>
+            {games.map(game => {
+                return (
+                    <GameCard key={game.id}>
+                        <GameId>{game.id}</GameId>
+                        <GameStatus>
+                            {game.gameState === 0 ? (
+                                <FontAwesomeIcon
+                                    icon="play-circle"
+                                    color="yellow"
+                                />
+                            ) : game.gameState === 1 ? (
+                                <FontAwesomeIcon
+                                    icon="hourglass-start"
+                                    color="orange"
+                                />
+                            ) : game.gameState === 2 ? (
+                                <FontAwesomeIcon
+                                    icon="check-circle"
+                                    color="gray"
+                                />
+                            ) : (
+                                <FontAwesomeIcon icon="question" size="3x" />
+                            )}
+                        </GameStatus>
+                        <GameDetails>
+                            <GameTitle>{game.title}</GameTitle>
+                            <GameDate>
+                                {new Date(game.updatedAt).toLocaleString(
+                                    'de-CH'
+                                )}
+                            </GameDate>
+                        </GameDetails>
+                    </GameCard>
+                )
+            })}
+            <h1>Games</h1>
             {error && <p>{error}</p>}
             {games.length < 1 && <p>No games</p>}
             <Table>
@@ -132,13 +212,15 @@ const GameList: FC = () => {
                             <TableData>{game.id}</TableData>
                             <TableData>{game.title}</TableData>
                             <TableData>
-                                {game.gameState === 0
-                                    ? 'Initialized'
-                                    : game.gameState === 1
-                                    ? 'Running'
-                                    : game.gameState === 2
-                                    ? 'Ended'
-                                    : 'Unknown'}
+                                {game.gameState === 0 ? (
+                                    <FontAwesomeIcon icon="play-circle" />
+                                ) : game.gameState === 1 ? (
+                                    <FontAwesomeIcon icon="hourglass-start" />
+                                ) : game.gameState === 2 ? (
+                                    <FontAwesomeIcon icon="check-circle" />
+                                ) : (
+                                    <FontAwesomeIcon icon="question" />
+                                )}
                             </TableData>
                             <TableData>{game.createdAt}</TableData>
                         </tr>

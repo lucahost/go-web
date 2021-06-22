@@ -3,7 +3,7 @@ import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { User } from '../lib/types'
 import axios from 'axios'
 import Spinner from './spinner'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 const FieldInput = styled.input`
     width: 25%;
@@ -13,6 +13,22 @@ const FieldInput = styled.input`
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+`
+const onLoginHover = keyframes`
+    0% {
+        background-position: 0% 0%
+    }
+    100% {
+        background-position: 100% 0%
+    }
+`
+const onLoginHoverOut = keyframes`
+    0% {
+        background-position: 100% 0%
+    }
+    100% {
+        background-position: 0% 0%
+    }
 `
 
 const LoginButton = styled.button`
@@ -24,6 +40,11 @@ const LoginButton = styled.button`
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-size: 150%;
+    animation: ${onLoginHoverOut} 600ms ease-in 1 forwards;
+    :hover {
+        animation: ${onLoginHover} 600ms ease-in 1 forwards;
+    }
 `
 
 const Login: FC = () => {

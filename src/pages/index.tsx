@@ -201,12 +201,12 @@ const HomePage: FC = () => {
     return (
         <>
             <Header>
-                <h1>Go</h1>
-                <h2>
+                <h3>
                     <Link href="https://www.learn-go.net/" target="_blank">
                         Visit learn-go
                     </Link>
-                </h2>
+                </h3>
+                <h1>Go</h1>
                 <h3>{localUser && <a onClick={handleLogout}>Logout</a>}</h3>
             </Header>
             <Content>
