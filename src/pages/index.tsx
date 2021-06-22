@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
@@ -38,6 +38,7 @@ const Nav = styled.div`
 `
 
 const NavButton = styled.div`
+    cursor: pointer;
     color: black;
     display: flex;
     flex-direction: column;
@@ -45,6 +46,14 @@ const NavButton = styled.div`
     align-items: center;
 
     height: 100%;
+`
+
+const Logout = styled.h3`
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+    &:hover {
+        color: #9198e5;
+    }
 `
 
 const Header = styled.div`
@@ -207,7 +216,9 @@ const HomePage: FC = () => {
                     </Link>
                 </h3>
                 <h1>Go</h1>
-                <h3>{localUser && <a onClick={handleLogout}>Logout</a>}</h3>
+                <Logout>
+                    {localUser && <a onClick={handleLogout}>Logout</a>}
+                </Logout>
             </Header>
             <Content>
                 {!localUser ? (

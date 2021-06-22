@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import Spinner from './spinner'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
@@ -15,45 +15,97 @@ import {
 
 library.add(fab, faCheckCircle, faHourglassHalf, faPlayCircle)
 
-const Table = styled.table`
-    padding: 20px;
-`
+// - TODO spacings,
+// - statusicon grösser / neutraler,
+// - heading datum switchen,
+// - datum konstrast verringern und kleiner,
+// - ort für id,
+// - border gradient
 
-const TableHead = styled.th`
-    text-align: left;
-    padding-right: 50px;
+const onGameHover = keyframes`
+    0% {
+        background-position: 0% 0%
+    }
+    100% {
+        background-position: 100% 0%
+    }
 `
-
-const TableData = styled.td`
-    text-align: left;
-    padding-right: 50px;
+const onGameHoverOut = keyframes`
+    0% {
+        background-position: 100% 0%
+    }
+    100% {
+        background-position: 0% 0%
+    }
 `
-
-// TODO spacings, statusicon grösser / neutraler, heading datum switchen, datum konstrast verringern und kleiner, ort für id, border gradient
 
 const GameCard = styled.div`
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    // background: gray;
-    padding: 10px 32px 10px 20px;
-    margin: 10px 0px;
-    border: white 1px solid;
-    border-radius: 5px;
-    width: 350px;
+    & {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        padding: 10px 32px 10px 20px;
+        background: #414246;
+        margin: 20px 0px;
+        width: 350px;
+    }
+    &:after {
+        content: '';
+        position: absolute;
+        background: linear-gradient(20deg, #e66465, #9198e5);
+        width: calc(100% + 10px);
+        height: calc(100% + 10px);
+        background-size: 150%;
+        z-index: -1;
+        top: -5px;
+        left: -5px;
+        border-radius: 5px;
+        animation: ${onGameHoverOut} 300ms ease-in 1 forwards;
+    }
+
+    &:hover:after {
+        animation: ${onGameHover} 300ms ease-in 1 forwards;
+    }
 `
 
 const GameDetails = styled.div`
-    margin-left: 20px;
+    margin-left: 25px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
 `
 const GameId = styled.div`
     position: absolute;
-    top: 0px;
+    top: 10px;
     right: 15px;
     padding: 5px;
 `
+const NewGame = styled.div`
+    display: flex-row;
+`
 
+const CreateGameButton = styled.button`
+    background: linear-gradient(20deg, #e66465, #9198e5);
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0px 8px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-size: 150%;
+`
+
+const NewGameTitleField = styled.input`
+    padding: 12px 20px;
+    margin: 8px 0;
+    flex-grow: 1;
+    display: inline-block;
+    border: 1px solid #ccc;
+    justify-content: stretch;
+    border-radius: 4px;
+    box-sizing: border-box;
+`
 const GameStatus = styled.h2``
 
 const GameTitle = styled.h2`
@@ -153,87 +205,70 @@ const GameList: FC = () => {
         }
     }, [gameTitle, games, localUser, setLocalGame])
 
-    return loading ? (
-        <Spinner />
-    ) : (
+    return (
         <>
             <h1>Games</h1>
-            {games.map(game => {
-                return (
-                    <GameCard key={game.id}>
-                        <GameId>{game.id}</GameId>
-                        <GameStatus>
-                            {game.gameState === 0 ? (
-                                <FontAwesomeIcon
-                                    icon="play-circle"
-                                    color="yellow"
-                                />
-                            ) : game.gameState === 1 ? (
-                                <FontAwesomeIcon
-                                    icon="hourglass-start"
-                                    color="orange"
-                                />
-                            ) : game.gameState === 2 ? (
-                                <FontAwesomeIcon
-                                    icon="check-circle"
-                                    color="gray"
-                                />
-                            ) : (
-                                <FontAwesomeIcon icon="question" size="3x" />
-                            )}
-                        </GameStatus>
-                        <GameDetails>
-                            <GameTitle>{game.title}</GameTitle>
-                            <GameDate>
-                                {new Date(game.updatedAt).toLocaleString(
-                                    'de-CH'
-                                )}
-                            </GameDate>
-                        </GameDetails>
-                    </GameCard>
-                )
-            })}
-            <h1>Games</h1>
-            {error && <p>{error}</p>}
-            {games.length < 1 && <p>No games</p>}
-            <Table>
-                <tr>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>State</TableHead>
-                    <TableHead>Created</TableHead>
-                </tr>
-                {games.map(game => {
-                    return (
-                        <tr
-                            key={game.id}
-                            onClick={() => handleGameSelect(game)}
-                        >
-                            <TableData>{game.id}</TableData>
-                            <TableData>{game.title}</TableData>
-                            <TableData>
-                                {game.gameState === 0 ? (
-                                    <FontAwesomeIcon icon="play-circle" />
-                                ) : game.gameState === 1 ? (
-                                    <FontAwesomeIcon icon="hourglass-start" />
-                                ) : game.gameState === 2 ? (
-                                    <FontAwesomeIcon icon="check-circle" />
-                                ) : (
-                                    <FontAwesomeIcon icon="question" />
-                                )}
-                            </TableData>
-                            <TableData>{game.createdAt}</TableData>
-                        </tr>
-                    )
-                })}
-            </Table>
-            <span>
-                <input
+            <NewGame>
+                <NewGameTitleField
                     onChange={handleGameTitleInput}
                     placeholder="Name eingeben"
                 />
-                <button onClick={handleCreateGame}>Create Game</button>
-            </span>
+                <CreateGameButton onClick={handleCreateGame}>
+                    Create Game
+                </CreateGameButton>
+            </NewGame>
+            {loading ? (
+                <Spinner />
+            ) : (
+                games.map(game => {
+                    return (
+                        <GameCard
+                            key={game.id}
+                            onClick={() => handleGameSelect(game)}
+                        >
+                            <GameId>{game.id}</GameId>
+                            <GameStatus>
+                                {game.gameState === 0 ? (
+                                    <FontAwesomeIcon
+                                        icon="play-circle"
+                                        color="#8b8683"
+                                        size="2x"
+                                    />
+                                ) : game.gameState === 1 ? (
+                                    <FontAwesomeIcon
+                                        icon="hourglass-start"
+                                        color="#8b8683"
+                                        size="2x"
+                                    />
+                                ) : game.gameState === 2 ? (
+                                    <FontAwesomeIcon
+                                        icon="check-circle"
+                                        color="#8b8683"
+                                        size="2x"
+                                    />
+                                ) : (
+                                    <FontAwesomeIcon
+                                        icon="question"
+                                        color="#8b8683"
+                                        size="3x"
+                                    />
+                                )}
+                            </GameStatus>
+                            <GameDetails>
+                                <GameTitle>{game.title}</GameTitle>
+                                <GameDate>
+                                    {new Date(game.updatedAt).toLocaleString(
+                                        'de-CH'
+                                    )}
+                                </GameDate>
+                            </GameDetails>
+                        </GameCard>
+                    )
+                })
+            )}
+
+            {error && <p>{error}</p>}
+            {games.length < 1 && <p>No games</p>}
         </>
     )
 }
