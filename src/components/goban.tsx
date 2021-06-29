@@ -45,8 +45,6 @@ const Captures = styled.div`
     height: 50px;
 `
 
-const { log } = console
-
 const Goban: FC<Props> = props => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -111,6 +109,7 @@ const Goban: FC<Props> = props => {
                     }
                 })
                 .catch(e => {
+                    // eslint-disable-next-line no-console
                     console.error(e)
                 })
         }
@@ -169,6 +168,7 @@ const Goban: FC<Props> = props => {
                 }
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [
             currentPlayer,
             userPlayer?.playerColor,
@@ -197,6 +197,7 @@ const Goban: FC<Props> = props => {
                 true
             )
         }
+        // eslint-disable-next-line
     }, [])
 
     return (

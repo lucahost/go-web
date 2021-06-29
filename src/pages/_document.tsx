@@ -16,32 +16,32 @@ export default class extends Document {
 
     render() {
         return (
-            <Html lang="en" dir="ltr">
+            <Html dir="ltr" lang="en">
                 <Head>
-                    <meta name="application-name" content={APP_NAME} />
-                    <meta name="apple-mobile-web-app-capable" content="yes" />
+                    <meta content={APP_NAME} name="application-name" />
+                    <meta content="yes" name="apple-mobile-web-app-capable" />
                     <meta
-                        name="apple-mobile-web-app-status-bar-style"
                         content="default"
+                        name="apple-mobile-web-app-status-bar-style"
                     />
                     <meta
-                        name="apple-mobile-web-app-title"
                         content={APP_NAME}
+                        name="apple-mobile-web-app-title"
                     />
-                    <meta name="description" content={APP_DESCRIPTION} />
-                    <meta name="format-detection" content="telephone=no" />
-                    <meta name="mobile-web-app-capable" content="yes" />
-                    <meta name="theme-color" content="#FFFFFF" />
+                    <meta content={APP_DESCRIPTION} name="description" />
+                    <meta content="telephone=no" name="format-detection" />
+                    <meta content="yes" name="mobile-web-app-capable" />
+                    <meta content="#FFFFFF" name="theme-color" />
                     {/* TIP: set viewport head meta tag in _app.js, otherwise it will show a warning */}
                     {/* <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover' /> */}
 
                     <link
+                        href="/icons/apple-touch-icon.png"
                         rel="apple-touch-icon"
                         sizes="180x180"
-                        href="/icons/apple-touch-icon.png"
                     />
-                    <link rel="manifest" href="/manifest.json" />
-                    <link rel="shortcut icon" href="/favicon.ico" />
+                    <link href="/manifest.json" rel="manifest" />
+                    <link href="/favicon.ico" rel="shortcut icon" />
                     <style>{`
             html, body, #__next {
               height: 100%;

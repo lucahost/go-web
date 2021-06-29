@@ -152,16 +152,8 @@ export const isKo = (board: GoBoard, move: Field): boolean => {
     // Check if the move would capture something
     // To not pass references to the original board around we need to
     // perform a deep copy of the board
-    const boardDeepCopy = JSON.parse(JSON.stringify(board)) as GoBoard
-    const boardAfterHandleCapture = handleCapture(
-        boardDeepCopy,
-        move.vertex,
-        move.color
-    )
-    const lastMove = board.history[board.history.length - 1]
     const secondLastMove = board.history[board.history.length - 2]
     const lastCapture = board.captures[board.captures.length - 1]
-    const newCaptures = boardAfterHandleCapture.captures
     return (
         lastCapture &&
         secondLastMove &&

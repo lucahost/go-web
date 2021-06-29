@@ -137,6 +137,7 @@ const GameList: FC = () => {
                     }
                 })
                 .catch(e => {
+                    // eslint-disable-next-line no-console
                     console.log(e)
                     setGames([])
                 })
@@ -169,6 +170,7 @@ const GameList: FC = () => {
                         setLoading(false)
                     })
                     .catch(e => {
+                        // eslint-disable-next-line no-console
                         console.log(e)
                         setError('Fehler beim Spiel erstellen')
                         setLoading(false)
@@ -176,6 +178,7 @@ const GameList: FC = () => {
                 setLocalGame(game)
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [setLocalGame]
     )
 
@@ -198,6 +201,7 @@ const GameList: FC = () => {
                     setLoading(false)
                 })
                 .catch(e => {
+                    // eslint-disable-next-line no-console
                     console.log(e)
                     setError('Fehler beim Spiel erstellen')
                     setLoading(false)
@@ -224,32 +228,33 @@ const GameList: FC = () => {
                     return (
                         <GameCard
                             key={game.id}
+                            // eslint-disable-next-line react/jsx-no-bind
                             onClick={() => handleGameSelect(game)}
                         >
                             <GameId>{game.id}</GameId>
                             <GameStatus>
                                 {game.gameState === 0 ? (
                                     <FontAwesomeIcon
-                                        icon="play-circle"
                                         color="#8b8683"
+                                        icon="play-circle"
                                         size="2x"
                                     />
                                 ) : game.gameState === 1 ? (
                                     <FontAwesomeIcon
-                                        icon="hourglass-start"
                                         color="#8b8683"
+                                        icon="hourglass-start"
                                         size="2x"
                                     />
                                 ) : game.gameState === 2 ? (
                                     <FontAwesomeIcon
-                                        icon="check-circle"
                                         color="#8b8683"
+                                        icon="check-circle"
                                         size="2x"
                                     />
                                 ) : (
                                     <FontAwesomeIcon
-                                        icon="question"
                                         color="#8b8683"
+                                        icon="question"
                                         size="3x"
                                     />
                                 )}

@@ -80,6 +80,7 @@ const Login: FC = () => {
                     setLoading(false)
                 })
                 .catch(e => {
+                    // eslint-disable-next-line no-console
                     console.log(e)
                     setError('Fehler bei Anmeldung')
                     setLoading(false)

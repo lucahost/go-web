@@ -70,6 +70,7 @@ const apiMethod = async (
 
                 res.status(200).json(newGame)
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error(err)
             }
 

@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
@@ -85,6 +85,7 @@ const HomePage: FC = () => {
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isSubscribed, setIsSubscribed] = useState(false)
     const [subscription, setSubscription] = useState<PushSubscription | null>(
         null
@@ -121,6 +122,7 @@ const HomePage: FC = () => {
                 setRegistration(reg)
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -205,6 +207,7 @@ const HomePage: FC = () => {
                     setLocalGame(null)
                 })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setLocalGame, localGame])
 
     return (
