@@ -40,16 +40,14 @@ const onGameHoverOut = keyframes`
 `
 
 const GameCard = styled.div`
-    & {
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        padding: 10px 32px 10px 20px;
-        background: #414246;
-        margin: 20px 0px;
-        width: 350px;
-    }
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    padding: 10px 32px 10px 20px;
+    background: #414246;
+    margin: 20px 0px;
+    width: 350px;
     &:after {
         content: '';
         position: absolute;
