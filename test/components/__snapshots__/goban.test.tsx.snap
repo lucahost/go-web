@@ -4,11 +4,6 @@ exports[`ButtonGroup renders correctly 1`] = `
 <div>
   <h1 />
   <div
-    class="goban__Message-c65plc-2 llDtut"
-  >
-    Du bist am Zug (Weiss)
-  </div>
-  <div
     class="goban__Board-c65plc-0"
   />
   <div
@@ -18,7 +13,7 @@ exports[`ButtonGroup renders correctly 1`] = `
       White: 0
     </p>
     <p>
-      Black: 1
+      Black: 0
     </p>
   </div>
 </div>

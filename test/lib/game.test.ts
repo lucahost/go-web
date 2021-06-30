@@ -149,8 +149,9 @@ describe('Move', () => {
 describe('Pass', () => {
     it('should set pass and reset it correctly', () => {
         const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
+        const game = newGame(initialBoard)
 
-        const boardWithOnePass = pass(initialBoard)
+        const boardWithOnePass = pass(game, initialBoard)
         expect(boardWithOnePass.pass).toBeTruthy()
 
         const resetPassBoard = resetPass(boardWithOnePass)
@@ -161,7 +162,7 @@ describe('Pass', () => {
         const testBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
         const game = newGame(testBoard)
 
-        const boardWithOnePass = pass(testBoard)
+        const boardWithOnePass = pass(game, testBoard)
         expect(boardWithOnePass.pass).toBeTruthy()
 
         const initialMove = {

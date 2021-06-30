@@ -191,7 +191,7 @@ const Goban: FC<Props> = props => {
         loadGame()
 
         return () => {
-            navigator.serviceWorker.removeEventListener(
+            navigator.serviceWorker?.removeEventListener(
                 'message',
                 loadGame,
                 true
