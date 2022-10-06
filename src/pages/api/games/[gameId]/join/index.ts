@@ -14,7 +14,7 @@ webPush.setVapidDetails(
 
 const { error } = console
 
-export default async (
+const JoinApi = async (
     req: NextApiRequest,
     res: NextApiResponse<JoinGameResponseData>
 ) => {
@@ -113,3 +113,5 @@ export default async (
             res.status(405).end(`Method ${method} Not Allowed`)
     }
 }
+
+export default JoinApi

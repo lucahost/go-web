@@ -6,7 +6,7 @@ import { pass } from '../../../../../lib/game'
 
 const { error } = console
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const {
         query: { gameId },
         method,
@@ -100,3 +100,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(405).end(`Method ${method} Not Allowed`)
     }
 }
+
+export default PassApi

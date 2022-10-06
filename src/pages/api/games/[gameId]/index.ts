@@ -5,7 +5,7 @@ type GameResponse = Game | never
 
 import prisma from '../../../../lib/db'
 
-export default async (
+const GameApi = async (
     req: NextApiRequest,
     res: NextApiResponse<GameResponse>
 ) => {
@@ -68,3 +68,5 @@ export default async (
             res.status(405).end(`Method ${method} Not Allowed`)
     }
 }
+
+export default GameApi

@@ -6,7 +6,7 @@ import { move } from '../../../../../lib/game'
 
 const { error } = console
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const {
         query: { gameId },
         method,
@@ -79,3 +79,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(405).end(`Method ${method} Not Allowed`)
     }
 }
+
+export default MoveApi

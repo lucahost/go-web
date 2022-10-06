@@ -9,7 +9,7 @@ import Document, {
 const APP_NAME = 'fwebt-go'
 const APP_DESCRIPTION = 'play go using our nextjs app'
 
-export default class extends Document {
+export default class DocumentClass extends Document {
     static async getInitialProps(ctx: DocumentContext) {
         return await Document.getInitialProps(ctx)
     }
