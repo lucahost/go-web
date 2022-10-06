@@ -68,8 +68,20 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                                         )
                                     })
                             })
+                        } else {
+                            res.status(404).end(
+                                `Subscription for game ${gId} and currentPlayer not found`
+                            )
                         }
+                    } else {
+                        res.status(404).end(
+                            `Game ${gId} currentPlayer is not currentPlayer ${goBoard.currentPlayer?.userId}`
+                        )
                     }
+                } else {
+                    res.status(404).end(
+                        `Game ${gId} with currentPlayer not found`
+                    )
                 }
             }
             res.status(200)

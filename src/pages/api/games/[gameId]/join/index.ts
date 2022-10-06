@@ -104,6 +104,10 @@ const JoinApi = async (
                             )
                         })
                 })
+            } else {
+                res.status(404).end(
+                    `Subscription for game ${gId} and currentPlayer not found`
+                )
             }
 
             res.status(200).json(existingGame)
