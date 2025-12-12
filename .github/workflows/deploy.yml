@@ -101,6 +101,6 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
-            npm ci --production
-            npx prisma migrate deploy
+            npm ci --omit=dev
+            npx prisma@6 migrate deploy
             pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
