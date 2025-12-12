@@ -61,6 +61,7 @@ jobs:
             package.json
             package-lock.json
             next.config.js
+            ecosystem.config.js
             prisma/
           retention-days: 30
           compression-level: 9
