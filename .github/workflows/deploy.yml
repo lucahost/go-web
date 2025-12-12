@@ -51,18 +51,19 @@ jobs:
       - name: Build for production
         run: npm run build
 
+      - name: Prepare build artifacts
+        run: |
+          mkdir -p deploy-bundle
+          cp -r .next deploy-bundle/
+          cp -r public deploy-bundle/
+          cp -r prisma deploy-bundle/
+          cp package.json package-lock.json next.config.js ecosystem.config.js deploy-bundle/
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: production-build-${{ github.sha }}
-          path: |
-            .next/
-            public/
-            package.json
-            package-lock.json
-            next.config.js
-            ecosystem.config.js
-            prisma/
+          path: deploy-bundle/
           retention-days: 30
           compression-level: 9
 
@@ -102,6 +103,11 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
+            echo "Checking .next directory..."
+            ls -la .next/ || { echo "ERROR: .next directory not found!"; exit 1; }
+            test -f .next/BUILD_ID || { echo "ERROR: BUILD_ID not found in .next!"; exit 1; }
+            echo "Build verified. Installing dependencies..."
             npm ci --omit=dev
-            npx prisma@6 migrate deploy
+            npx prisma generate
+            npx prisma migrate deploy
             pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
