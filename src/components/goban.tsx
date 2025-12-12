@@ -251,8 +251,8 @@ const Goban: FC<Props> = props => {
                                                   props.size
                                               )
                                             : field.color === PlayerColor.BLACK
-                                            ? FieldLocation.BLACK_STONE
-                                            : FieldLocation.WHITE_STONE
+                                              ? FieldLocation.BLACK_STONE
+                                              : FieldLocation.WHITE_STONE
                                     }
                                     userPlayer={userPlayer?.playerColor}
                                 />

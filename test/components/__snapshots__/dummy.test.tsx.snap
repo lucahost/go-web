@@ -2,7 +2,7 @@
 
 exports[`ButtonGroup renders correctly 1`] = `
 <h1
-  class="dummy__PageTitle-sc-1omcpq1-0 jeiwF"
+  class="sc-bRKDuR dIAsdX"
 >
   Hello World
 </h1>

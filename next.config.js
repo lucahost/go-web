@@ -1,4 +1,4 @@
-﻿const prod = process.env.NODE_ENV === 'production'
+const prod = process.env.NODE_ENV === 'production'
 
 const withPWA = require('next-pwa')({
     dest: 'public',
@@ -6,8 +6,8 @@ const withPWA = require('next-pwa')({
 })
 
 const settings = withPWA({
-    devIndicators: {
-        buildActivity: false,
+    compiler: {
+        styledComponents: true,
     },
 })
 

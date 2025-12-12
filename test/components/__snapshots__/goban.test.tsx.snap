@@ -4,10 +4,10 @@ exports[`ButtonGroup renders correctly 1`] = `
 <div>
   <h1 />
   <div
-    class="goban__Board-c65plc-0"
+    class="sc-hvigdm"
   />
   <div
-    class="goban__Captures-c65plc-4 hVbJej"
+    class="sc-jwTyAe hoMgea"
   >
     <p>
       White: 0
