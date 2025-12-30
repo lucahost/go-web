@@ -86,10 +86,16 @@ export const move = (game: Game, move: Field): GoBoard => {
 
 export const pass = (game: Game, board: GoBoard): GoBoard => {
     if (board.pass) {
+        // Double pass ends the game
         game.gameState = GameState.ENDED
-        return { ...board, pass: false }
+        return { ...board, pass: false, currentPlayer: null }
     } else {
-        return { ...board, pass: true }
+        // Single pass: switch to the other player
+        if (!game.players || game.players.length !== 2) {
+            throw new Error('Cannot pass: game requires exactly 2 players')
+        }
+        const updatedBoard = switchPlayer(board, game.players)
+        return { ...updatedBoard, pass: true }
     }
 }
 

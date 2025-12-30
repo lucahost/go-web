@@ -32,7 +32,26 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                 })
                 if (game && game.author !== null) {
                     let goBoard = JSON.parse(game.board) as GoBoard
-                    goBoard = move(game, field)
+
+                    try {
+                        goBoard = move(game, field)
+                    } catch (err) {
+                        const message =
+                            err instanceof Error ? err.message : String(err)
+                        logger.error('Move failed', {
+                            gameId: gId,
+                            userId,
+                            field,
+                            error: message,
+                        })
+                        res.status(400).json({
+                            error: 'Invalid move',
+                            message,
+                            gameId: gId,
+                            field,
+                        })
+                        return
+                    }
 
                     if (
                         goBoard.currentPlayer &&
@@ -53,11 +72,6 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                             gameId: String(gId),
                             playerColor:
                                 goBoard.currentPlayer.playerColor ?? 'unknown',
-                        })
-                        logger.info('Move made', {
-                            gameId: gId,
-                            userId,
-                            field,
                         })
 
                         const existingSubscriptions =
@@ -96,9 +110,11 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                         res.status(200).json(goBoard)
                         return
                     } else {
-                        res.status(400).end(
-                            `Not your turn. Current player: ${game.currentPlayer?.userId}`
-                        )
+                        res.status(400).json({
+                            error: 'Not your turn',
+                            message: `Current player is ${game.currentPlayer?.userId}`,
+                            gameId: gId,
+                        })
                         return
                     }
                 } else {
