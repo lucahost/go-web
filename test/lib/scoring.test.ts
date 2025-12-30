@@ -1,4 +1,4 @@
-import { calculateDominance } from '../../src/lib/scoring'
+import { calculateDominance, calculateInfluence } from '../../src/lib/scoring'
 import { start, setStone } from '../../src/lib/game'
 import { PlayerColor } from '../../src/lib/types'
 
@@ -115,5 +115,21 @@ describe('Dominance Calculation', () => {
         expect(dominance.neutral).toBe(41)
         expect(dominance.blackPercentage).toBe(25)
         expect(dominance.whitePercentage).toBe(25)
+    })
+})
+
+describe('Influence Calculation', () => {
+    it('should calculate influence for single stone', () => {
+        let board = start()
+        board = setStone(board, { vertex: [5, 5], color: PlayerColor.BLACK })
+        
+        const influence = calculateInfluence(board)
+        
+        // Single black stone at center should influence the whole board
+        // as there are no white stones to counteract it.
+        // It might not be 100% due to thresholding, but should be > 0.
+        expect(influence.black).toBeGreaterThan(0)
+        expect(influence.white).toBe(0)
+        expect(influence.blackPercentage).toBeGreaterThan(0)
     })
 })

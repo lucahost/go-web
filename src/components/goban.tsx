@@ -27,7 +27,12 @@ import useSoundEffect from '../lib/hooks/useSoundEffect'
 import { media } from '../lib/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShare } from '@fortawesome/free-solid-svg-icons'
-import { calculateDominance, Dominance } from '../lib/scoring'
+import {
+    calculateDominance,
+    calculateInfluence,
+    Dominance,
+    Influence,
+} from '../lib/scoring'
 
 interface Props {
     size: number
@@ -191,6 +196,7 @@ const Goban: FC<Props> = props => {
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
     const [dominance, setDominance] = useState<Dominance | null>(null)
+    const [influence, setInfluence] = useState<Influence | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [shareStatus, setShareStatus] = useState<string | null>(null)
 
@@ -301,6 +307,8 @@ const Goban: FC<Props> = props => {
                         if (parsedBoard) {
                             const dom = calculateDominance(parsedBoard)
                             setDominance(dom)
+                            const inf = calculateInfluence(parsedBoard)
+                            setInfluence(inf)
                         }
 
                         if (parsedBoard && r.data.currentPlayer) {
@@ -561,6 +569,12 @@ const Goban: FC<Props> = props => {
                 <DominanceInfo>
                     <p>{`Dominanz W: ${dominance.whitePercentage}%`}</p>
                     <p>{`Dominanz S: ${dominance.blackPercentage}%`}</p>
+                    {influence && (
+                        <>
+                            <p>{`Potenzial W: ${influence.whitePercentage}%`}</p>
+                            <p>{`Potenzial S: ${influence.blackPercentage}%`}</p>
+                        </>
+                    )}
                 </DominanceInfo>
             )}
         </GobanContainer>
