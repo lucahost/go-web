@@ -65,52 +65,50 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                                 where: { gameId: gId },
                             })
 
-                        if (existingSubscriptions) {
-                            existingSubscriptions.forEach(sub => {
-                                const subscription = JSON.parse(
-                                    sub.subscription
+                        // Send push notifications (fire and forget)
+                        existingSubscriptions.forEach(sub => {
+                            const subscription = JSON.parse(sub.subscription)
+                            webPush
+                                .sendNotification(
+                                    subscription,
+                                    JSON.stringify({
+                                        title: 'A move in your game was made!',
+                                        message: `${userId} just set a stone!`,
+                                    })
                                 )
-                                webPush
-                                    .sendNotification(
-                                        subscription,
-                                        JSON.stringify({
-                                            title: 'A move in your game was made!',
-                                            message: `${userId} just set a stone!`,
-                                        })
+                                .then(() => {
+                                    pushNotificationsSentCounter.add(1, {
+                                        type: 'move',
+                                    })
+                                })
+                                .catch(err => {
+                                    pushNotificationsFailedCounter.add(1, {
+                                        type: 'move',
+                                    })
+                                    logger.error(
+                                        'Failed to send push notification',
+                                        err,
+                                        { gameId: gId, type: 'move' }
                                     )
-                                    .then(() => {
-                                        pushNotificationsSentCounter.add(1, {
-                                            type: 'move',
-                                        })
-                                    })
-                                    .catch(err => {
-                                        pushNotificationsFailedCounter.add(1, {
-                                            type: 'move',
-                                        })
-                                        logger.error(
-                                            'Failed to send push notification',
-                                            err,
-                                            { gameId: gId, type: 'move' }
-                                        )
-                                    })
-                            })
-                        } else {
-                            res.status(404).end(
-                                `Subscription for game ${gId} and currentPlayer not found`
-                            )
-                        }
+                                })
+                        })
+
+                        res.status(200).json(goBoard)
+                        return
                     } else {
-                        res.status(404).end(
-                            `Game ${gId} currentPlayer is not currentPlayer ${goBoard.currentPlayer?.userId}`
+                        res.status(400).end(
+                            `Not your turn. Current player: ${game.currentPlayer?.userId}`
                         )
+                        return
                     }
                 } else {
-                    res.status(404).end(
-                        `Game ${gId} with currentPlayer not found`
-                    )
+                    res.status(404).end(`Game ${gId} not found`)
+                    return
                 }
+            } else {
+                res.status(400).end(`Invalid gameId: ${gameId}`)
+                return
             }
-            res.status(200)
             break
         default:
             res.setHeader('Allow', [HttpMethod.POST])

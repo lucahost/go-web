@@ -76,7 +76,7 @@ const JoinApi = async (
                 playerColor: PlayerColor.BLACK,
             }
 
-            await prisma.game.update({
+            const updatedGame = await prisma.game.update({
                 where: { id: existingGame.id },
                 data: {
                     board: JSON.stringify(board),
@@ -103,43 +103,34 @@ const JoinApi = async (
                 where: { gameId: gId },
             })
 
-            if (existingSubscriptions) {
-                existingSubscriptions.forEach((sub: any) => {
-                    const subscription = JSON.parse(sub.subscription)
-                    webPush
-                        .sendNotification(
-                            subscription,
-                            JSON.stringify({
-                                title: 'A Player joined your game!',
-                                message: `${userId} just joined your game, click this message to start it!`,
-                            })
-                        )
-                        .then(() => {
-                            pushNotificationsSentCounter.add(1, {
-                                type: 'join',
-                            })
+            // Send push notifications (fire and forget)
+            existingSubscriptions.forEach((sub: any) => {
+                const subscription = JSON.parse(sub.subscription)
+                webPush
+                    .sendNotification(
+                        subscription,
+                        JSON.stringify({
+                            title: 'A Player joined your game!',
+                            message: `${userId} just joined your game, click this message to start it!`,
                         })
-                        .catch((err: any) => {
-                            pushNotificationsFailedCounter.add(1, {
-                                type: 'join',
-                            })
-                            logger.error(
-                                'Failed to send push notification',
-                                err,
-                                {
-                                    gameId: gId,
-                                    type: 'join',
-                                }
-                            )
+                    )
+                    .then(() => {
+                        pushNotificationsSentCounter.add(1, {
+                            type: 'join',
                         })
-                })
-            } else {
-                res.status(404).end(
-                    `Subscription for game ${gId} and currentPlayer not found`
-                )
-            }
+                    })
+                    .catch((err: any) => {
+                        pushNotificationsFailedCounter.add(1, {
+                            type: 'join',
+                        })
+                        logger.error('Failed to send push notification', err, {
+                            gameId: gId,
+                            type: 'join',
+                        })
+                    })
+            })
 
-            res.status(200).json(existingGame)
+            res.status(200).json(updatedGame)
             break
         default:
             res.setHeader('Allow', [HttpMethod.GET, HttpMethod.POST])
