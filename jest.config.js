@@ -6,10 +6,18 @@ module.exports = {
     testEnvironment: 'jsdom',
     transform: {
         '^.+\\.tsx?$': [
-            'ts-jest',
+            '@swc/jest',
             {
-                tsconfig: {
-                    jsx: 'react-jsx',
+                jsc: {
+                    parser: {
+                        syntax: 'typescript',
+                        tsx: true,
+                    },
+                    transform: {
+                        react: {
+                            runtime: 'automatic',
+                        },
+                    },
                 },
             },
         ],
