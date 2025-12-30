@@ -10,15 +10,13 @@ import {
 } from '@opentelemetry/semantic-conventions'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import {
-    LoggerProvider,
-    SimpleLogRecordProcessor,
+    BatchLogRecordProcessor,
+    ConsoleLogRecordExporter,
 } from '@opentelemetry/sdk-logs'
-import { logs } from '@opentelemetry/api-logs'
 import { PrismaInstrumentation } from '@prisma/instrumentation'
 import { config } from './config'
 
 let sdk: NodeSDK | null = null
-let loggerProvider: LoggerProvider | null = null
 
 export function initTelemetry(): void {
     if (!config.enabled) {
@@ -40,16 +38,19 @@ export function initTelemetry(): void {
         'host.name': config.hostName,
     })
 
-    // Set up log exporter
-    loggerProvider = new LoggerProvider({
-        resource,
-        processors: [
-            new SimpleLogRecordProcessor(
-                new OTLPLogExporter({ url: config.otlpEndpoint })
-            ),
-        ],
-    })
-    logs.setGlobalLoggerProvider(loggerProvider)
+    // Create log processors - use BatchLogRecordProcessor for better performance
+    const logProcessors = [
+        new BatchLogRecordProcessor(
+            new OTLPLogExporter({ url: config.otlpEndpoint })
+        ),
+    ]
+
+    // Add console exporter in development for debugging
+    if (config.deploymentEnvironment === 'development') {
+        logProcessors.push(
+            new BatchLogRecordProcessor(new ConsoleLogRecordExporter())
+        )
+    }
 
     sdk = new NodeSDK({
         resource,
@@ -62,6 +63,7 @@ export function initTelemetry(): void {
             }),
             exportIntervalMillis: 60000,
         }),
+        logRecordProcessors: logProcessors,
         instrumentations: [
             getNodeAutoInstrumentations({
                 '@opentelemetry/instrumentation-fs': { enabled: false },
@@ -79,7 +81,7 @@ export function initTelemetry(): void {
     )
 
     const shutdown = () => {
-        Promise.all([sdk?.shutdown(), loggerProvider?.shutdown()])
+        sdk?.shutdown()
             // eslint-disable-next-line no-console
             .then(() => console.log('OpenTelemetry shut down'))
             // eslint-disable-next-line no-console
