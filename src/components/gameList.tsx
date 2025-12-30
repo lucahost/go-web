@@ -282,6 +282,7 @@ const GameList: FC = () => {
     }, [localUser])
 
     const handleGameTitleInput = useCallback(
+        // eslint-disable-next-line no-undef
         (event: React.ChangeEvent<HTMLInputElement>) =>
             setGameTitle(event.target.value),
         []
@@ -349,7 +350,6 @@ const GameList: FC = () => {
     const handleDeleteGame = useCallback(
         (e: React.MouseEvent, gameId: number) => {
             e.stopPropagation()
-            // eslint-disable-next-line no-undef
             if (!window.confirm('Spiel wirklich löschen?')) return
 
             setLoading(true)

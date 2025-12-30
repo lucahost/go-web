@@ -118,6 +118,7 @@ const Login: FC = () => {
     const [name, setName] = useState<string>('')
 
     const handleNameInput = useCallback(
+        // eslint-disable-next-line no-undef
         (event: React.ChangeEvent<HTMLInputElement>) =>
             setName(event.target.value),
         []
