@@ -2,9 +2,6 @@ module.exports = {
     compiler: {
         styledComponents: true,
     },
-    experimental: {
-        instrumentationHook: true,
-    },
     serverExternalPackages: [
         'better-sqlite3',
         '@prisma/adapter-better-sqlite3',

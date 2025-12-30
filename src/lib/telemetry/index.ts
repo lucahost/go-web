@@ -2,11 +2,10 @@ import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
-import { Resource } from '@opentelemetry/resources'
+import { resourceFromAttributes } from '@opentelemetry/resources'
 import {
     ATTR_SERVICE_NAME,
     ATTR_SERVICE_VERSION,
-    ATTR_DEPLOYMENT_ENVIRONMENT,
 } from '@opentelemetry/semantic-conventions'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { PrismaInstrumentation } from '@prisma/instrumentation'
@@ -25,10 +24,10 @@ export function initTelemetry(): void {
         return
     }
 
-    const resource = new Resource({
+    const resource = resourceFromAttributes({
         [ATTR_SERVICE_NAME]: config.serviceName,
         [ATTR_SERVICE_VERSION]: config.serviceVersion,
-        [ATTR_DEPLOYMENT_ENVIRONMENT]: config.deploymentEnvironment,
+        'deployment.environment': config.deploymentEnvironment,
         'host.name': config.hostName,
     })
 
@@ -82,4 +81,9 @@ export {
     httpRequestDurationHistogram,
     databaseQueryDurationHistogram,
 } from './metrics'
-export { withTelemetry, createSpan, tracer, type TelemetryOptions } from './middleware'
+export {
+    withTelemetry,
+    createSpan,
+    tracer,
+    type TelemetryOptions,
+} from './middleware'

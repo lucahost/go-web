@@ -19,11 +19,7 @@ export const start = (): GoBoard => {
         captures: [],
         fields: generateBoardLayout(width),
         height,
-        currentPlayer: {
-            playerColor: PlayerColor.BLACK,
-            gameId: 0,
-            userId: 1,
-        },
+        currentPlayer: null, // Set when BLACK player joins via /join endpoint
         history: [],
         identifier: '',
         pass: false,

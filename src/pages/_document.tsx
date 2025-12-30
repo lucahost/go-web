@@ -55,8 +55,6 @@ export default class DocumentClass extends Document {
                     <meta content="telephone=no" name="format-detection" />
                     <meta content="yes" name="mobile-web-app-capable" />
                     <meta content="#FFFFFF" name="theme-color" />
-                    {/* TIP: set viewport head meta tag in _app.js, otherwise it will show a warning */}
-                    {/* <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover' /> */}
 
                     <link
                         href="/icons/apple-touch-icon.png"

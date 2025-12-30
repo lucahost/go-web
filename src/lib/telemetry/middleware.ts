@@ -1,5 +1,6 @@
 import { trace, SpanStatusCode, context, SpanKind } from '@opentelemetry/api'
 import type { NextApiRequest, NextApiResponse, NextApiHandler } from 'next'
+import { performance } from 'perf_hooks'
 import { logger } from './logging'
 import { httpRequestDurationHistogram } from './metrics'
 import { config } from './config'
@@ -48,10 +49,14 @@ export function withTelemetry<T>(
                     message: String(error),
                 })
                 span.recordException(error as Error)
-                logger.error(`${options.operationName} failed`, error as Error, {
-                    route,
-                    method: req.method,
-                })
+                logger.error(
+                    `${options.operationName} failed`,
+                    error as Error,
+                    {
+                        route,
+                        method: req.method,
+                    }
+                )
                 throw error
             } finally {
                 const duration = (performance.now() - startTime) / 1000

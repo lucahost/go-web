@@ -68,10 +68,19 @@ const JoinApi = async (
                 },
             })
 
+            // Update board's currentPlayer to the joining BLACK player
+            const board = JSON.parse(existingGame.board)
+            board.currentPlayer = {
+                userId: uId,
+                gameId: gId,
+                playerColor: PlayerColor.BLACK,
+            }
+
             await prisma.game.update({
                 where: { id: existingGame.id },
                 data: {
                     ...existingGame,
+                    board: JSON.stringify(board),
                     gameState: GameState.RUNNING,
                     currentPlayerColor: PlayerColor.BLACK,
                     currentPlayerId: uId,
@@ -107,14 +116,22 @@ const JoinApi = async (
                             })
                         )
                         .then(() => {
-                            pushNotificationsSentCounter.add(1, { type: 'join' })
-                        })
-                        .catch((err: any) => {
-                            pushNotificationsFailedCounter.add(1, { type: 'join' })
-                            logger.error('Failed to send push notification', err, {
-                                gameId: gId,
+                            pushNotificationsSentCounter.add(1, {
                                 type: 'join',
                             })
+                        })
+                        .catch((err: any) => {
+                            pushNotificationsFailedCounter.add(1, {
+                                type: 'join',
+                            })
+                            logger.error(
+                                'Failed to send push notification',
+                                err,
+                                {
+                                    gameId: gId,
+                                    type: 'join',
+                                }
+                            )
                         })
                 })
             } else {

@@ -9,16 +9,10 @@ import {
 
 type UserResponseData = User | User[]
 
-type CreateUserDto = {
-    name: string
-}
-
-type NextApiRequestWithCreateUserDto = NextApiRequest & CreateUserDto
-
 import prisma from '../../../lib/db'
 
 const apiMethod = async (
-    req: NextApiRequestWithCreateUserDto,
+    req: NextApiRequest,
     res: NextApiResponse<UserResponseData>
 ) => {
     const { method, body } = req
