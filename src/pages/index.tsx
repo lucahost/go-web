@@ -3,7 +3,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
 import styled from 'styled-components'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
-import { Game, User } from '../lib/types'
+import { Game, GameState, User } from '../lib/types'
 import axios from 'axios'
 import Login from '../components/login'
 import GameList from '../components/gameList'
@@ -74,10 +74,15 @@ const NavButton = styled.button`
     font-weight: 500;
     font-family: inherit;
     border-radius: ${({ theme }) => theme.borderRadius.md};
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 
     &:active {
         background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
     }
 `
 
@@ -352,8 +357,17 @@ const HomePage: FC = () => {
             </Content>
             {localUser && localGame && (
                 <Nav>
-                    <NavButton onClick={handleNewGame}>Neues Spiel</NavButton>
-                    <NavButton onClick={handlePass}>Passen</NavButton>
+                    <NavButton onClick={handleNewGame}>
+                        {localGame.gameState === GameState.ENDED
+                            ? 'Zurück'
+                            : 'Neues Spiel'}
+                    </NavButton>
+                    <NavButton
+                        onClick={handlePass}
+                        disabled={localGame.gameState === GameState.ENDED}
+                    >
+                        Passen
+                    </NavButton>
                 </Nav>
             )}
         </>
