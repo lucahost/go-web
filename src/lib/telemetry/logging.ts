@@ -1,5 +1,6 @@
 import pino, { Logger as PinoLogger } from 'pino'
 import { trace, context } from '@opentelemetry/api'
+import { logs, SeverityNumber } from '@opentelemetry/api-logs'
 import { config } from './config'
 
 function getTraceContext(): { trace_id?: string; span_id?: string } {
@@ -12,6 +13,29 @@ function getTraceContext(): { trace_id?: string; span_id?: string } {
         }
     }
     return {}
+}
+
+const severityMap: Record<string, SeverityNumber> = {
+    trace: SeverityNumber.TRACE,
+    debug: SeverityNumber.DEBUG,
+    info: SeverityNumber.INFO,
+    warn: SeverityNumber.WARN,
+    error: SeverityNumber.ERROR,
+    fatal: SeverityNumber.FATAL,
+}
+
+function emitOtelLog(
+    level: string,
+    msg: string,
+    attributes?: Record<string, unknown>
+) {
+    const otelLogger = logs.getLogger(config.serviceName)
+    otelLogger.emit({
+        severityNumber: severityMap[level] ?? SeverityNumber.INFO,
+        severityText: level.toUpperCase(),
+        body: msg,
+        attributes: attributes as Record<string, string | number | boolean>,
+    })
 }
 
 const baseLogger: PinoLogger = pino({
@@ -40,18 +64,27 @@ export interface Logger {
 function createLogger(pinoInstance: PinoLogger): Logger {
     return {
         trace(msg: string, data?: object) {
-            pinoInstance.trace({ ...getTraceContext(), ...data }, msg)
+            const ctx = getTraceContext()
+            pinoInstance.trace({ ...ctx, ...data }, msg)
+            emitOtelLog('trace', msg, { ...ctx, ...data })
         },
         debug(msg: string, data?: object) {
-            pinoInstance.debug({ ...getTraceContext(), ...data }, msg)
+            const ctx = getTraceContext()
+            pinoInstance.debug({ ...ctx, ...data }, msg)
+            emitOtelLog('debug', msg, { ...ctx, ...data })
         },
         info(msg: string, data?: object) {
-            pinoInstance.info({ ...getTraceContext(), ...data }, msg)
+            const ctx = getTraceContext()
+            pinoInstance.info({ ...ctx, ...data }, msg)
+            emitOtelLog('info', msg, { ...ctx, ...data })
         },
         warn(msg: string, data?: object) {
-            pinoInstance.warn({ ...getTraceContext(), ...data }, msg)
+            const ctx = getTraceContext()
+            pinoInstance.warn({ ...ctx, ...data }, msg)
+            emitOtelLog('warn', msg, { ...ctx, ...data })
         },
         error(msg: string, error?: Error | unknown, data?: object) {
+            const ctx = getTraceContext()
             const errorData =
                 error instanceof Error
                     ? {
@@ -62,12 +95,21 @@ function createLogger(pinoInstance: PinoLogger): Logger {
                           },
                       }
                     : { error }
-            pinoInstance.error(
-                { ...getTraceContext(), ...errorData, ...data },
-                msg
-            )
+            pinoInstance.error({ ...ctx, ...errorData, ...data }, msg)
+            emitOtelLog('error', msg, {
+                ...ctx,
+                ...(error instanceof Error
+                    ? {
+                          'error.message': error.message,
+                          'error.name': error.name,
+                          'error.stack': error.stack,
+                      }
+                    : {}),
+                ...data,
+            })
         },
         fatal(msg: string, error?: Error | unknown, data?: object) {
+            const ctx = getTraceContext()
             const errorData =
                 error instanceof Error
                     ? {
@@ -78,10 +120,18 @@ function createLogger(pinoInstance: PinoLogger): Logger {
                           },
                       }
                     : { error }
-            pinoInstance.fatal(
-                { ...getTraceContext(), ...errorData, ...data },
-                msg
-            )
+            pinoInstance.fatal({ ...ctx, ...errorData, ...data }, msg)
+            emitOtelLog('fatal', msg, {
+                ...ctx,
+                ...(error instanceof Error
+                    ? {
+                          'error.message': error.message,
+                          'error.name': error.name,
+                          'error.stack': error.stack,
+                      }
+                    : {}),
+                ...data,
+            })
         },
         child(bindings: object): Logger {
             return createLogger(pinoInstance.child(bindings))

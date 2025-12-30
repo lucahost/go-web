@@ -2,16 +2,23 @@ import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc'
 import { resourceFromAttributes } from '@opentelemetry/resources'
 import {
     ATTR_SERVICE_NAME,
     ATTR_SERVICE_VERSION,
 } from '@opentelemetry/semantic-conventions'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+import {
+    LoggerProvider,
+    SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs'
+import { logs } from '@opentelemetry/api-logs'
 import { PrismaInstrumentation } from '@prisma/instrumentation'
 import { config } from './config'
 
 let sdk: NodeSDK | null = null
+let loggerProvider: LoggerProvider | null = null
 
 export function initTelemetry(): void {
     if (!config.enabled) {
@@ -32,6 +39,17 @@ export function initTelemetry(): void {
         'deployment.environment': config.deploymentEnvironment,
         'host.name': config.hostName,
     })
+
+    // Set up log exporter
+    loggerProvider = new LoggerProvider({
+        resource,
+        processors: [
+            new SimpleLogRecordProcessor(
+                new OTLPLogExporter({ url: config.otlpEndpoint })
+            ),
+        ],
+    })
+    logs.setGlobalLoggerProvider(loggerProvider)
 
     sdk = new NodeSDK({
         resource,
@@ -61,7 +79,7 @@ export function initTelemetry(): void {
     )
 
     const shutdown = () => {
-        sdk?.shutdown()
+        Promise.all([sdk?.shutdown(), loggerProvider?.shutdown()])
             // eslint-disable-next-line no-console
             .then(() => console.log('OpenTelemetry shut down'))
             // eslint-disable-next-line no-console
