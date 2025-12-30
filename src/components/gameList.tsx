@@ -12,15 +12,83 @@ import {
     faHourglassHalf,
     faPlayCircle,
 } from '@fortawesome/free-solid-svg-icons'
+import { media } from '../lib/theme'
 
 library.add(fab, faCheckCircle, faHourglassHalf, faPlayCircle)
 
-// - TODO spacings,
-// - statusicon grösser / neutraler,
-// - heading datum switchen,
-// - datum konstrast verringern und kleiner,
-// - ort für id,
-// - border gradient
+const GameListContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    gap: ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.sm};
+`
+
+const GameListTitle = styled.h1`
+    font-size: ${({ theme }) => theme.typography.fontSize.xl};
+    margin: 0;
+
+    ${media.md} {
+        font-size: ${({ theme }) => theme.typography.fontSize.xxl};
+    }
+`
+
+const NewGame = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: ${({ theme }) => theme.spacing.sm};
+    width: 100%;
+
+    ${media.sm} {
+        flex-direction: row;
+        align-items: center;
+    }
+`
+
+const NewGameTitleField = styled.input`
+    flex: 1;
+    width: 100%;
+    padding: ${({ theme }) => theme.spacing.md};
+    font-size: 16px;
+    border: 2px solid ${({ theme }) => theme.colors.textMuted};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    background-color: ${({ theme }) => theme.colors.white};
+    min-height: ${({ theme }) => theme.touchTarget.comfortable};
+
+    &:focus {
+        outline: none;
+        border-color: ${({ theme }) => theme.colors.secondary};
+    }
+`
+
+const CreateGameButton = styled.button`
+    background: linear-gradient(
+        20deg,
+        ${({ theme }) => theme.colors.primary},
+        ${({ theme }) => theme.colors.secondary}
+    );
+    color: ${({ theme }) => theme.colors.white};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-weight: 600;
+    padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+    border: none;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    cursor: pointer;
+    min-height: ${({ theme }) => theme.touchTarget.comfortable};
+    white-space: nowrap;
+    background-size: 150%;
+    transition: transform 0.1s ease;
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    ${media.sm} {
+        width: auto;
+    }
+`
 
 const onGameHover = keyframes`
     0% {
@@ -30,6 +98,7 @@ const onGameHover = keyframes`
         background-position: 100% 0%
     }
 `
+
 const onGameHoverOut = keyframes`
     0% {
         background-position: 100% 0%
@@ -39,78 +108,115 @@ const onGameHoverOut = keyframes`
     }
 `
 
-const GameCard = styled.div`
+const GameCard = styled.button`
     cursor: pointer;
     position: relative;
     display: flex;
-    flex-direction: row;
-    padding: 10px 32px 10px 20px;
-    background: #414246;
-    margin: 20px 0px;
-    width: 350px;
+    flex-direction: column;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing.sm};
+    width: 100%;
+    max-width: 400px;
+    min-height: ${({ theme }) => theme.touchTarget.comfortable};
+    padding: ${({ theme }) => theme.spacing.lg};
+    background: ${({ theme }) => theme.colors.background};
+    border: none;
+    text-align: center;
+    color: inherit;
+    font-family: inherit;
+
     &:after {
         content: '';
         position: absolute;
-        background: linear-gradient(20deg, #e66465, #9198e5);
-        width: calc(100% + 10px);
-        height: calc(100% + 10px);
+        background: linear-gradient(
+            20deg,
+            ${({ theme }) => theme.colors.primary},
+            ${({ theme }) => theme.colors.secondary}
+        );
+        width: calc(100% + 6px);
+        height: calc(100% + 6px);
         background-size: 150%;
         z-index: -1;
-        top: -5px;
-        left: -5px;
-        border-radius: 5px;
+        top: -3px;
+        left: -3px;
+        border-radius: ${({ theme }) => theme.borderRadius.md};
         animation: ${onGameHoverOut} 300ms ease-in 1 forwards;
     }
 
-    &:hover:after {
+    &:hover:after,
+    &:focus:after {
         animation: ${onGameHover} 300ms ease-in 1 forwards;
+    }
+
+    &:focus {
+        outline: 2px solid ${({ theme }) => theme.colors.secondary};
+        outline-offset: 4px;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    ${media.sm} {
+        flex-direction: row;
+        text-align: left;
+        padding: ${({ theme }) => theme.spacing.md}
+            ${({ theme }) => theme.spacing.xxl} ${({ theme }) => theme.spacing.md}
+            ${({ theme }) => theme.spacing.md};
     }
 `
 
-const GameDetails = styled.div`
-    margin-left: 25px;
+const GameStatus = styled.div`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    width: 48px;
+    height: 48px;
+`
+
+const GameDetails = styled.div`
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
+    gap: ${({ theme }) => theme.spacing.xs};
 `
-const GameId = styled.div`
+
+const GameTitle = styled.h3`
+    margin: 0;
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`
+
+const GameDate = styled.span`
+    margin: 0;
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    color: ${({ theme }) => theme.colors.textMuted};
+`
+
+const GameId = styled.span`
     position: absolute;
-    top: 10px;
-    right: 15px;
-    padding: 5px;
-`
-const NewGame = styled.div`
-    display: flex-row;
+    top: ${({ theme }) => theme.spacing.sm};
+    right: ${({ theme }) => theme.spacing.sm};
+    font-size: ${({ theme }) => theme.typography.fontSize.xs};
+    color: ${({ theme }) => theme.colors.textMuted};
 `
 
-const CreateGameButton = styled.button`
-    background: linear-gradient(20deg, #e66465, #9198e5);
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0px 8px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-size: 150%;
+const EmptyState = styled.p`
+    color: ${({ theme }) => theme.colors.textMuted};
+    text-align: center;
+    padding: ${({ theme }) => theme.spacing.xl};
 `
 
-const NewGameTitleField = styled.input`
-    padding: 12px 20px;
-    margin: 8px 0;
-    flex-grow: 1;
-    display: inline-block;
-    border: 1px solid #ccc;
-    justify-content: stretch;
-    border-radius: 4px;
-    box-sizing: border-box;
-`
-const GameStatus = styled.h2``
-
-const GameTitle = styled.h2`
+const ErrorMessage = styled.p`
+    color: ${({ theme }) => theme.colors.error};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
     margin: 0;
-`
-const GameDate = styled.h4`
-    margin: 0;
+    text-align: center;
 `
 
 const GameList: FC = () => {
@@ -143,13 +249,14 @@ const GameList: FC = () => {
     }, [localUser])
 
     const handleGameTitleInput = useCallback(
-        event => setGameTitle(event.target.value),
+        (event: React.ChangeEvent<HTMLInputElement>) =>
+            setGameTitle(event.target.value),
         []
     )
 
     const handleGameSelect = useCallback(
-        game => {
-            if (game !== '' && localUser) {
+        (game: Game) => {
+            if (game && localUser) {
                 const url = `/api/games/${game.id}/join`
                 setLoading(true)
                 axios
@@ -176,7 +283,7 @@ const GameList: FC = () => {
             }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [setLocalGame]
+        [setLocalGame, localUser, gameTitle, games]
     )
 
     const handleCreateGame = useCallback(() => {
@@ -207,71 +314,70 @@ const GameList: FC = () => {
     }, [gameTitle, games, localUser, setLocalGame])
 
     return (
-        <>
-            <h1>Games</h1>
+        <GameListContainer>
+            <GameListTitle>Games</GameListTitle>
             <NewGame>
                 <NewGameTitleField
                     onChange={handleGameTitleInput}
-                    placeholder="Name eingeben"
+                    placeholder="Spielname eingeben"
                 />
                 <CreateGameButton onClick={handleCreateGame}>
-                    Create Game
+                    Neues Spiel
                 </CreateGameButton>
             </NewGame>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
             {loading ? (
                 <Spinner />
             ) : (
-                games.map(game => {
-                    return (
-                        <GameCard
-                            key={game.id}
-                            // eslint-disable-next-line react/jsx-no-bind
-                            onClick={() => handleGameSelect(game)}
-                        >
-                            <GameId>{game.id}</GameId>
-                            <GameStatus>
-                                {game.gameState === 0 ? (
-                                    <FontAwesomeIcon
-                                        color="#8b8683"
-                                        icon="play-circle"
-                                        size="2x"
-                                    />
-                                ) : game.gameState === 1 ? (
-                                    <FontAwesomeIcon
-                                        color="#8b8683"
-                                        icon="hourglass-start"
-                                        size="2x"
-                                    />
-                                ) : game.gameState === 2 ? (
-                                    <FontAwesomeIcon
-                                        color="#8b8683"
-                                        icon="check-circle"
-                                        size="2x"
-                                    />
-                                ) : (
-                                    <FontAwesomeIcon
-                                        color="#8b8683"
-                                        icon="question"
-                                        size="3x"
-                                    />
+                games.map(game => (
+                    <GameCard
+                        key={game.id}
+                        onClick={() => handleGameSelect(game)}
+                        type="button"
+                    >
+                        <GameId>{game.id}</GameId>
+                        <GameStatus>
+                            {game.gameState === 0 ? (
+                                <FontAwesomeIcon
+                                    color="#8b8683"
+                                    icon="play-circle"
+                                    size="2x"
+                                />
+                            ) : game.gameState === 1 ? (
+                                <FontAwesomeIcon
+                                    color="#8b8683"
+                                    icon="hourglass-half"
+                                    size="2x"
+                                />
+                            ) : game.gameState === 2 ? (
+                                <FontAwesomeIcon
+                                    color="#8b8683"
+                                    icon="check-circle"
+                                    size="2x"
+                                />
+                            ) : (
+                                <FontAwesomeIcon
+                                    color="#8b8683"
+                                    icon="question"
+                                    size="2x"
+                                />
+                            )}
+                        </GameStatus>
+                        <GameDetails>
+                            <GameTitle>{game.title}</GameTitle>
+                            <GameDate>
+                                {new Date(game.updatedAt).toLocaleString(
+                                    'de-CH'
                                 )}
-                            </GameStatus>
-                            <GameDetails>
-                                <GameTitle>{game.title}</GameTitle>
-                                <GameDate>
-                                    {new Date(game.updatedAt).toLocaleString(
-                                        'de-CH'
-                                    )}
-                                </GameDate>
-                            </GameDetails>
-                        </GameCard>
-                    )
-                })
+                            </GameDate>
+                        </GameDetails>
+                    </GameCard>
+                ))
             )}
-
-            {error && <p>{error}</p>}
-            {games.length < 1 && <p>No games</p>}
-        </>
+            {!loading && games.length < 1 && (
+                <EmptyState>Keine Spiele vorhanden</EmptyState>
+            )}
+        </GameListContainer>
     )
 }
 

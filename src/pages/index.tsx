@@ -7,71 +7,115 @@ import { Game, User } from '../lib/types'
 import axios from 'axios'
 import Login from '../components/login'
 import GameList from '../components/gameList'
+import { media } from '../lib/theme'
 
 const { log } = console
 
-const Content = styled.div`
+const Content = styled.main`
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
-
     width: 100%;
+    padding: ${({ theme }) => theme.spacing.md};
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    ${media.md} {
+        justify-content: center;
+        padding: ${({ theme }) => theme.spacing.xl};
+    }
 `
 
 const Link = styled.a`
     text-decoration: none;
     color: whitesmoke;
+    padding: ${({ theme }) => theme.spacing.sm};
+    min-height: ${({ theme }) => theme.touchTarget.minimum};
+    display: inline-flex;
+    align-items: center;
 `
 
-const Nav = styled.div`
+const Nav = styled.nav`
     display: flex;
     justify-content: space-around;
     align-items: center;
-
-    height: 60px;
+    gap: ${({ theme }) => theme.spacing.md};
+    min-height: 60px;
     width: 100%;
-    padding: 5px 0;
-
-    background-color: white;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    padding-bottom: max(${({ theme }) => theme.spacing.sm}, env(safe-area-inset-bottom));
+    background-color: ${({ theme }) => theme.colors.white};
 `
 
-const NavButton = styled.div`
+const NavButton = styled.button`
     cursor: pointer;
-    color: black;
+    color: ${({ theme }) => theme.colors.surface};
+    background: transparent;
+    border: none;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+    gap: ${({ theme }) => theme.spacing.xs};
+    min-width: ${({ theme }) => theme.touchTarget.comfortable};
+    min-height: ${({ theme }) => theme.touchTarget.comfortable};
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    transition: background-color 0.2s ease;
 
-    height: 100%;
-`
-
-const Logout = styled.h3`
-    cursor: pointer;
-    transition: color 0.3s ease-in-out;
-    &:hover {
-        color: #9198e5;
+    &:active {
+        background-color: rgba(0, 0, 0, 0.05);
     }
 `
 
-const Header = styled.div`
+const Logout = styled.button`
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: ${({ theme }) => theme.colors.text};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-family: inherit;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    min-height: ${({ theme }) => theme.touchTarget.minimum};
+    transition: color 0.3s ease-in-out;
+
+    &:hover,
+    &:active {
+        color: ${({ theme }) => theme.colors.secondary};
+    }
+`
+
+const Header = styled.header`
+    position: relative;
+    display: flex;
     align-items: center;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-
-    background-color: #252525;
-
+    justify-content: center;
+    background-color: ${({ theme }) => theme.colors.surface};
     width: 100%;
-    height: 50px;
-    padding: 0 20px;
+    min-height: 56px;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+
+    ${media.md} {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        padding: 0 ${({ theme }) => theme.spacing.lg};
+        height: 60px;
+    }
 `
 
 const HeaderLeft = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    display: none;
+
+    ${media.md} {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
 
     h3 {
         margin: 0;
@@ -85,13 +129,27 @@ const HeaderCenter = styled.div`
 
     h1 {
         margin: 0;
+        font-size: ${({ theme }) => theme.typography.fontSize.xl};
+
+        ${media.md} {
+            font-size: ${({ theme }) => theme.typography.fontSize.xxl};
+        }
     }
 `
 
 const HeaderRight = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    position: absolute;
+    right: ${({ theme }) => theme.spacing.md};
+    top: 50%;
+    transform: translateY(-50%);
+
+    ${media.md} {
+        position: static;
+        transform: none;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
 
     h3 {
         margin: 0;
@@ -256,9 +314,11 @@ const HomePage: FC = () => {
                     <h1>Go</h1>
                 </HeaderCenter>
                 <HeaderRight>
-                    <Logout>
-                        {localUser && <a onClick={handleLogout}>Logout</a>}
-                    </Logout>
+                    {localUser && (
+                        <Logout onClick={handleLogout} type="button">
+                            Logout
+                        </Logout>
+                    )}
                 </HeaderRight>
             </Header>
             <Content>
