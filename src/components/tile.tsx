@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { Field, FieldLocation, PlayerColor, Vertex } from '../lib/types'
 import { memo, useState } from 'react'
 
@@ -8,9 +8,40 @@ interface Props {
     clickHandler: (vertex: Vertex) => void
     currentPlayer?: PlayerColor
     userPlayer?: PlayerColor
+    isNewlyPlaced?: boolean
+    isBeingCaptured?: boolean
 }
 
-const TileContainer = styled.img`
+const stonePlaceAnimation = keyframes`
+    0% {
+        transform: scale(0.5);
+        opacity: 0.7;
+    }
+    70% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+`
+
+const stoneCaptureAnimation = keyframes`
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+`
+
+const TileContainer = styled.img<{
+    $isNewlyPlaced?: boolean
+    $isBeingCaptured?: boolean
+}>`
     width: 100%;
     height: 100%;
     cursor: pointer;
@@ -21,14 +52,36 @@ const TileContainer = styled.img`
     &:active {
         transform: scale(0.95);
     }
+
+    ${({ $isNewlyPlaced }) =>
+        $isNewlyPlaced &&
+        css`
+            animation: ${stonePlaceAnimation} 0.25s ease-out forwards;
+        `}
+
+    ${({ $isBeingCaptured }) =>
+        $isBeingCaptured &&
+        css`
+            animation: ${stoneCaptureAnimation} 0.3s ease-in forwards;
+        `}
 `
 
 const Tile = memo(
-    ({ field, location, clickHandler, currentPlayer, userPlayer }: Props) => {
+    ({
+        field,
+        location,
+        clickHandler,
+        currentPlayer,
+        userPlayer,
+        isNewlyPlaced,
+        isBeingCaptured,
+    }: Props) => {
         const [isHover, setIsHover] = useState(false)
 
         return (
             <TileContainer
+                $isNewlyPlaced={isNewlyPlaced}
+                $isBeingCaptured={isBeingCaptured}
                 alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
                 // eslint-disable-next-line react/jsx-no-bind
                 onClick={() => clickHandler(field.vertex)}

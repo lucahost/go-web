@@ -17,6 +17,7 @@ import {
     Player,
     PlayerColor,
     User,
+    Vertex,
 } from '../lib/types'
 import { isKo, isOccupied, isSuicide } from '../lib/game'
 import axios from 'axios'
@@ -26,10 +27,14 @@ import useSoundEffect from '../lib/hooks/useSoundEffect'
 import { media } from '../lib/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShare } from '@fortawesome/free-solid-svg-icons'
+import { calculateDominance, Dominance } from '../lib/scoring'
 
 interface Props {
     size: number
 }
+
+// Helper to create a unique key for a vertex
+const vertexKey = (v: Vertex) => `${v[0]},${v[1]}`
 
 const GobanContainer = styled.div`
     display: flex;
@@ -117,6 +122,21 @@ const Captures = styled.div`
     }
 `
 
+const DominanceInfo = styled.div`
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 300px;
+    padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md};
+    padding-bottom: ${({ theme }) => theme.spacing.md};
+
+    p {
+        margin: 0;
+        font-size: ${({ theme }) => theme.typography.fontSize.xs};
+        color: ${({ theme }) => theme.colors.textMuted};
+    }
+`
+
 const ShareContainer = styled.div`
     display: flex;
     align-items: center;
@@ -163,8 +183,16 @@ const Goban: FC<Props> = props => {
     const [board, setBoard] = useState<GoBoard>()
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
+    const [dominance, setDominance] = useState<Dominance | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [shareStatus, setShareStatus] = useState<string | null>(null)
+
+    // Animation state
+    const [lastPlacedVertex, setLastPlacedVertex] = useState<string | null>(null)
+    const [capturingFields, setCapturingFields] = useState<Map<string, Field>>(
+        new Map()
+    )
+    const previousBoardRef = useRef<GoBoard | null>(null)
 
     // Ref to store latest loadGame function for service worker messages
     const loadGameRef = useRef<() => void>(() => {})
@@ -200,7 +228,68 @@ const Goban: FC<Props> = props => {
                                 : r.data.board
                         const parsedBoard = boardData as GoBoard
 
+                        // Detect newly placed stone for animation
+                        const prevBoard = previousBoardRef.current
+                        if (prevBoard && parsedBoard) {
+                            const prevHistoryLen = prevBoard.history?.length || 0
+                            const newHistoryLen = parsedBoard.history?.length || 0
+
+                            // A new move was made
+                            if (newHistoryLen > prevHistoryLen) {
+                                const lastMove =
+                                    parsedBoard.history[newHistoryLen - 1]
+                                if (lastMove) {
+                                    const key = vertexKey(lastMove.vertex)
+                                    setLastPlacedVertex(key)
+                                    // Clear animation after it completes
+                                    setTimeout(
+                                        () => setLastPlacedVertex(null),
+                                        300
+                                    )
+                                }
+                            }
+
+                            // Detect newly captured stones for animation
+                            // Find stones that were on the board but are now empty
+                            const newCaptured = new Map<string, Field>()
+                            for (const prevField of prevBoard.fields) {
+                                if (prevField.color !== PlayerColor.EMPTY) {
+                                    const newField = parsedBoard.fields.find(
+                                        f =>
+                                            f.vertex[0] === prevField.vertex[0] &&
+                                            f.vertex[1] === prevField.vertex[1]
+                                    )
+                                    if (
+                                        newField &&
+                                        newField.color === PlayerColor.EMPTY
+                                    ) {
+                                        newCaptured.set(
+                                            vertexKey(prevField.vertex),
+                                            prevField
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (newCaptured.size > 0) {
+                                setCapturingFields(newCaptured)
+                                // Clear after animation completes
+                                setTimeout(
+                                    () => setCapturingFields(new Map()),
+                                    350
+                                )
+                            }
+                        }
+
+                        // Store current board for next comparison
+                        previousBoardRef.current = parsedBoard
+
                         setBoard(parsedBoard)
+
+                        if (parsedBoard) {
+                            const dom = calculateDominance(parsedBoard)
+                            setDominance(dom)
+                        }
 
                         if (parsedBoard && r.data.currentPlayer) {
                             const currentPlayer = r.data.currentPlayer as Player
@@ -415,32 +504,53 @@ const Goban: FC<Props> = props => {
                             <h4>{error}</h4>
                         </Error>
                     )}
-                    {board?.fields?.map((field, i) => (
-                        <Tile
-                            key={i}
-                            // eslint-disable-next-line react/jsx-no-bind
-                            clickHandler={() => handleTileClick(field)}
-                            currentPlayer={currentPlayer?.playerColor}
-                            field={field}
-                            location={
-                                field.color === PlayerColor.EMPTY
-                                    ? getFieldLocationByVertex(
-                                          field.vertex,
-                                          props.size
-                                      )
-                                    : field.color === PlayerColor.BLACK
-                                      ? FieldLocation.BLACK_STONE
-                                      : FieldLocation.WHITE_STONE
-                            }
-                            userPlayer={userPlayer?.playerColor}
-                        />
-                    ))}
+                    {board?.fields?.map((field, i) => {
+                        const key = vertexKey(field.vertex)
+                        const isNewlyPlaced = lastPlacedVertex === key
+                        const capturingField = capturingFields.get(key)
+                        const isBeingCaptured = !!capturingField
+
+                        // Use the capturing field's color for animation
+                        const displayField = isBeingCaptured
+                            ? capturingField
+                            : field
+                        const displayColor = displayField.color
+
+                        return (
+                            <Tile
+                                key={i}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                clickHandler={() => handleTileClick(field)}
+                                currentPlayer={currentPlayer?.playerColor}
+                                field={displayField}
+                                isBeingCaptured={isBeingCaptured}
+                                isNewlyPlaced={isNewlyPlaced}
+                                location={
+                                    displayColor === PlayerColor.EMPTY
+                                        ? getFieldLocationByVertex(
+                                              field.vertex,
+                                              props.size
+                                          )
+                                        : displayColor === PlayerColor.BLACK
+                                          ? FieldLocation.BLACK_STONE
+                                          : FieldLocation.WHITE_STONE
+                                }
+                                userPlayer={userPlayer?.playerColor}
+                            />
+                        )
+                    })}
                 </Board>
             </BoardWrapper>
             <Captures>
                 <p>{`Weiss: ${whiteCaptures}`}</p>
                 <p>{`Schwarz: ${blackCaptures}`}</p>
             </Captures>
+            {dominance && (
+                <DominanceInfo>
+                    <p>{`Dominanz W: ${dominance.whitePercentage}%`}</p>
+                    <p>{`Dominanz S: ${dominance.blackPercentage}%`}</p>
+                </DominanceInfo>
+            )}
         </GobanContainer>
     )
 }
