@@ -1,9 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { HttpMethod, Game, GoBoard, Player } from '../../../../lib/types'
-
-type GameResponse = Game | never
-
 import prisma from '../../../../lib/db'
+import {
+    withTelemetry,
+    logger,
+    gamesDeletedCounter,
+} from '../../../../lib/telemetry'
+
+type GameResponse = Game | { deleted: boolean } | never
 
 const GameApi = async (
     req: NextApiRequest,
@@ -14,13 +18,14 @@ const GameApi = async (
         method,
     } = req
 
+    const gId = Number(gameId)
+    if (isNaN(gId)) {
+        res.status(400).end(`${gId} is not a valid gameId`)
+        return
+    }
+
     switch (method) {
         case HttpMethod.GET:
-            const gId = Number(gameId)
-            if (isNaN(gId)) {
-                res.status(400).end(`${gId} is not a valid gameId`)
-                return
-            }
             const existingGame = await prisma.game.findUnique({
                 where: {
                     id: gId,
@@ -59,14 +64,34 @@ const GameApi = async (
                 res.status(404).end()
             }
             break
+
         case HttpMethod.DELETE:
-            // TODO: Stop game by id
-            res.status(200).end(`TODO: Stop game ${gameId}`)
+            const gameToDelete = await prisma.game.findUnique({
+                where: { id: gId },
+            })
+
+            if (!gameToDelete) {
+                logger.warn('Game not found for deletion', { gameId: gId })
+                res.status(404).end(`Game ${gId} not found`)
+                return
+            }
+
+            await prisma.$transaction([
+                prisma.subscription.deleteMany({ where: { gameId: gId } }),
+                prisma.userGame.deleteMany({ where: { gameId: gId } }),
+                prisma.game.delete({ where: { id: gId } }),
+            ])
+
+            logger.info('Game deleted', { gameId: gId })
+            gamesDeletedCounter.add(1)
+
+            res.status(200).json({ deleted: true })
             break
+
         default:
-            res.setHeader('Allow', [HttpMethod.GET, HttpMethod.POST])
+            res.setHeader('Allow', [HttpMethod.GET, HttpMethod.DELETE])
             res.status(405).end(`Method ${method} Not Allowed`)
     }
 }
 
-export default GameApi
+export default withTelemetry(GameApi, { operationName: 'games.byId' })

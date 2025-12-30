@@ -11,10 +11,11 @@ import {
     faCheckCircle,
     faHourglassHalf,
     faPlayCircle,
+    faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 import { media } from '../lib/theme'
 
-library.add(fab, faCheckCircle, faHourglassHalf, faPlayCircle)
+library.add(fab, faCheckCircle, faHourglassHalf, faPlayCircle, faTrash)
 
 const GameListContainer = styled.div`
     display: flex;
@@ -72,7 +73,8 @@ const CreateGameButton = styled.button`
     color: ${({ theme }) => theme.colors.white};
     font-size: ${({ theme }) => theme.typography.fontSize.base};
     font-weight: 600;
-    padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+    padding: ${({ theme }) => theme.spacing.md}
+        ${({ theme }) => theme.spacing.lg};
     border: none;
     border-radius: ${({ theme }) => theme.borderRadius.md};
     cursor: pointer;
@@ -161,7 +163,8 @@ const GameCard = styled.button`
         flex-direction: row;
         text-align: left;
         padding: ${({ theme }) => theme.spacing.md}
-            ${({ theme }) => theme.spacing.xxl} ${({ theme }) => theme.spacing.md}
+            ${({ theme }) => theme.spacing.xxl}
+            ${({ theme }) => theme.spacing.md}
             ${({ theme }) => theme.spacing.md};
     }
 `
@@ -206,6 +209,37 @@ const GameId = styled.span`
     color: ${({ theme }) => theme.colors.textMuted};
 `
 
+const DeleteButton = styled.button`
+    position: absolute;
+    bottom: ${({ theme }) => theme.spacing.sm};
+    right: ${({ theme }) => theme.spacing.sm};
+    background: transparent;
+    border: none;
+    color: ${({ theme }) => theme.colors.textMuted};
+    cursor: pointer;
+    padding: ${({ theme }) => theme.spacing.sm};
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: ${({ theme }) => theme.borderRadius.sm};
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+
+    &:hover,
+    &:focus {
+        color: ${({ theme }) => theme.colors.error};
+        background-color: rgba(255, 0, 0, 0.1);
+    }
+
+    &:focus {
+        outline: 2px solid ${({ theme }) => theme.colors.error};
+        outline-offset: 2px;
+    }
+`
+
 const EmptyState = styled.p`
     color: ${({ theme }) => theme.colors.textMuted};
     text-align: center;
@@ -220,7 +254,6 @@ const ErrorMessage = styled.p`
 `
 
 const GameList: FC = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
@@ -282,7 +315,7 @@ const GameList: FC = () => {
                 setLocalGame(game)
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
         [setLocalGame, localUser, gameTitle, games]
     )
 
@@ -312,6 +345,35 @@ const GameList: FC = () => {
                 })
         }
     }, [gameTitle, games, localUser, setLocalGame])
+
+    const handleDeleteGame = useCallback(
+        (e: React.MouseEvent, gameId: number) => {
+            e.stopPropagation()
+            // eslint-disable-next-line no-undef
+            if (!window.confirm('Spiel wirklich löschen?')) return
+
+            setLoading(true)
+            axios
+                .delete(`/api/games/${gameId}`)
+                .then(r => {
+                    if (r.status === 200) {
+                        setGames(games.filter(g => g.id !== gameId))
+                        if (localGame?.id === gameId) {
+                            setLocalGame(null)
+                        }
+                    }
+                    setError(null)
+                    setLoading(false)
+                })
+                .catch(e => {
+                    // eslint-disable-next-line no-console
+                    console.log(e)
+                    setError('Fehler beim Löschen')
+                    setLoading(false)
+                })
+        },
+        [games, localGame, setLocalGame]
+    )
 
     return (
         <GameListContainer>
@@ -371,6 +433,13 @@ const GameList: FC = () => {
                                 )}
                             </GameDate>
                         </GameDetails>
+                        <DeleteButton
+                            aria-label="Spiel löschen"
+                            onClick={e => handleDeleteGame(e, game.id)}
+                            type="button"
+                        >
+                            <FontAwesomeIcon icon="trash" />
+                        </DeleteButton>
                     </GameCard>
                 ))
             )}

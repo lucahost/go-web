@@ -11,8 +11,16 @@ interface Props {
 }
 
 const TileContainer = styled.img`
-    height: 50px;
-    width: 50px;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+
+    &:active {
+        transform: scale(0.95);
+    }
 `
 
 const Tile = memo(
@@ -21,18 +29,6 @@ const Tile = memo(
 
         return (
             <TileContainer
-                // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => clickHandler(field.vertex)}
-                // eslint-disable-next-line react/jsx-no-bind
-                onMouseEnter={() => {
-                    if (currentPlayer === userPlayer) {
-                        setIsHover(true)
-                    }
-                }}
-                // eslint-disable-next-line react/jsx-no-bind
-                onMouseLeave={() => {
-                    setIsHover(false)
-                }}
                 src={`/Go_${
                     isHover
                         ? currentPlayer == PlayerColor.BLACK
@@ -40,6 +36,18 @@ const Tile = memo(
                             : FieldLocation.WHITE_STONE_HOVER
                         : location
                 }.svg`}
+                alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseLeave={() => {
+                    setIsHover(false)
+                }}
+                onClick={() => clickHandler(field.vertex)}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseEnter={() => {
+                    if (currentPlayer === userPlayer) {
+                        setIsHover(true)
+                    }
+                }}
             />
         )
     }

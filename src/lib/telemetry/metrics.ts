@@ -24,6 +24,10 @@ export const gameJoinsCounter = meter.createCounter('game_joins_total', {
     description: 'Total number of game joins',
 })
 
+export const gamesDeletedCounter = meter.createCounter('games_deleted_total', {
+    description: 'Total number of games deleted',
+})
+
 export const pushNotificationsSentCounter = meter.createCounter(
     'push_notifications_sent_total',
     {

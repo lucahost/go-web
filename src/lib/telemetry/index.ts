@@ -72,6 +72,7 @@ export { config } from './config'
 export { logger, type Logger } from './logging'
 export {
     gamesCreatedCounter,
+    gamesDeletedCounter,
     movesMadeCounter,
     passesMadeCounter,
     usersCreatedCounter,

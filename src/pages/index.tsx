@@ -8,6 +8,8 @@ import axios from 'axios'
 import Login from '../components/login'
 import GameList from '../components/gameList'
 import { media } from '../lib/theme'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 const { log } = console
 
@@ -35,6 +37,7 @@ const Link = styled.a`
     min-height: ${({ theme }) => theme.touchTarget.minimum};
     display: inline-flex;
     align-items: center;
+    gap: ${({ theme }) => theme.spacing.xs};
 `
 
 const Nav = styled.nav`
@@ -44,8 +47,12 @@ const Nav = styled.nav`
     gap: ${({ theme }) => theme.spacing.md};
     min-height: 60px;
     width: 100%;
-    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-    padding-bottom: max(${({ theme }) => theme.spacing.sm}, env(safe-area-inset-bottom));
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
+    padding-bottom: max(
+        ${({ theme }) => theme.spacing.sm},
+        env(safe-area-inset-bottom)
+    );
     background-color: ${({ theme }) => theme.colors.white};
 `
 
@@ -61,7 +68,8 @@ const NavButton = styled.button`
     gap: ${({ theme }) => theme.spacing.xs};
     min-width: ${({ theme }) => theme.touchTarget.comfortable};
     min-height: ${({ theme }) => theme.touchTarget.comfortable};
-    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
     font-size: ${({ theme }) => theme.typography.fontSize.sm};
     font-weight: 500;
     font-family: inherit;
@@ -80,7 +88,8 @@ const Logout = styled.button`
     color: ${({ theme }) => theme.colors.text};
     font-size: ${({ theme }) => theme.typography.fontSize.sm};
     font-family: inherit;
-    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
     min-height: ${({ theme }) => theme.touchTarget.minimum};
     transition: color 0.3s ease-in-out;
 
@@ -98,7 +107,8 @@ const Header = styled.header`
     background-color: ${({ theme }) => theme.colors.surface};
     width: 100%;
     min-height: 56px;
-    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
 
     ${media.md} {
         display: grid;
@@ -305,8 +315,16 @@ const HomePage: FC = () => {
             <Header>
                 <HeaderLeft>
                     <h3>
-                        <Link href="https://www.learn-go.net/" target="_blank">
-                            Visit learn-go
+                        <Link
+                            href="https://www.learn-go.net/"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            Visit learn-go{' '}
+                            <FontAwesomeIcon
+                                icon={faExternalLinkAlt}
+                                size="xs"
+                            />
                         </Link>
                     </h3>
                 </HeaderLeft>

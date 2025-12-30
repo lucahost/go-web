@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { chunk } from '../lib/utils'
 import Tile from './tile'
 import {
     Field,
@@ -17,32 +16,96 @@ import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { getFieldLocationByVertex } from '../lib/board'
 import useSoundEffect from '../lib/hooks/useSoundEffect'
+import { media } from '../lib/theme'
 
 interface Props {
     size: number
 }
 
-const Board = styled.div``
-
-const TileRow = styled.div`
+const GobanContainer = styled.div`
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
 `
+
+const GameTitle = styled.h1`
+    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+    margin: 0 0 ${({ theme }) => theme.spacing.sm};
+    text-align: center;
+
+    ${media.md} {
+        font-size: ${({ theme }) => theme.typography.fontSize.xl};
+    }
+`
+
+const PassNotice = styled.h2`
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    color: ${({ theme }) => theme.colors.secondary};
+    margin: 0 0 ${({ theme }) => theme.spacing.sm};
+    text-align: center;
+`
+
+const BoardWrapper = styled.div`
+    position: relative;
+    width: 100%;
+    max-width: min(90vw, 450px);
+    aspect-ratio: 1;
+`
+
+const Board = styled.div<{ $size: number }>`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(${({ $size }) => $size}, 1fr);
+    grid-template-rows: repeat(${({ $size }) => $size}, 1fr);
+`
+
 const Message = styled.div`
-    height: 50px;
+    min-height: 40px;
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    text-align: center;
+    padding: ${({ theme }) => theme.spacing.sm};
+
+    ${media.md} {
+        font-size: ${({ theme }) => theme.typography.fontSize.base};
+        min-height: 50px;
+    }
 `
+
 const Error = styled.div`
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%);
-    background-color: rgba(255, 255, 255, 0.9);
-    z-index: 1;
-    color: red;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    z-index: 10;
+    color: ${({ theme }) => theme.colors.error};
+    padding: ${({ theme }) => theme.spacing.md};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    text-align: center;
+
+    h4 {
+        margin: 0;
+        font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    }
 `
 
 const Captures = styled.div`
-    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 300px;
+    padding: ${({ theme }) => theme.spacing.md};
+
+    p {
+        margin: 0;
+        font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    }
 `
 
 const Goban: FC<Props> = props => {
@@ -56,9 +119,6 @@ const Goban: FC<Props> = props => {
     const [board, setBoard] = useState<GoBoard>()
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
-
-    const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
-
     const [error, setError] = useState<string | null>(null)
 
     const addErrorMessage = (message: string) => {
@@ -93,7 +153,6 @@ const Goban: FC<Props> = props => {
                             const currentPlayer = r.data.currentPlayer as Player
                             setCurrentPlayer(currentPlayer)
                             setBoard(board)
-                            setRows(chunk(board.fields, props.size))
                             setWhiteCaptures(
                                 board.captures.filter(
                                     field => field.color === PlayerColor.WHITE
@@ -198,11 +257,11 @@ const Goban: FC<Props> = props => {
     }, [])
 
     return (
-        <>
-            <h1>{localGame?.title}</h1>
+        <GobanContainer>
+            <GameTitle>{localGame?.title}</GameTitle>
             {userPlayer?.playerColor === currentPlayer?.playerColor &&
                 (localGame?.board as GoBoard)?.pass && (
-                    <h2>Der andere Spieler hat gepasst</h2>
+                    <PassNotice>Der andere Spieler hat gepasst</PassNotice>
                 )}
 
             {localGame?.gameState === GameState.RUNNING && (
@@ -225,43 +284,42 @@ const Goban: FC<Props> = props => {
                 <Message>GAME OVER</Message>
             )}
 
-            <Board>
-                {error && (
-                    <Error>
-                        <h4>{error}</h4>
-                    </Error>
-                )}
-                {rows.map((rows, i) => (
-                    <TileRow key={i}>
-                        {currentPlayer &&
-                            rows.map((field, j) => (
-                                <Tile
-                                    key={j}
-                                    // eslint-disable-next-line react/jsx-no-bind
-                                    clickHandler={() => handleTileClick(field)}
-                                    currentPlayer={currentPlayer?.playerColor}
-                                    field={field}
-                                    location={
-                                        field.color === PlayerColor.EMPTY
-                                            ? getFieldLocationByVertex(
-                                                  field.vertex,
-                                                  props.size
-                                              )
-                                            : field.color === PlayerColor.BLACK
-                                              ? FieldLocation.BLACK_STONE
-                                              : FieldLocation.WHITE_STONE
-                                    }
-                                    userPlayer={userPlayer?.playerColor}
-                                />
-                            ))}
-                    </TileRow>
-                ))}
-            </Board>
+            <BoardWrapper>
+                <Board $size={props.size}>
+                    {error && (
+                        <Error>
+                            <h4>{error}</h4>
+                        </Error>
+                    )}
+                    {board?.fields &&
+                        currentPlayer &&
+                        board.fields.map((field, i) => (
+                            <Tile
+                                key={i}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                clickHandler={() => handleTileClick(field)}
+                                currentPlayer={currentPlayer?.playerColor}
+                                field={field}
+                                location={
+                                    field.color === PlayerColor.EMPTY
+                                        ? getFieldLocationByVertex(
+                                              field.vertex,
+                                              props.size
+                                          )
+                                        : field.color === PlayerColor.BLACK
+                                          ? FieldLocation.BLACK_STONE
+                                          : FieldLocation.WHITE_STONE
+                                }
+                                userPlayer={userPlayer?.playerColor}
+                            />
+                        ))}
+                </Board>
+            </BoardWrapper>
             <Captures>
-                <p>{`White: ${whiteCaptures}`}</p>
-                <p>{`Black: ${blackCaptures}`}</p>
+                <p>{`Weiss: ${whiteCaptures}`}</p>
+                <p>{`Schwarz: ${blackCaptures}`}</p>
             </Captures>
-        </>
+        </GobanContainer>
     )
 }
 
