@@ -140,7 +140,6 @@ const GameList: FC = () => {
                     setGames([])
                 })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localUser])
 
     const handleGameTitleInput = useCallback(

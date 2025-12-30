@@ -64,6 +64,7 @@ export default class DocumentClass extends Document {
                         sizes="180x180"
                     />
                     <link href="/manifest.json" rel="manifest" />
+                    <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
                     <link href="/favicon.ico" rel="shortcut icon" />
                     <style>{`
             html, body, #__next {

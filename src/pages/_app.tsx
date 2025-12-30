@@ -17,7 +17,8 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <Layout>
             <Head>
                 <title>Go</title>
-                <link href="/favicon.ico" rel="icon" />
+                <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+                <link href="/favicon.ico" rel="alternate icon" />
             </Head>
             <GlobalStyle />
             <Component {...pageProps} />

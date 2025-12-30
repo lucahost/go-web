@@ -1,9 +1,6 @@
-/* eslint-disable no-undef */
 'use strict'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-self.addEventListener('push', function (event) {
-    // eslint-disable-next-line no-console
+self.addEventListener('push', function (_event) {
     console.log('got update from web-push')
     // event.waitUntil(
     //     registration.showNotification('player update', {

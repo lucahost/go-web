@@ -57,7 +57,6 @@ const Goban: FC<Props> = props => {
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rows, setRows] = useState(chunk(board?.fields ?? [], props.size))
 
     const [error, setError] = useState<string | null>(null)
