@@ -328,14 +328,14 @@ const GamePage: FC = () => {
         joinGame()
     }, [localUser, gameId, gameExists, localGame, setLocalGame])
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         await subscription?.unsubscribe()
         setSubscription(null)
         setIsSubscribed(false)
         setLocalUser(null)
         setLocalGame(null)
         router.push('/')
-    }
+    }, [subscription, setLocalUser, setLocalGame, router])
 
     const handleNewGame = useCallback(() => {
         setLocalGame(null)

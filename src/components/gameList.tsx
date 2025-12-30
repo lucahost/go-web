@@ -272,6 +272,78 @@ const ErrorMessage = styled.p`
 
 type GameWithAnimation = Game & { isNew?: boolean }
 
+interface GameListItemProps {
+    game: GameWithAnimation
+    onSelect: (game: Game) => void
+    onDelete: (e: React.MouseEvent, gameId: number) => void
+    onAnimationEnd: (gameId: number) => void
+}
+
+const GameListItem: FC<GameListItemProps> = React.memo(
+    ({ game, onSelect, onDelete, onAnimationEnd }) => {
+        const handleSelect = useCallback(() => onSelect(game), [game, onSelect])
+        const handleDelete = useCallback(
+            (e: React.MouseEvent) => onDelete(e, game.id),
+            [game.id, onDelete]
+        )
+        const handleAnimationEnd = useCallback(
+            () => onAnimationEnd(game.id),
+            [game.id, onAnimationEnd]
+        )
+
+        return (
+            <GameCard
+                $isNew={game.isNew}
+                onAnimationEnd={handleAnimationEnd}
+                onClick={handleSelect}
+                type="button"
+            >
+                <GameId>{game.id}</GameId>
+                <GameStatus>
+                    {game.gameState === 0 ? (
+                        <FontAwesomeIcon
+                            color="#8b8683"
+                            icon="play-circle"
+                            size="2x"
+                        />
+                    ) : game.gameState === 1 ? (
+                        <FontAwesomeIcon
+                            color="#8b8683"
+                            icon="hourglass-half"
+                            size="2x"
+                        />
+                    ) : game.gameState === 2 ? (
+                        <FontAwesomeIcon
+                            color="#8b8683"
+                            icon="check-circle"
+                            size="2x"
+                        />
+                    ) : (
+                        <FontAwesomeIcon
+                            color="#8b8683"
+                            icon="question"
+                            size="2x"
+                        />
+                    )}
+                </GameStatus>
+                <GameDetails>
+                    <GameTitle>{game.title}</GameTitle>
+                    <GameDate>
+                        {new Date(game.updatedAt).toLocaleString('de-CH')}
+                    </GameDate>
+                </GameDetails>
+                <DeleteButton
+                    aria-label="Spiel löschen"
+                    onClick={handleDelete}
+                    type="button"
+                >
+                    <FontAwesomeIcon icon="trash" />
+                </DeleteButton>
+            </GameCard>
+        )
+    }
+)
+
 const GameList: FC = () => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -426,6 +498,12 @@ const GameList: FC = () => {
         [games, localGame, setLocalGame]
     )
 
+    const handleAnimationEnd = useCallback((gameId: number) => {
+        setGames(prev =>
+            prev.map(g => (g.id === gameId ? { ...g, isNew: false } : g))
+        )
+    }, [])
+
     return (
         <GameListContainer>
             <GameListTitle>Games</GameListTitle>
@@ -443,68 +521,13 @@ const GameList: FC = () => {
                 <Spinner />
             ) : (
                 games.map(game => (
-                    <GameCard
-                        $isNew={game.isNew}
-                        onAnimationEnd={() => {
-                            setGames(prev =>
-                                prev.map(g =>
-                                    g.id === game.id
-                                        ? { ...g, isNew: false }
-                                        : g
-                                )
-                            )
-                        }}
-                        // eslint-disable-next-line react/jsx-no-bind
-                        type="button"
+                    <GameListItem
                         key={game.id}
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick={() => handleGameSelect(game)}
-                    >
-                        <GameId>{game.id}</GameId>
-                        <GameStatus>
-                            {game.gameState === 0 ? (
-                                <FontAwesomeIcon
-                                    color="#8b8683"
-                                    icon="play-circle"
-                                    size="2x"
-                                />
-                            ) : game.gameState === 1 ? (
-                                <FontAwesomeIcon
-                                    color="#8b8683"
-                                    icon="hourglass-half"
-                                    size="2x"
-                                />
-                            ) : game.gameState === 2 ? (
-                                <FontAwesomeIcon
-                                    color="#8b8683"
-                                    icon="check-circle"
-                                    size="2x"
-                                />
-                            ) : (
-                                <FontAwesomeIcon
-                                    color="#8b8683"
-                                    icon="question"
-                                    size="2x"
-                                />
-                            )}
-                        </GameStatus>
-                        <GameDetails>
-                            <GameTitle>{game.title}</GameTitle>
-                            <GameDate>
-                                {new Date(game.updatedAt).toLocaleString(
-                                    'de-CH'
-                                )}
-                            </GameDate>
-                        </GameDetails>
-                        <DeleteButton
-                            aria-label="Spiel löschen"
-                            // eslint-disable-next-line react/jsx-no-bind
-                            onClick={e => handleDeleteGame(e, game.id)}
-                            type="button"
-                        >
-                            <FontAwesomeIcon icon="trash" />
-                        </DeleteButton>
-                    </GameCard>
+                        game={game}
+                        onAnimationEnd={handleAnimationEnd}
+                        onDelete={handleDeleteGame}
+                        onSelect={handleGameSelect}
+                    />
                 ))
             )}
             {!loading && games.length < 1 && (

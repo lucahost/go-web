@@ -1,6 +1,6 @@
 import styled, { keyframes, css } from 'styled-components'
 import { Field, FieldLocation, PlayerColor, Vertex } from '../lib/types'
-import { memo, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 interface Props {
     field: Field
@@ -78,23 +78,28 @@ const Tile = memo(
     }: Props) => {
         const [isHover, setIsHover] = useState(false)
 
+        const handleMouseEnter = useCallback(() => {
+            if (currentPlayer === userPlayer) {
+                setIsHover(true)
+            }
+        }, [currentPlayer, userPlayer])
+
+        const handleMouseLeave = useCallback(() => {
+            setIsHover(false)
+        }, [])
+
+        const handleClick = useCallback(() => {
+            clickHandler(field.vertex)
+        }, [clickHandler, field.vertex])
+
         return (
             <TileContainer
-                $isNewlyPlaced={isNewlyPlaced}
                 $isBeingCaptured={isBeingCaptured}
+                $isNewlyPlaced={isNewlyPlaced}
                 alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
-                // eslint-disable-next-line react/jsx-no-bind
-                onClick={() => clickHandler(field.vertex)}
-                // eslint-disable-next-line react/jsx-no-bind
-                onMouseEnter={() => {
-                    if (currentPlayer === userPlayer) {
-                        setIsHover(true)
-                    }
-                }}
-                // eslint-disable-next-line react/jsx-no-bind
-                onMouseLeave={() => {
-                    setIsHover(false)
-                }}
+                onClick={handleClick}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 src={`/Go_${
                     isHover &&
                     currentPlayer === userPlayer &&

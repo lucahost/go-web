@@ -127,7 +127,8 @@ const DominanceInfo = styled.div`
     justify-content: space-around;
     width: 100%;
     max-width: 300px;
-    padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.xs}
+        ${({ theme }) => theme.spacing.md};
     padding-bottom: ${({ theme }) => theme.spacing.md};
 
     p {
@@ -188,7 +189,9 @@ const Goban: FC<Props> = props => {
     const [shareStatus, setShareStatus] = useState<string | null>(null)
 
     // Animation state
-    const [lastPlacedVertex, setLastPlacedVertex] = useState<string | null>(null)
+    const [lastPlacedVertex, setLastPlacedVertex] = useState<string | null>(
+        null
+    )
     const [capturingFields, setCapturingFields] = useState<Map<string, Field>>(
         new Map()
     )
@@ -231,8 +234,10 @@ const Goban: FC<Props> = props => {
                         // Detect newly placed stone for animation
                         const prevBoard = previousBoardRef.current
                         if (prevBoard && parsedBoard) {
-                            const prevHistoryLen = prevBoard.history?.length || 0
-                            const newHistoryLen = parsedBoard.history?.length || 0
+                            const prevHistoryLen =
+                                prevBoard.history?.length || 0
+                            const newHistoryLen =
+                                parsedBoard.history?.length || 0
 
                             // A new move was made
                             if (newHistoryLen > prevHistoryLen) {
@@ -256,7 +261,8 @@ const Goban: FC<Props> = props => {
                                 if (prevField.color !== PlayerColor.EMPTY) {
                                     const newField = parsedBoard.fields.find(
                                         f =>
-                                            f.vertex[0] === prevField.vertex[0] &&
+                                            f.vertex[0] ===
+                                                prevField.vertex[0] &&
                                             f.vertex[1] === prevField.vertex[1]
                                     )
                                     if (

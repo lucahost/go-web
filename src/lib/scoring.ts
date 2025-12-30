@@ -30,11 +30,21 @@ export const calculateDominance = (board: GoBoard): Dominance => {
             }
 
             // Start flood fill for this empty region
-            const { region, touchingColors } = analyzeRegion(board, field.vertex, visited)
-            
-            if (touchingColors.has(PlayerColor.BLACK) && !touchingColors.has(PlayerColor.WHITE)) {
+            const { region, touchingColors } = analyzeRegion(
+                board,
+                field.vertex,
+                visited
+            )
+
+            if (
+                touchingColors.has(PlayerColor.BLACK) &&
+                !touchingColors.has(PlayerColor.WHITE)
+            ) {
                 blackScore += region.length
-            } else if (touchingColors.has(PlayerColor.WHITE) && !touchingColors.has(PlayerColor.BLACK)) {
+            } else if (
+                touchingColors.has(PlayerColor.WHITE) &&
+                !touchingColors.has(PlayerColor.BLACK)
+            ) {
                 whiteScore += region.length
             } else {
                 neutralScore += region.length
@@ -47,19 +57,19 @@ export const calculateDominance = (board: GoBoard): Dominance => {
         white: whiteScore,
         neutral: neutralScore,
         blackPercentage: Math.round((blackScore / totalPoints) * 100),
-        whitePercentage: Math.round((whiteScore / totalPoints) * 100)
+        whitePercentage: Math.round((whiteScore / totalPoints) * 100),
     }
 }
 
 const analyzeRegion = (
-    board: GoBoard, 
-    startVertex: Vertex, 
+    board: GoBoard,
+    startVertex: Vertex,
     visited: Set<string>
-): { region: Vertex[], touchingColors: Set<PlayerColor> } => {
+): { region: Vertex[]; touchingColors: Set<PlayerColor> } => {
     const region: Vertex[] = []
     const touchingColors = new Set<PlayerColor>()
     const queue: Vertex[] = [startVertex]
-    
+
     // Mark start as visited immediately to avoid re-queueing
     const startKey = `${startVertex[0]},${startVertex[1]}`
     visited.add(startKey)
