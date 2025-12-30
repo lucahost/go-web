@@ -107,7 +107,7 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
           remote_key_pass: ${{ secrets.SSH_KEY_PASSPHRASE }}
 
-      - name: Restart Application
+      - name: Inject secrets and restart
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -119,6 +119,11 @@ jobs:
             echo "Checking .next directory..."
             ls -la .next/ || { echo "ERROR: .next directory not found!"; exit 1; }
             test -f .next/BUILD_ID || { echo "ERROR: BUILD_ID not found in .next!"; exit 1; }
+
+            # Inject secrets into .env (append if not present)
+            grep -q "^WEB_PUSH_PRIVATE_KEY=" .env || echo "WEB_PUSH_PRIVATE_KEY=${{ secrets.WEB_PUSH_PRIVATE_KEY }}" >> .env
+            grep -q "^WEB_PUSH_EMAIL=" .env || echo "WEB_PUSH_EMAIL=${{ secrets.WEB_PUSH_EMAIL }}" >> .env
+
             echo "Build verified. Installing dependencies..."
             npm ci --omit=dev
             npx prisma generate

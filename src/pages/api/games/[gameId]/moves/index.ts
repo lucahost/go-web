@@ -109,7 +109,6 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                 res.status(400).end(`Invalid gameId: ${gameId}`)
                 return
             }
-            break
         default:
             res.setHeader('Allow', [HttpMethod.POST])
             res.status(405).end(`Method ${method} Not Allowed`)
