@@ -124,12 +124,14 @@ const HomePage: FC = () => {
         useState<ServiceWorkerRegistration | null>(null)
 
     useEffect(() => {
-        if (
-            typeof window !== 'undefined' &&
-            'serviceWorker' in navigator &&
-            window.workbox !== undefined
-        ) {
-            // run only in browser
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            // Register service worker
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                // eslint-disable-next-line no-console
+                console.error('Service worker registration failed:', err)
+            })
+
+            // Wait for service worker to be ready
             navigator.serviceWorker.ready.then(reg => {
                 reg.pushManager.getSubscription().then(sub => {
                     if (

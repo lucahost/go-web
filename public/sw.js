@@ -1,1 +1,73 @@
-if(!self.define){let e,s={};const n=(n,a)=>(n=new URL(n+".js",a).href,s[n]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()}).then(()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e}));self.define=(a,i)=>{const c=e||("document"in self?document.currentScript.src:"")||location.href;if(s[c])return;let t={};const r=e=>n(e,c),o={module:{uri:c},exports:t,require:r};s[c]=Promise.all(a.map(e=>o[e]||r(e))).then(e=>(i(...e),t))}}define(["./workbox-4754cb34"],function(e){"use strict";importScripts("worker-QzamCoHmUnTQr_wIz0CGc.js"),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/Go_-.svg",revision:"0bb66f9604f824d8eb667abe3b2758fc"},{url:"/Go_b.svg",revision:"4841d9f65f6c6c8edc99ec178eac23c5"},{url:"/Go_bh.svg",revision:"016f946153c6b565218288f3a40194d7"},{url:"/Go_d.svg",revision:"9a5e6116b7d2ae18504537f62d28d2b9"},{url:"/Go_dl.svg",revision:"73a13678ddf8e395d3d63781341ee178"},{url:"/Go_dr.svg",revision:"7c84a6890a85dc52481d81e948ce332c"},{url:"/Go_l.svg",revision:"cfff0584c580dc05f85268c506f4b317"},{url:"/Go_m.svg",revision:"fb808d59145eed1b5855c0deb4e33dca"},{url:"/Go_r.svg",revision:"330d42a2a1f4561b575781617614c0a9"},{url:"/Go_u.svg",revision:"3fa5515caac6ea31676d75576eb9b9d1"},{url:"/Go_ul.svg",revision:"b79630637459b51c5afe0bbf30728654"},{url:"/Go_ur.svg",revision:"28e988125b3275c912f122e2db02eea4"},{url:"/Go_w.svg",revision:"6642b27954afa03866220c0cf2db0f0e"},{url:"/Go_wh.svg",revision:"c89b1cef5e92678d80c3055742d93fc3"},{url:"/_next/dynamic-css-manifest.json",revision:"d751713988987e9331980363e24189ce"},{url:"/_next/static/QzamCoHmUnTQr_wIz0CGc/_buildManifest.js",revision:"b3834bab425a68784d2c463a3b946e62"},{url:"/_next/static/QzamCoHmUnTQr_wIz0CGc/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/chunks/769-fdb772c7aa7e1ecb.js",revision:"fdb772c7aa7e1ecb"},{url:"/_next/static/chunks/98bef5de-4f195be386ba5229.js",revision:"4f195be386ba5229"},{url:"/_next/static/chunks/cd97a040-07647f25a0536477.js",revision:"07647f25a0536477"},{url:"/_next/static/chunks/framework-a6e0b7e30f98059a.js",revision:"a6e0b7e30f98059a"},{url:"/_next/static/chunks/main-1661007bf8542550.js",revision:"1661007bf8542550"},{url:"/_next/static/chunks/pages/_app-0ef5c193b24ec94e.js",revision:"0ef5c193b24ec94e"},{url:"/_next/static/chunks/pages/_error-5366f00fee9a89ba.js",revision:"5366f00fee9a89ba"},{url:"/_next/static/chunks/pages/index-e3ff3d85b626a07b.js",revision:"e3ff3d85b626a07b"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/webpack-ed8db4e92067a91e.js",revision:"ed8db4e92067a91e"},{url:"/click.mp3",revision:"d6ddcf954129f384f612664b20d23fad"},{url:"/favicon.ico",revision:"21b739d43fcb9bbb83d8541fe4fe88fa"},{url:"/manifest.json",revision:"5d430fccebf2e11e02ce67722d7e34ca"},{url:"/vercel.svg",revision:"4b4f1876502eb6721764637fe5c41702"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:n,state:a})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")},new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")},new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>!(self.origin===e.origin),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")});
+// Simple service worker for push notifications and messaging
+// No Workbox needed - following Next.js recommendations
+
+const SW_VERSION = '1.0.0';
+const CACHE_NAME = `go-app-${SW_VERSION}`;
+
+// Install event
+self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
+  self.skipWaiting();
+});
+
+// Activate event
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
+  event.waitUntil(
+    // Clean up old caches
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Handle push notifications
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    return;
+  }
+
+  const data = event.data.json();
+  const title = data.title || 'Go Game';
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    data: data.data || {},
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // If a window is already open, focus it
+      for (const client of clientList) {
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise open a new window
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});
+
+// Handle messages from the app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});

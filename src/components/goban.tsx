@@ -180,22 +180,20 @@ const Goban: FC<Props> = props => {
     )
 
     useEffect(() => {
-        if (
-            typeof window !== 'undefined' &&
-            'serviceWorker' in navigator &&
-            window.workbox !== undefined
-        ) {
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             // run only in browser
             navigator.serviceWorker.addEventListener('message', loadGame, true)
         }
         loadGame()
 
         return () => {
-            navigator.serviceWorker?.removeEventListener(
-                'message',
-                loadGame,
-                true
-            )
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.removeEventListener(
+                    'message',
+                    loadGame,
+                    true
+                )
+            }
         }
         // eslint-disable-next-line
     }, [])
