@@ -112,29 +112,35 @@ const Error = styled.div`
 const Captures = styled.div`
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
     width: 100%;
-    max-width: 300px;
+    max-width: 500px;
     padding: ${({ theme }) => theme.spacing.md};
+    gap: ${({ theme }) => theme.spacing.sm};
 
     p {
         margin: 0;
         font-size: ${({ theme }) => theme.typography.fontSize.sm};
+        white-space: nowrap;
     }
 `
 
 const DominanceInfo = styled.div`
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
     width: 100%;
-    max-width: 300px;
+    max-width: 500px;
     padding: ${({ theme }) => theme.spacing.xs}
         ${({ theme }) => theme.spacing.md};
     padding-bottom: ${({ theme }) => theme.spacing.md};
+    gap: ${({ theme }) => theme.spacing.sm};
 
     p {
         margin: 0;
         font-size: ${({ theme }) => theme.typography.fontSize.xs};
         color: ${({ theme }) => theme.colors.textMuted};
+        white-space: nowrap;
     }
 `
 
