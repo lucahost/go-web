@@ -3,8 +3,13 @@ import prisma from '../../../../../lib/db'
 import webPush from 'web-push'
 import { GoBoard, HttpMethod } from '../../../../../lib/types'
 import { move } from '../../../../../lib/game'
-
-const { error } = console
+import {
+    withTelemetry,
+    logger,
+    movesMadeCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
+} from '../../../../../lib/telemetry'
 
 const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const {
@@ -44,6 +49,17 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                             },
                         })
 
+                        movesMadeCounter.add(1, {
+                            gameId: String(gId),
+                            playerColor:
+                                goBoard.currentPlayer.playerColor ?? 'unknown',
+                        })
+                        logger.info('Move made', {
+                            gameId: gId,
+                            userId,
+                            field,
+                        })
+
                         const existingSubscriptions =
                             await prisma.subscription.findMany({
                                 where: { gameId: gId },
@@ -62,9 +78,19 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
                                             message: `${userId} just set a stone!`,
                                         })
                                     )
+                                    .then(() => {
+                                        pushNotificationsSentCounter.add(1, {
+                                            type: 'move',
+                                        })
+                                    })
                                     .catch(err => {
-                                        error(
-                                            `could not send push notifications. error ${err}`
+                                        pushNotificationsFailedCounter.add(1, {
+                                            type: 'move',
+                                        })
+                                        logger.error(
+                                            'Failed to send push notification',
+                                            err,
+                                            { gameId: gId, type: 'move' }
                                         )
                                     })
                             })
@@ -92,4 +118,4 @@ const MoveApi = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 }
 
-export default MoveApi
+export default withTelemetry(MoveApi, { operationName: 'games.move' })

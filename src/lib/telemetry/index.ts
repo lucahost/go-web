@@ -1,0 +1,85 @@
+import { NodeSDK } from '@opentelemetry/sdk-node'
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
+import { Resource } from '@opentelemetry/resources'
+import {
+    ATTR_SERVICE_NAME,
+    ATTR_SERVICE_VERSION,
+    ATTR_DEPLOYMENT_ENVIRONMENT,
+} from '@opentelemetry/semantic-conventions'
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
+import { PrismaInstrumentation } from '@prisma/instrumentation'
+import { config } from './config'
+
+let sdk: NodeSDK | null = null
+
+export function initTelemetry(): void {
+    if (!config.enabled) {
+        console.log('OpenTelemetry disabled')
+        return
+    }
+
+    if (sdk) {
+        console.log('OpenTelemetry already initialized')
+        return
+    }
+
+    const resource = new Resource({
+        [ATTR_SERVICE_NAME]: config.serviceName,
+        [ATTR_SERVICE_VERSION]: config.serviceVersion,
+        [ATTR_DEPLOYMENT_ENVIRONMENT]: config.deploymentEnvironment,
+        'host.name': config.hostName,
+    })
+
+    sdk = new NodeSDK({
+        resource,
+        traceExporter: new OTLPTraceExporter({
+            url: config.otlpEndpoint,
+        }),
+        metricReader: new PeriodicExportingMetricReader({
+            exporter: new OTLPMetricExporter({
+                url: config.otlpEndpoint,
+            }),
+            exportIntervalMillis: 60000,
+        }),
+        instrumentations: [
+            getNodeAutoInstrumentations({
+                '@opentelemetry/instrumentation-fs': { enabled: false },
+                '@opentelemetry/instrumentation-dns': { enabled: false },
+                '@opentelemetry/instrumentation-net': { enabled: false },
+            }),
+            new PrismaInstrumentation(),
+        ],
+    })
+
+    sdk.start()
+    console.log(
+        `OpenTelemetry initialized for ${config.serviceName} -> ${config.otlpEndpoint}`
+    )
+
+    const shutdown = () => {
+        sdk?.shutdown()
+            .then(() => console.log('OpenTelemetry shut down'))
+            .catch(err => console.error('OpenTelemetry shutdown error', err))
+            .finally(() => process.exit(0))
+    }
+
+    process.on('SIGTERM', shutdown)
+    process.on('SIGINT', shutdown)
+}
+
+export { config } from './config'
+export { logger, type Logger } from './logging'
+export {
+    gamesCreatedCounter,
+    movesMadeCounter,
+    passesMadeCounter,
+    usersCreatedCounter,
+    gameJoinsCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
+    httpRequestDurationHistogram,
+    databaseQueryDurationHistogram,
+} from './metrics'
+export { withTelemetry, createSpan, tracer, type TelemetryOptions } from './middleware'

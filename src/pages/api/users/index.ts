@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { User } from '@prisma/client'
 import { HttpMethod } from '../../../lib/types'
+import {
+    withTelemetry,
+    logger,
+    usersCreatedCounter,
+} from '../../../lib/telemetry'
 
 type UserResponseData = User | User[]
 
@@ -21,6 +26,7 @@ const apiMethod = async (
     switch (method) {
         case HttpMethod.GET:
             const users = await prisma.user.findMany()
+            logger.debug('Listed users', { count: users.length })
             res.status(200).json(users)
             break
         case HttpMethod.POST:
@@ -35,11 +41,14 @@ const apiMethod = async (
                 },
             })
             if (existingUser) {
+                logger.debug('User already exists', { userId: existingUser.id })
                 res.status(200).json(existingUser)
                 return
             }
 
             const user = await prisma.user.create({ data: body })
+            usersCreatedCounter.add(1)
+            logger.info('User created', { userId: user.id, name: user.name })
             res.status(201).json(user)
             break
         default:
@@ -48,4 +57,4 @@ const apiMethod = async (
     }
 }
 
-export default apiMethod
+export default withTelemetry(apiMethod, { operationName: 'users' })

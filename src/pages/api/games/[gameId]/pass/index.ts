@@ -1,10 +1,15 @@
-﻿import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { GameState, GoBoard, HttpMethod } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { pass } from '../../../../../lib/game'
-
-const { error } = console
+import {
+    withTelemetry,
+    logger,
+    passesMadeCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
+} from '../../../../../lib/telemetry'
 
 const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const {
@@ -69,6 +74,9 @@ const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
                     }
                 }
 
+                passesMadeCounter.add(1, { gameId: String(gId) })
+                logger.info('Pass made', { gameId: gId, userId })
+
                 const existingSubscriptions =
                     await prisma.subscription.findMany({
                         where: { gameId: gId },
@@ -85,9 +93,19 @@ const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
                                     message: `${userId} just passed!`,
                                 })
                             )
+                            .then(() => {
+                                pushNotificationsSentCounter.add(1, {
+                                    type: 'pass',
+                                })
+                            })
                             .catch(err => {
-                                error(
-                                    `could not send push notifications. error ${err}`
+                                pushNotificationsFailedCounter.add(1, {
+                                    type: 'pass',
+                                })
+                                logger.error(
+                                    'Failed to send push notification',
+                                    err,
+                                    { gameId: gId, type: 'pass' }
                                 )
                             })
                     })
@@ -101,4 +119,4 @@ const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 }
 
-export default PassApi
+export default withTelemetry(PassApi, { operationName: 'games.pass' })

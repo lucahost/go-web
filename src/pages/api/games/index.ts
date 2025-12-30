@@ -3,6 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/db'
 import { start } from '../../../lib/game'
 import { HttpMethod, PlayerColor } from '../../../lib/types'
+import {
+    withTelemetry,
+    logger,
+    gamesCreatedCounter,
+} from '../../../lib/telemetry'
 
 type GameResponseData = Game[] | Game | never
 
@@ -22,6 +27,7 @@ const apiMethod = async (
     switch (method) {
         case HttpMethod.GET:
             const games = await prisma.game.findMany()
+            logger.debug('Listed games', { count: games.length })
             res.status(200).json(games)
             break
         case HttpMethod.POST:
@@ -68,10 +74,16 @@ const apiMethod = async (
                     })
                 }
 
+                gamesCreatedCounter.add(1)
+                logger.info('Game created', {
+                    gameId: newGame.id,
+                    title,
+                    authorId: author.id,
+                })
+
                 res.status(200).json(newGame)
             } catch (err) {
-                // eslint-disable-next-line no-console
-                console.error(err)
+                logger.error('Failed to create game', err, { userId, title })
             }
 
             break
@@ -81,4 +93,4 @@ const apiMethod = async (
     }
 }
 
-export default apiMethod
+export default withTelemetry(apiMethod, { operationName: 'games' })

@@ -3,6 +3,13 @@ import { GameState, HttpMethod, PlayerColor } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { Game } from '@prisma/client'
+import {
+    withTelemetry,
+    logger,
+    gameJoinsCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
+} from '../../../../../lib/telemetry'
 
 type JoinGameResponseData = Game | never
 
@@ -11,8 +18,6 @@ webPush.setVapidDetails(
     process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
     process.env.WEB_PUSH_PRIVATE_KEY ?? ''
 )
-
-const { error } = console
 
 const JoinApi = async (
     req: NextApiRequest,
@@ -73,6 +78,9 @@ const JoinApi = async (
                 },
             })
 
+            gameJoinsCounter.add(1, { gameId: String(gId) })
+            logger.info('Player joined game', { gameId: gId, userId: uId })
+
             if (subscription) {
                 await prisma.subscription.create({
                     data: {
@@ -98,10 +106,15 @@ const JoinApi = async (
                                 message: `${userId} just joined your game, click this message to start it!`,
                             })
                         )
+                        .then(() => {
+                            pushNotificationsSentCounter.add(1, { type: 'join' })
+                        })
                         .catch((err: any) => {
-                            error(
-                                `could not send push notifications. error ${err}`
-                            )
+                            pushNotificationsFailedCounter.add(1, { type: 'join' })
+                            logger.error('Failed to send push notification', err, {
+                                gameId: gId,
+                                type: 'join',
+                            })
                         })
                 })
             } else {
@@ -118,4 +131,4 @@ const JoinApi = async (
     }
 }
 
-export default JoinApi
+export default withTelemetry(JoinApi, { operationName: 'games.join' })
