@@ -132,7 +132,8 @@ const Captures = styled.div`
 
 const DominanceInfo = styled.div`
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     width: 100%;
     max-width: 500px;
@@ -140,6 +141,7 @@ const DominanceInfo = styled.div`
         ${({ theme }) => theme.spacing.md};
     padding-bottom: ${({ theme }) => theme.spacing.md};
     gap: ${({ theme }) => theme.spacing.sm};
+    position: relative;
 
     p {
         margin: 0;
@@ -185,7 +187,7 @@ const ShareFeedback = styled.span`
 `
 
 const TooltipContainer = styled.div`
-    position: relative;
+    position: static;
     display: inline-flex;
     align-items: center;
     margin-left: ${({ theme }) => theme.spacing.xs};
@@ -196,9 +198,11 @@ const TooltipContent = styled.div`
     opacity: 0;
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 280px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: max-content;
+    max-width: 90vw;
     background-color: ${({ theme }) => theme.colors.surface};
     color: ${({ theme }) => theme.colors.text};
     padding: ${({ theme }) => theme.spacing.md};
@@ -682,11 +686,12 @@ const Goban: FC<Props> = props => {
 
                             <h5>Potenzial (Einfluss)</h5>
                             <p>
-                                Geschätzter strategischer Vorteil durch die
-                                Ausstrahlung der Steine.
+                                Zeigt, wer das Brett strategisch kontrolliert
+                                und welche Bereiche wahrscheinlich wem gehören
+                                werden.
                                 <span className="calc">
-                                    Berechnung: Simulation der Diffusion von
-                                    Einfluss auf leere Felder.
+                                    Berechnung: Wie stark die Steine auf freie
+                                    Felder ausstrahlen.
                                 </span>
                             </p>
                         </TooltipContent>
