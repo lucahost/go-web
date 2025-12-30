@@ -205,7 +205,9 @@ const TooltipContent = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.md};
     border: 1px solid ${({ theme }) => theme.colors.textMuted};
     z-index: 100;
-    transition: opacity 0.2s, visibility 0.2s;
+    transition:
+        opacity 0.2s,
+        visibility 0.2s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     margin-bottom: ${({ theme }) => theme.spacing.sm};
     text-align: left;
@@ -257,9 +259,12 @@ const InfoIconWrapper = styled.div`
     display: flex;
     outline: none;
 
-    &:hover + ${TooltipContent},
-    &:focus + ${TooltipContent},
-    &:active + ${TooltipContent} {
+    &:hover
+        + ${TooltipContent},
+        &:focus
+        + ${TooltipContent},
+        &:active
+        + ${TooltipContent} {
         visibility: visible;
         opacity: 1;
         pointer-events: auto;
@@ -659,9 +664,9 @@ const Goban: FC<Props> = props => {
                     )}
                     <TooltipContainer>
                         <InfoIconWrapper
-                            tabIndex={0}
-                            role="button"
                             aria-label="Info zu Dominanz und Potenzial"
+                            role="button"
+                            tabIndex={0}
                         >
                             <FontAwesomeIcon icon={faInfoCircle} />
                         </InfoIconWrapper>
