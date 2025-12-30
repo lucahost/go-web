@@ -53,13 +53,7 @@ const Login: FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
-    const [email, setEmail] = useState<string>('')
     const [name, setName] = useState<string>('')
-
-    const handleEmailInput = useCallback(
-        event => setEmail(event.target.value),
-        []
-    )
 
     const handleNameInput = useCallback(
         event => setName(event.target.value),
@@ -67,11 +61,11 @@ const Login: FC = () => {
     )
 
     const handleLogin = useCallback(() => {
-        if (email !== '') {
+        if (name !== '') {
             const url = `/api/users`
             setLoading(true)
             axios
-                .post<User>(url, { name: name, email: email })
+                .post<User>(url, { name: name })
                 .then(async r => {
                     if (r.status === 200 || r.status === 201) {
                         setLocalUser(r.data)
@@ -86,7 +80,7 @@ const Login: FC = () => {
                     setLoading(false)
                 })
         }
-    }, [email, name, setLocalUser])
+    }, [name, setLocalUser])
 
     return loading ? (
         <Spinner />
@@ -98,11 +92,6 @@ const Login: FC = () => {
                 name="name"
                 onChange={handleNameInput}
                 placeholder="Name eingeben"
-            />
-            <FieldInput
-                name="email"
-                onChange={handleEmailInput}
-                placeholder="Email eingeben"
             />
             <LoginButton onClick={handleLogin}>Go</LoginButton>
         </>

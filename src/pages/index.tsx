@@ -58,14 +58,32 @@ const Logout = styled.h3`
 
 const Header = styled.div`
     align-items: center;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
 
     background-color: #252525;
 
     width: 100%;
     height: 50px;
     padding: 0 20px;
+`
+
+const HeaderLeft = styled.div`
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+`
+
+const HeaderCenter = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`
+
+const HeaderRight = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 `
 
 const base64ToUint8Array = (base64: string) => {
@@ -213,15 +231,21 @@ const HomePage: FC = () => {
     return (
         <>
             <Header>
-                <h3>
-                    <Link href="https://www.learn-go.net/" target="_blank">
-                        Visit learn-go
-                    </Link>
-                </h3>
-                <h1>Go</h1>
-                <Logout>
-                    {localUser && <a onClick={handleLogout}>Logout</a>}
-                </Logout>
+                <HeaderLeft>
+                    <h3>
+                        <Link href="https://www.learn-go.net/" target="_blank">
+                            Visit learn-go
+                        </Link>
+                    </h3>
+                </HeaderLeft>
+                <HeaderCenter>
+                    <h1>Go</h1>
+                </HeaderCenter>
+                <HeaderRight>
+                    <Logout>
+                        {localUser && <a onClick={handleLogout}>Logout</a>}
+                    </Logout>
+                </HeaderRight>
             </Header>
             <Content>
                 {!localUser ? (

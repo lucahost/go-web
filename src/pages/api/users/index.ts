@@ -5,8 +5,7 @@ import { HttpMethod } from '../../../lib/types'
 type UserResponseData = User | User[]
 
 type CreateUserDto = {
-    name?: string
-    email: string
+    name: string
 }
 
 type NextApiRequestWithCreateUserDto = NextApiRequest & CreateUserDto
@@ -25,14 +24,14 @@ const apiMethod = async (
             res.status(200).json(users)
             break
         case HttpMethod.POST:
-            if (body?.email === '' || body?.email === null) {
-                res.status(400).end(`no email in request`)
+            if (body?.name === '' || body?.name === null) {
+                res.status(400).end(`no name in request`)
                 return
             }
 
             const existingUser = await prisma.user.findUnique({
                 where: {
-                    email: body.email,
+                    name: body.name,
                 },
             })
             if (existingUser) {

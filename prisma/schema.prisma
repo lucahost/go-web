@@ -20,8 +20,7 @@ model Subscription {
 
 model User {
   id            Int            @id @default(autoincrement())
-  email         String         @unique
-  name          String?
+  name          String         @unique
   games         UserGame[]
   authoredGames Game[]         @relation("author")
   Subscription  Subscription[]
