@@ -144,22 +144,26 @@ const Goban: FC<Props> = props => {
                 .then(r => {
                     if (r.status === 200) {
                         setLocalGame(r.data)
-                        setBoard(r.data.board as GoBoard)
-                        if (
-                            r.data.board !== '' &&
-                            r.data.currentPlayer !== null
-                        ) {
-                            const board = r.data.board as GoBoard
+
+                        // Parse board if it's a string (backwards compatibility)
+                        const boardData =
+                            typeof r.data.board === 'string'
+                                ? JSON.parse(r.data.board)
+                                : r.data.board
+                        const parsedBoard = boardData as GoBoard
+
+                        setBoard(parsedBoard)
+
+                        if (parsedBoard && r.data.currentPlayer) {
                             const currentPlayer = r.data.currentPlayer as Player
                             setCurrentPlayer(currentPlayer)
-                            setBoard(board)
                             setWhiteCaptures(
-                                board.captures.filter(
+                                parsedBoard.captures.filter(
                                     field => field.color === PlayerColor.WHITE
                                 ).length
                             )
                             setBlackCaptures(
-                                board.captures.filter(
+                                parsedBoard.captures.filter(
                                     field => field.color === PlayerColor.BLACK
                                 ).length
                             )
