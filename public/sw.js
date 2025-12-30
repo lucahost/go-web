@@ -35,8 +35,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Go Game';
   const options = {
     body: data.body || 'You have a new notification',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/favicon-192.png',
+    badge: '/favicon-192.png',
     data: data.data || {},
   };
 
