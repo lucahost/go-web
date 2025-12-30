@@ -84,7 +84,7 @@ describe('isOccupied', () => {
     it('should throw for move out of bound', () => {
         const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
 
-        expect(() => isOccupied(initialBoard, [0, 0])).toThrowError(
+        expect(() => isOccupied(initialBoard, [0, 0])).toThrow(
             /Move does not exist/
         )
     })
@@ -116,7 +116,7 @@ describe('Move', () => {
             color: PlayerColor.BLACK,
         }
 
-        expect(() => move(game, simpleMove)).toThrowError(/out of bounds/)
+        expect(() => move(game, simpleMove)).toThrow(/out of bounds/)
     })
 
     it('should not allow a move on a field with a stone', () => {
@@ -140,7 +140,7 @@ describe('Move', () => {
             color: PlayerColor.WHITE,
         }
 
-        expect(() => move(game, preOccupiedMove)).toThrowError(
+        expect(() => move(game, preOccupiedMove)).toThrow(
             /Already occupied/
         )
     })
