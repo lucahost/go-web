@@ -60,7 +60,7 @@ jobs:
           cp -r .next deploy-bundle/
           cp -r public deploy-bundle/
           cp -r prisma deploy-bundle/
-          cp package.json package-lock.json next.config.js ecosystem.config.js deploy-bundle/
+          cp package.json package-lock.json next.config.js ecosystem.config.js prisma.config.ts .env deploy-bundle/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
