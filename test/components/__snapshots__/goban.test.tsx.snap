@@ -2,19 +2,29 @@
 
 exports[`ButtonGroup renders correctly 1`] = `
 <div>
-  <h1 />
   <div
-    class="sc-hvigdm"
-  />
-  <div
-    class="sc-jwTyAe hoMgea"
+    class="sc-hvigdm iyEAYx"
   >
-    <p>
-      White: 0
-    </p>
-    <p>
-      Black: 0
-    </p>
+    <h1
+      class="sc-fhHczv gSLrZT"
+    />
+    <div
+      class="sc-dTvVRJ leEMxI"
+    >
+      <div
+        class="sc-jwTyAe fHkBlg"
+      />
+    </div>
+    <div
+      class="sc-hwkwBN HqMcb"
+    >
+      <p>
+        Weiss: 0
+      </p>
+      <p>
+        Schwarz: 0
+      </p>
+    </div>
   </div>
 </div>
 `;

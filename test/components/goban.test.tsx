@@ -1,5 +1,7 @@
 import { render } from '@testing-library/react'
+import { ThemeProvider } from 'styled-components'
 import Goban from '../../src/components/goban'
+import { theme } from '../../src/lib/theme'
 
 beforeAll(() => {
     window.HTMLMediaElement.prototype.load = () => {
@@ -16,7 +18,11 @@ beforeAll(() => {
 
 describe('ButtonGroup', () => {
     it('renders correctly', () => {
-        const { container } = render(<Goban size={9} />)
+        const { container } = render(
+            <ThemeProvider theme={theme}>
+                <Goban size={9} />
+            </ThemeProvider>
+        )
         expect(container).toMatchSnapshot()
     })
 })

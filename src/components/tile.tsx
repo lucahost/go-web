@@ -29,18 +29,8 @@ const Tile = memo(
 
         return (
             <TileContainer
-                src={`/Go_${
-                    isHover
-                        ? currentPlayer == PlayerColor.BLACK
-                            ? FieldLocation.BLACK_STONE_HOVER
-                            : FieldLocation.WHITE_STONE_HOVER
-                        : location
-                }.svg`}
                 alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
                 // eslint-disable-next-line react/jsx-no-bind
-                onMouseLeave={() => {
-                    setIsHover(false)
-                }}
                 onClick={() => clickHandler(field.vertex)}
                 // eslint-disable-next-line react/jsx-no-bind
                 onMouseEnter={() => {
@@ -48,6 +38,17 @@ const Tile = memo(
                         setIsHover(true)
                     }
                 }}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseLeave={() => {
+                    setIsHover(false)
+                }}
+                src={`/Go_${
+                    isHover
+                        ? currentPlayer == PlayerColor.BLACK
+                            ? FieldLocation.BLACK_STONE_HOVER
+                            : FieldLocation.WHITE_STONE_HOVER
+                        : location
+                }.svg`}
             />
         )
     }

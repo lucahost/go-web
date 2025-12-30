@@ -2,7 +2,8 @@
 
 exports[`Tile renders correctly 1`] = `
 <img
-  class="sc-bRKDuR hTMpym"
+  alt="Go board tile at 0,0"
+  class="sc-bRKDuR kiPink"
   src="/Go_undefined.svg"
 />
 `;

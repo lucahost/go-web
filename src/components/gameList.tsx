@@ -394,6 +394,7 @@ const GameList: FC = () => {
                 games.map(game => (
                     <GameCard
                         key={game.id}
+                        // eslint-disable-next-line react/jsx-no-bind
                         onClick={() => handleGameSelect(game)}
                         type="button"
                     >
@@ -435,6 +436,7 @@ const GameList: FC = () => {
                         </GameDetails>
                         <DeleteButton
                             aria-label="Spiel löschen"
+                            // eslint-disable-next-line react/jsx-no-bind
                             onClick={e => handleDeleteGame(e, game.id)}
                             type="button"
                         >
