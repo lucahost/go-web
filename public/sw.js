@@ -1,7 +1,7 @@
 // Simple service worker for push notifications and messaging
 // No Workbox needed - following Next.js recommendations
 
-const SW_VERSION = '1.0.0';
+const SW_VERSION = '1.1.0';
 const CACHE_NAME = `go-app-${SW_VERSION}`;
 
 // Install event
@@ -34,14 +34,29 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const title = data.title || 'Go Game';
   const options = {
-    body: data.body || 'You have a new notification',
+    body: data.message || data.body || 'You have a new notification',
     icon: '/favicon-192.png',
     badge: '/favicon-192.png',
     data: data.data || {},
   };
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Notify all clients to reload game data
+      clientList.forEach((client) => {
+        client.postMessage({ type: 'GAME_UPDATE', data });
+      });
+
+      // Check if any client window is focused/visible
+      const hasVisibleClient = clientList.some(
+        (client) => client.visibilityState === 'visible'
+      );
+
+      // Only show notification if no window is actively visible
+      if (!hasVisibleClient) {
+        return self.registration.showNotification(title, options);
+      }
+    })
   );
 });
 

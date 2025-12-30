@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import Tile from './tile'
 import {
@@ -121,6 +121,9 @@ const Goban: FC<Props> = props => {
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
     const [error, setError] = useState<string | null>(null)
 
+    // Ref to store latest loadGame function for service worker messages
+    const loadGameRef = useRef<() => void>(() => {})
+
     const addErrorMessage = (message: string) => {
         setError(message)
         const timer = setTimeout(() => setError(null), 1000)
@@ -176,6 +179,9 @@ const Goban: FC<Props> = props => {
                 })
         }
     }
+
+    // Keep ref updated with latest loadGame function
+    loadGameRef.current = loadGame
 
     const handleTileClick = useCallback(
         (field: Field) => {
@@ -240,21 +246,28 @@ const Goban: FC<Props> = props => {
     )
 
     useEffect(() => {
+        // Handler that uses ref to always call the latest loadGame
+        const handleServiceWorkerMessage = () => {
+            loadGameRef.current()
+        }
+
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-            // run only in browser
-            navigator.serviceWorker.addEventListener('message', loadGame, true)
+            navigator.serviceWorker.addEventListener(
+                'message',
+                handleServiceWorkerMessage,
+                true
+            )
         }
 
         return () => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.removeEventListener(
                     'message',
-                    loadGame,
+                    handleServiceWorkerMessage,
                     true
                 )
             }
         }
-        // eslint-disable-next-line
     }, [])
 
     // Load game data when localGame changes (handles async localStorage initialization)

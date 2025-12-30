@@ -7,7 +7,7 @@ import Document, {
 } from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
 
-const APP_NAME = 'fwebt-go'
+const APP_NAME = 'go-web'
 const APP_DESCRIPTION = 'play go using our nextjs app'
 
 export default class DocumentClass extends Document {

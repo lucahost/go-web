@@ -1,6 +1,6 @@
 {
-    "name": "fwebt-go",
-    "short_name": "fwebt-go",
+    "name": "go-web",
+    "short_name": "go-web",
     "display": "standalone",
     "orientation": "portrait",
     "theme_color": "#FFFFFF",
