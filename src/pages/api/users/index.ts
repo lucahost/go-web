@@ -40,7 +40,7 @@ const apiMethod = async (
                 return
             }
 
-            const user = await prisma.user.create({ data: body })
+            const user = await prisma.user.create({ data: { name: body.name } })
             usersCreatedCounter.add(1)
             logger.info('User created', { userId: user.id, name: user.name })
             res.status(201).json(user)

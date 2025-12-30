@@ -79,7 +79,6 @@ const JoinApi = async (
             await prisma.game.update({
                 where: { id: existingGame.id },
                 data: {
-                    ...existingGame,
                     board: JSON.stringify(board),
                     gameState: GameState.RUNNING,
                     currentPlayerColor: PlayerColor.BLACK,
