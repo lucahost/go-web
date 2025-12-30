@@ -14,7 +14,6 @@
         "prisma:migrate": "prisma migrate deploy",
         "test:ci": "cross-env CI=true NODE_ENV=test npm test -- --maxWorkers=50%",
         "test:coverage": "npm test -- --coverage",
-        "test:e2e": "testcafe chrome:headless src/__tests__/e2e --app \"npm run dev\"",
         "test:watch": "jest --watch",
         "typecheck": "tsc",
         "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"}",
@@ -61,7 +60,6 @@
         "stylelint-config-recommended": "^17.0.0",
         "stylelint-config-styled-components": "^0.1.1",
         "stylelint-processor-styled-components": "^1.10.0",
-        "testcafe": "^3.7.3",
         "ts-jest": "^29.4.6",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3"
