@@ -43,8 +43,10 @@ const Tile = memo(
                     setIsHover(false)
                 }}
                 src={`/Go_${
-                    isHover
-                        ? currentPlayer == PlayerColor.BLACK
+                    isHover &&
+                    currentPlayer === userPlayer &&
+                    field.color === PlayerColor.EMPTY
+                        ? userPlayer == PlayerColor.BLACK
                             ? FieldLocation.BLACK_STONE_HOVER
                             : FieldLocation.WHITE_STONE_HOVER
                         : location
