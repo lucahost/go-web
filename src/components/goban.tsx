@@ -180,7 +180,11 @@ const Goban: FC<Props> = props => {
                     addErrorMessage('Game finished')
                     return
                 }
-                if (currentPlayer?.playerColor != userPlayer?.playerColor) {
+                if (!currentPlayer || !userPlayer) {
+                    addErrorMessage('Waiting for opponent')
+                    return
+                }
+                if (currentPlayer.playerColor !== userPlayer.playerColor) {
                     addErrorMessage('Not your turn')
                     return
                 }
@@ -188,17 +192,11 @@ const Goban: FC<Props> = props => {
                     addErrorMessage('Field is occupied')
                     return
                 }
-                if (
-                    !currentPlayer ||
-                    !board ||
-                    isSuicide(board, field.vertex, currentPlayer.playerColor)
-                ) {
+                if (isSuicide(board, field.vertex, currentPlayer.playerColor)) {
                     addErrorMessage('Suicide')
                     return
                 }
                 if (
-                    currentPlayer &&
-                    board &&
                     isKo(board, {
                         vertex: field.vertex,
                         color: currentPlayer.playerColor,
@@ -296,28 +294,26 @@ const Goban: FC<Props> = props => {
                             <h4>{error}</h4>
                         </Error>
                     )}
-                    {board?.fields &&
-                        currentPlayer &&
-                        board.fields.map((field, i) => (
-                            <Tile
-                                key={i}
-                                // eslint-disable-next-line react/jsx-no-bind
-                                clickHandler={() => handleTileClick(field)}
-                                currentPlayer={currentPlayer?.playerColor}
-                                field={field}
-                                location={
-                                    field.color === PlayerColor.EMPTY
-                                        ? getFieldLocationByVertex(
-                                              field.vertex,
-                                              props.size
-                                          )
-                                        : field.color === PlayerColor.BLACK
-                                          ? FieldLocation.BLACK_STONE
-                                          : FieldLocation.WHITE_STONE
-                                }
-                                userPlayer={userPlayer?.playerColor}
-                            />
-                        ))}
+                    {board?.fields?.map((field, i) => (
+                        <Tile
+                            key={i}
+                            // eslint-disable-next-line react/jsx-no-bind
+                            clickHandler={() => handleTileClick(field)}
+                            currentPlayer={currentPlayer?.playerColor}
+                            field={field}
+                            location={
+                                field.color === PlayerColor.EMPTY
+                                    ? getFieldLocationByVertex(
+                                          field.vertex,
+                                          props.size
+                                      )
+                                    : field.color === PlayerColor.BLACK
+                                      ? FieldLocation.BLACK_STONE
+                                      : FieldLocation.WHITE_STONE
+                            }
+                            userPlayer={userPlayer?.playerColor}
+                        />
+                    ))}
                 </Board>
             </BoardWrapper>
             <Captures>
