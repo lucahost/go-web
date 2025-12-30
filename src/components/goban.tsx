@@ -302,12 +302,12 @@ const Goban: FC<Props> = props => {
                             setCurrentPlayer(currentPlayer)
                             setWhiteCaptures(
                                 parsedBoard.captures.filter(
-                                    field => field.color === PlayerColor.WHITE
+                                    field => field.color === PlayerColor.BLACK
                                 ).length
                             )
                             setBlackCaptures(
                                 parsedBoard.captures.filter(
-                                    field => field.color === PlayerColor.BLACK
+                                    field => field.color === PlayerColor.WHITE
                                 ).length
                             )
                         }
@@ -548,8 +548,8 @@ const Goban: FC<Props> = props => {
                 </Board>
             </BoardWrapper>
             <Captures>
-                <p>{`Weiss: ${whiteCaptures}`}</p>
-                <p>{`Schwarz: ${blackCaptures}`}</p>
+                <p>{`Weiss (Gefangen): ${whiteCaptures}`}</p>
+                <p>{`Schwarz (Gefangen): ${blackCaptures}`}</p>
             </Captures>
             {dominance && (
                 <DominanceInfo>

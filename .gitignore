@@ -56,3 +56,6 @@ prisma/db/*.db-journal
 !.vscode/tasks.json
 !.vscode/launch.json
 *.code-workspace
+
+# Gemini
+.gemini-clipboard/

@@ -42,10 +42,10 @@ exports[`ButtonGroup renders correctly 1`] = `
       class="sc-hwkwBN HqMcb"
     >
       <p>
-        Weiss: 0
+        Weiss (Gefangen): 0
       </p>
       <p>
-        Schwarz: 0
+        Schwarz (Gefangen): 0
       </p>
     </div>
   </div>
