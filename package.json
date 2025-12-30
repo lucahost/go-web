@@ -67,5 +67,9 @@
     },
     "engines": {
         "node": ">=20"
+    },
+    "overrides": {
+        "jsdom": "^27.4.0",
+        "test-exclude": "^7.0.1"
     }
 }
