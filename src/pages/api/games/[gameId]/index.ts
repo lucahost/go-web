@@ -50,10 +50,12 @@ const GameApi = async (
                 const resObject = {
                     ...existingGame,
                     players: mappedPlayers,
-                    currentPlayer: {
-                        ...existingGame.currentPlayer,
-                        playerColor: existingGame.currentPlayerColor,
-                    },
+                    currentPlayer: existingGame.currentPlayer
+                        ? {
+                              ...existingGame.currentPlayer,
+                              playerColor: existingGame.currentPlayerColor,
+                          }
+                        : null,
                 } as Game
 
                 if (resObject.board) {

@@ -259,26 +259,31 @@ const Goban: FC<Props> = props => {
     return (
         <GobanContainer>
             <GameTitle>{localGame?.title}</GameTitle>
-            {userPlayer?.playerColor === currentPlayer?.playerColor &&
+            {userPlayer &&
+                currentPlayer &&
+                userPlayer.playerColor === currentPlayer.playerColor &&
                 (localGame?.board as GoBoard)?.pass && (
                     <PassNotice>Der andere Spieler hat gepasst</PassNotice>
                 )}
 
-            {localGame?.gameState === GameState.RUNNING && (
-                <Message>
-                    {userPlayer?.playerColor === currentPlayer?.playerColor
-                        ? `Du bist am Zug (${
-                              userPlayer?.playerColor === PlayerColor.BLACK
-                                  ? 'Schwarz'
-                                  : 'Weiss'
-                          })`
-                        : `Gegner am Zug (${
-                              currentPlayer?.playerColor === PlayerColor.BLACK
-                                  ? 'Schwarz'
-                                  : 'Weiss'
-                          })`}
-                </Message>
-            )}
+            {localGame?.gameState === GameState.RUNNING &&
+                currentPlayer &&
+                userPlayer && (
+                    <Message>
+                        {userPlayer.playerColor === currentPlayer.playerColor
+                            ? `Du bist am Zug (${
+                                  userPlayer.playerColor === PlayerColor.BLACK
+                                      ? 'Schwarz'
+                                      : 'Weiss'
+                              })`
+                            : `Gegner am Zug (${
+                                  currentPlayer.playerColor ===
+                                  PlayerColor.BLACK
+                                      ? 'Schwarz'
+                                      : 'Weiss'
+                              })`}
+                    </Message>
+                )}
 
             {localGame?.gameState === GameState.ENDED && (
                 <Message>GAME OVER</Message>
