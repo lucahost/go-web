@@ -57,4 +57,63 @@ describe('Dominance Calculation', () => {
         
         // Total = 1 + 45 + 35 = 81. Correct.
     })
+
+    it('should reproduce the scenario from the user image', () => {
+        let board = start()
+
+        // Black Wall
+        // Row 2: Cols 3-8
+        for (let c = 3; c <= 8; c++)
+            board = setStone(board, {
+                vertex: [2, c],
+                color: PlayerColor.BLACK,
+            })
+        // Row 7: Cols 3-8
+        for (let c = 3; c <= 8; c++)
+            board = setStone(board, {
+                vertex: [7, c],
+                color: PlayerColor.BLACK,
+            })
+        // Cols 3 & 8: Rows 3-6
+        for (let r = 3; r <= 6; r++) {
+            board = setStone(board, {
+                vertex: [r, 3],
+                color: PlayerColor.BLACK,
+            })
+            board = setStone(board, {
+                vertex: [r, 8],
+                color: PlayerColor.BLACK,
+            })
+        }
+
+        // White Top Block
+        // Row 3: 4,5,7
+        board = setStone(board, { vertex: [3, 4], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [3, 5], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [3, 7], color: PlayerColor.WHITE })
+        // Rows 4-6: Cols 4-7
+        for (let r = 4; r <= 6; r++) {
+            for (let c = 4; c <= 7; c++) {
+                board = setStone(board, {
+                    vertex: [r, c],
+                    color: PlayerColor.WHITE,
+                })
+            }
+        }
+
+        // White Bottom Left
+        board = setStone(board, { vertex: [5, 1], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [8, 2], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [8, 3], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [9, 1], color: PlayerColor.WHITE })
+        board = setStone(board, { vertex: [9, 2], color: PlayerColor.WHITE })
+
+        const dominance = calculateDominance(board)
+
+        expect(dominance.black).toBe(20)
+        expect(dominance.white).toBe(20)
+        expect(dominance.neutral).toBe(41)
+        expect(dominance.blackPercentage).toBe(25)
+        expect(dominance.whitePercentage).toBe(25)
+    })
 })
