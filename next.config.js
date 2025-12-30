@@ -9,6 +9,7 @@ const settings = withPWA({
     compiler: {
         styledComponents: true,
     },
+    turbopack: {},
 })
 
 module.exports = settings

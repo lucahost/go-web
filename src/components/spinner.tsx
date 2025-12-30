@@ -43,20 +43,14 @@ interface Props {
     sizeUnit?: string
 }
 
-const Spinner: FC<Props> = props => (
+const Spinner: FC<Props> = ({
+    color = 'black',
+    size = 40,
+    sizeUnit = 'px',
+}) => (
     <Wrapper>
-        <CircleSpinner
-            color={props.color}
-            size={props.size}
-            sizeUnit={props.sizeUnit}
-        />
+        <CircleSpinner color={color} size={size} sizeUnit={sizeUnit} />
     </Wrapper>
 )
-
-Spinner.defaultProps = {
-    size: 40,
-    color: 'black',
-    sizeUnit: 'px',
-}
 
 export default Spinner

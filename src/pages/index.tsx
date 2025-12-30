@@ -72,18 +72,30 @@ const HeaderLeft = styled.div`
     display: flex;
     justify-content: flex-start;
     align-items: center;
+
+    h3 {
+        margin: 0;
+    }
 `
 
 const HeaderCenter = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    h1 {
+        margin: 0;
+    }
 `
 
 const HeaderRight = styled.div`
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    h3 {
+        margin: 0;
+    }
 `
 
 const base64ToUint8Array = (base64: string) => {
