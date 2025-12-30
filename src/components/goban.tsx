@@ -26,7 +26,7 @@ import { getFieldLocationByVertex } from '../lib/board'
 import useSoundEffect from '../lib/hooks/useSoundEffect'
 import { media } from '../lib/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShare } from '@fortawesome/free-solid-svg-icons'
+import { faShare, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
 import {
     calculateDominance,
     calculateInfluence,
@@ -182,6 +182,88 @@ const ShareButton = styled.button`
 const ShareFeedback = styled.span`
     font-size: ${({ theme }) => theme.typography.fontSize.xs};
     color: ${({ theme }) => theme.colors.secondary};
+`
+
+const TooltipContainer = styled.div`
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: ${({ theme }) => theme.spacing.xs};
+`
+
+const TooltipContent = styled.div`
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    background-color: ${({ theme }) => theme.colors.surface};
+    color: ${({ theme }) => theme.colors.text};
+    padding: ${({ theme }) => theme.spacing.md};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    border: 1px solid ${({ theme }) => theme.colors.textMuted};
+    z-index: 100;
+    transition: opacity 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: ${({ theme }) => theme.spacing.sm};
+    text-align: left;
+    pointer-events: none;
+
+    /* Arrow */
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: ${({ theme }) => theme.colors.surface} transparent
+            transparent transparent;
+    }
+
+    h5 {
+        margin: 0 0 ${({ theme }) => theme.spacing.xs};
+        font-size: ${({ theme }) => theme.typography.fontSize.sm};
+        color: ${({ theme }) => theme.colors.primary};
+    }
+
+    p {
+        margin: 0 0 ${({ theme }) => theme.spacing.sm};
+        font-size: ${({ theme }) => theme.typography.fontSize.xs};
+        color: ${({ theme }) => theme.colors.text};
+        white-space: normal;
+        line-height: 1.4;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    .calc {
+        color: ${({ theme }) => theme.colors.textMuted};
+        font-style: italic;
+        display: block;
+        margin-top: 2px;
+    }
+`
+
+const InfoIconWrapper = styled.div`
+    color: ${({ theme }) => theme.colors.textMuted};
+    cursor: pointer;
+    padding: ${({ theme }) => theme.spacing.xs};
+    display: flex;
+    outline: none;
+
+    &:hover + ${TooltipContent},
+    &:focus + ${TooltipContent},
+    &:active + ${TooltipContent} {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
 `
 
 const Goban: FC<Props> = props => {
@@ -575,6 +657,35 @@ const Goban: FC<Props> = props => {
                             <p>{`Potenzial S: ${influence.blackPercentage}%`}</p>
                         </>
                     )}
+                    <TooltipContainer>
+                        <InfoIconWrapper
+                            tabIndex={0}
+                            role="button"
+                            aria-label="Info zu Dominanz und Potenzial"
+                        >
+                            <FontAwesomeIcon icon={faInfoCircle} />
+                        </InfoIconWrapper>
+                        <TooltipContent>
+                            <h5>Dominanz</h5>
+                            <p>
+                                Aktueller Punktestand basierend auf Steinen und
+                                sicherem Gebiet.
+                                <span className="calc">
+                                    Berechnung: Steine + umschlossenes Gebiet.
+                                </span>
+                            </p>
+
+                            <h5>Potenzial (Einfluss)</h5>
+                            <p>
+                                Geschätzter strategischer Vorteil durch die
+                                Ausstrahlung der Steine.
+                                <span className="calc">
+                                    Berechnung: Simulation der Diffusion von
+                                    Einfluss auf leere Felder.
+                                </span>
+                            </p>
+                        </TooltipContent>
+                    </TooltipContainer>
                 </DominanceInfo>
             )}
         </GobanContainer>
