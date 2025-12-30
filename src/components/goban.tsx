@@ -244,7 +244,6 @@ const Goban: FC<Props> = props => {
             // run only in browser
             navigator.serviceWorker.addEventListener('message', loadGame, true)
         }
-        loadGame()
 
         return () => {
             if ('serviceWorker' in navigator) {
@@ -257,6 +256,14 @@ const Goban: FC<Props> = props => {
         }
         // eslint-disable-next-line
     }, [])
+
+    // Load game data when localGame changes (handles async localStorage initialization)
+    useEffect(() => {
+        if (localGame?.id) {
+            loadGame()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localGame?.id])
 
     return (
         <GobanContainer>
