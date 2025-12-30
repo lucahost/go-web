@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, User } from '../lib/types'
 import axios from 'axios'
-import styled, { keyframes } from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 import Spinner from './spinner'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
@@ -110,7 +110,18 @@ const onGameHoverOut = keyframes`
     }
 `
 
-const GameCard = styled.button`
+const slideInFromBottom = keyframes`
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`
+
+const GameCard = styled.button<{ $isNew?: boolean }>`
     cursor: pointer;
     position: relative;
     display: flex;
@@ -167,6 +178,12 @@ const GameCard = styled.button`
             ${({ theme }) => theme.spacing.md}
             ${({ theme }) => theme.spacing.md};
     }
+
+    ${({ $isNew }) =>
+        $isNew &&
+        css`
+            animation: ${slideInFromBottom} 400ms ease-out forwards;
+        `}
 `
 
 const GameStatus = styled.div`
@@ -253,6 +270,8 @@ const ErrorMessage = styled.p`
     text-align: center;
 `
 
+type GameWithAnimation = Game & { isNew?: boolean }
+
 const GameList: FC = () => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -261,7 +280,7 @@ const GameList: FC = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [gameTitle, setGameTitle] = useState<string>('')
-    const [games, setGames] = useState<Game[]>([])
+    const [games, setGames] = useState<GameWithAnimation[]>([])
 
     useEffect(() => {
         if (localUser) {
@@ -280,6 +299,38 @@ const GameList: FC = () => {
                 })
         }
     }, [localUser])
+
+    // Listen for service worker messages about new games
+    useEffect(() => {
+        const handleServiceWorkerMessage = (event: globalThis.MessageEvent) => {
+            if (event.data?.type === 'NEW_GAME_CREATED') {
+                const newGame = event.data.data?.data?.game
+                if (newGame) {
+                    setGames(prev => {
+                        // Avoid duplicates
+                        if (prev.find(g => g.id === newGame.id)) return prev
+                        return [...prev, { ...newGame, isNew: true }]
+                    })
+                }
+            }
+        }
+
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener(
+                'message',
+                handleServiceWorkerMessage
+            )
+        }
+
+        return () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.removeEventListener(
+                    'message',
+                    handleServiceWorkerMessage
+                )
+            }
+        }
+    }, [])
 
     const handleGameTitleInput = useCallback(
         // eslint-disable-next-line no-undef
@@ -393,10 +444,21 @@ const GameList: FC = () => {
             ) : (
                 games.map(game => (
                     <GameCard
+                        $isNew={game.isNew}
+                        onAnimationEnd={() => {
+                            setGames(prev =>
+                                prev.map(g =>
+                                    g.id === game.id
+                                        ? { ...g, isNew: false }
+                                        : g
+                                )
+                            )
+                        }}
+                        // eslint-disable-next-line react/jsx-no-bind
+                        type="button"
                         key={game.id}
                         // eslint-disable-next-line react/jsx-no-bind
                         onClick={() => handleGameSelect(game)}
-                        type="button"
                     >
                         <GameId>{game.id}</GameId>
                         <GameStatus>

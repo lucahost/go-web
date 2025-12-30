@@ -9,12 +9,13 @@ generator client {
 // enum not supported (PlayerColor as string)
 
 model Subscription {
-  id           Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   subscription String
-  User         User?  @relation(fields: [userId], references: [id])
+  User         User?   @relation(fields: [userId], references: [id])
   userId       Int?
-  Game         Game?  @relation(fields: [gameId], references: [id])
+  Game         Game?   @relation(fields: [gameId], references: [id])
   gameId       Int?
+  isGlobal     Boolean @default(false)
 }
 
 model User {

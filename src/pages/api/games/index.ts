@@ -1,5 +1,6 @@
 import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import webPush from 'web-push'
 import prisma from '../../../lib/db'
 import { start } from '../../../lib/game'
 import { HttpMethod, PlayerColor } from '../../../lib/types'
@@ -7,7 +8,15 @@ import {
     withTelemetry,
     logger,
     gamesCreatedCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
 } from '../../../lib/telemetry'
+
+webPush.setVapidDetails(
+    `mailto:${process.env.WEB_PUSH_EMAIL}`,
+    process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
+    process.env.WEB_PUSH_PRIVATE_KEY ?? ''
+)
 
 type GameResponseData = Game[] | Game | never
 
@@ -82,6 +91,43 @@ const apiMethod = async (
                 })
 
                 res.status(200).json(newGame)
+
+                // Broadcast to all global subscribers (fire and forget)
+                const globalSubscriptions = await prisma.subscription.findMany({
+                    where: { isGlobal: true },
+                })
+
+                globalSubscriptions.forEach((sub: any) => {
+                    // Don't notify the creator about their own game
+                    if (sub.userId === author.id) return
+
+                    const subscription = JSON.parse(sub.subscription)
+                    webPush
+                        .sendNotification(
+                            subscription,
+                            JSON.stringify({
+                                type: 'NEW_GAME_CREATED',
+                                title: 'Neues Spiel verfügbar!',
+                                message: `Ein neues Spiel "${title}" wurde erstellt`,
+                                data: { game: newGame },
+                            })
+                        )
+                        .then(() => {
+                            pushNotificationsSentCounter.add(1, {
+                                type: 'new_game',
+                            })
+                        })
+                        .catch((err: any) => {
+                            pushNotificationsFailedCounter.add(1, {
+                                type: 'new_game',
+                            })
+                            logger.error(
+                                'Failed to send new game notification',
+                                err,
+                                { gameId: newGame.id, type: 'new_game' }
+                            )
+                        })
+                })
             } catch (err) {
                 logger.error('Failed to create game', err, { userId, title })
             }

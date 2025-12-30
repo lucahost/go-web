@@ -1,17 +1,15 @@
-/* eslint-disable react/jsx-no-bind */
 import React, { FC, useCallback, useEffect, useState } from 'react'
-import Goban from '../components/goban'
+import { useRouter } from 'next/router'
 import styled from 'styled-components'
-import useLocalStorage from '../lib/hooks/useLocalStorage'
-import { Game, GameState, User } from '../lib/types'
+import useLocalStorage from '../../lib/hooks/useLocalStorage'
+import { Game, GameState, User } from '../../lib/types'
 import axios from 'axios'
-import Login from '../components/login'
-import GameList from '../components/gameList'
-import { media } from '../lib/theme'
+import Login from '../../components/login'
+import Goban from '../../components/goban'
+import Spinner from '../../components/spinner'
+import { media } from '../../lib/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
-
-const { log } = console
 
 const Content = styled.main`
     flex: 1;
@@ -173,23 +171,39 @@ const HeaderRight = styled.div`
     }
 `
 
+const LoginMessage = styled.p`
+    color: ${({ theme }) => theme.colors.textMuted};
+    text-align: center;
+    margin-top: ${({ theme }) => theme.spacing.md};
+`
+
+const ErrorMessage = styled.div`
+    color: ${({ theme }) => theme.colors.error};
+    text-align: center;
+    padding: ${({ theme }) => theme.spacing.xl};
+`
+
 const base64ToUint8Array = (base64: string) => {
     const padding = '='.repeat((4 - (base64.length % 4)) % 4)
     const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
-
     const rawData = window.atob(b64)
     const outputArray = new Uint8Array(rawData.length)
-
     for (let i = 0; i < rawData.length; ++i) {
         outputArray[i] = rawData.charCodeAt(i)
     }
     return outputArray
 }
 
-const HomePage: FC = () => {
+const GamePage: FC = () => {
+    const router = useRouter()
+    const { gameId } = router.query
+
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
 
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const [gameExists, setGameExists] = useState(false)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isSubscribed, setIsSubscribed] = useState(false)
     const [subscription, setSubscription] = useState<PushSubscription | null>(
@@ -198,15 +212,14 @@ const HomePage: FC = () => {
     const [registration, setRegistration] =
         useState<ServiceWorkerRegistration | null>(null)
 
+    // Register service worker
     useEffect(() => {
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-            // Register service worker
             navigator.serviceWorker.register('/sw.js').catch(err => {
                 // eslint-disable-next-line no-console
                 console.error('Service worker registration failed:', err)
             })
 
-            // Wait for service worker to be ready
             navigator.serviceWorker.ready.then(reg => {
                 reg.pushManager.getSubscription().then(sub => {
                     if (
@@ -232,11 +245,11 @@ const HomePage: FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // Subscribe to push after login
     useEffect(() => {
         const onLogin = async () => {
-            if (!localUser) {
-                return
-            }
+            if (!localUser) return
+
             const sub = await registration?.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: base64ToUint8Array(
@@ -248,7 +261,7 @@ const HomePage: FC = () => {
             setIsSubscribed(true)
             setLocalUser({ ...localUser, subscription: JSON.stringify(sub) })
 
-            // Register global subscription for new game notifications
+            // Register global subscription
             if (sub) {
                 axios
                     .post('/api/subscriptions', {
@@ -256,17 +269,8 @@ const HomePage: FC = () => {
                         subscription: JSON.stringify(sub),
                         isGlobal: true,
                     })
-                    .catch(err => {
-                        // eslint-disable-next-line no-console
-                        console.error(
-                            'Failed to register global subscription:',
-                            err
-                        )
-                    })
+                    .catch(() => {})
             }
-
-            log('web push subscribed!')
-            log(sub)
         }
 
         if (localUser && localUser?.subscription === undefined) {
@@ -274,36 +278,55 @@ const HomePage: FC = () => {
         }
     }, [localUser, setLocalUser, registration?.pushManager])
 
-    // if there is a user/game already in the local storage: check if it is still valid
+    // Check if game exists
     useEffect(() => {
-        if (localUser) {
-            const url = `/api/users/${localUser.id}`
-            axios
-                .get<User>(url)
-                .then(r => {
-                    if (r.status !== 200) {
-                        setLocalUser(null)
-                    }
-                })
-                .catch(() => {
-                    setLocalUser(null)
-                })
+        if (!gameId || typeof gameId !== 'string') return
+
+        const checkGame = async () => {
+            try {
+                const response = await axios.get(`/api/games/${gameId}`)
+                if (response.status === 200) {
+                    setGameExists(true)
+                }
+            } catch {
+                setError('Spiel nicht gefunden')
+            } finally {
+                setLoading(false)
+            }
         }
-        if (localGame) {
-            const url = `/api/games/${localGame.id}`
-            axios
-                .get<Game>(url)
-                .then(r => {
-                    if (r.status !== 200) {
-                        setLocalGame(null)
-                    }
-                })
-                .catch(() => {
-                    setLocalGame(null)
-                })
+        checkGame()
+    }, [gameId])
+
+    // Auto-join after login
+    useEffect(() => {
+        if (!localUser || !gameId || typeof gameId !== 'string' || !gameExists)
+            return
+
+        // Already in this game
+        if (localGame && localGame.id === Number(gameId)) {
+            setLoading(false)
+            return
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+
+        const joinGame = async () => {
+            setLoading(true)
+            try {
+                const response = await axios.post(`/api/games/${gameId}/join`, {
+                    userId: localUser.id,
+                    subscription: localUser.subscription,
+                })
+                if (response.status === 200) {
+                    setLocalGame(response.data)
+                }
+            } catch {
+                setError('Fehler beim Beitreten')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        joinGame()
+    }, [localUser, gameId, gameExists, localGame, setLocalGame])
 
     const handleLogout = async () => {
         await subscription?.unsubscribe()
@@ -311,29 +334,135 @@ const HomePage: FC = () => {
         setIsSubscribed(false)
         setLocalUser(null)
         setLocalGame(null)
+        router.push('/')
     }
 
     const handleNewGame = useCallback(() => {
         setLocalGame(null)
-    }, [setLocalGame])
+        router.push('/')
+    }, [setLocalGame, router])
 
     const handlePass = useCallback(() => {
         if (localGame) {
-            const url = `/api/games/${localGame.id}/pass`
             axios
-                .post<Game>(url, { userId: localUser?.id })
-                .then(r => {
-                    if (r.status !== 200) {
-                        setLocalGame(null)
-                    }
+                .post(`/api/games/${localGame.id}/pass`, {
+                    userId: localUser?.id,
                 })
-                .catch(() => {
-                    setLocalGame(null)
-                })
+                .catch(() => {})
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setLocalGame, localGame])
+    }, [localGame, localUser?.id])
 
+    // Show login if not logged in
+    if (!localUser) {
+        return (
+            <>
+                <Header>
+                    <HeaderLeft>
+                        <h3>
+                            <Link
+                                href="https://www.learn-go.net/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Visit learn-go{' '}
+                                <FontAwesomeIcon
+                                    icon={faExternalLinkAlt}
+                                    size="xs"
+                                />
+                            </Link>
+                        </h3>
+                    </HeaderLeft>
+                    <HeaderCenter>
+                        <h1>Go</h1>
+                    </HeaderCenter>
+                    <HeaderRight />
+                </Header>
+                <Content>
+                    <Login />
+                    <LoginMessage>
+                        Bitte anmelden um dem Spiel beizutreten
+                    </LoginMessage>
+                </Content>
+            </>
+        )
+    }
+
+    // Show loading
+    if (loading) {
+        return (
+            <>
+                <Header>
+                    <HeaderLeft>
+                        <h3>
+                            <Link
+                                href="https://www.learn-go.net/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Visit learn-go{' '}
+                                <FontAwesomeIcon
+                                    icon={faExternalLinkAlt}
+                                    size="xs"
+                                />
+                            </Link>
+                        </h3>
+                    </HeaderLeft>
+                    <HeaderCenter>
+                        <h1>Go</h1>
+                    </HeaderCenter>
+                    <HeaderRight>
+                        <Logout onClick={handleLogout} type="button">
+                            Logout
+                        </Logout>
+                    </HeaderRight>
+                </Header>
+                <Content>
+                    <Spinner />
+                </Content>
+            </>
+        )
+    }
+
+    // Show error
+    if (error) {
+        return (
+            <>
+                <Header>
+                    <HeaderLeft>
+                        <h3>
+                            <Link
+                                href="https://www.learn-go.net/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Visit learn-go{' '}
+                                <FontAwesomeIcon
+                                    icon={faExternalLinkAlt}
+                                    size="xs"
+                                />
+                            </Link>
+                        </h3>
+                    </HeaderLeft>
+                    <HeaderCenter>
+                        <h1>Go</h1>
+                    </HeaderCenter>
+                    <HeaderRight>
+                        <Logout onClick={handleLogout} type="button">
+                            Logout
+                        </Logout>
+                    </HeaderRight>
+                </Header>
+                <Content>
+                    <ErrorMessage>{error}</ErrorMessage>
+                    <NavButton onClick={handleNewGame}>
+                        Zur Spieleliste
+                    </NavButton>
+                </Content>
+            </>
+        )
+    }
+
+    // Show game board
     return (
         <>
             <Header>
@@ -356,25 +485,15 @@ const HomePage: FC = () => {
                     <h1>Go</h1>
                 </HeaderCenter>
                 <HeaderRight>
-                    {localUser && (
-                        <Logout onClick={handleLogout} type="button">
-                            Logout
-                        </Logout>
-                    )}
+                    <Logout onClick={handleLogout} type="button">
+                        Logout
+                    </Logout>
                 </HeaderRight>
             </Header>
             <Content>
-                {!localUser ? (
-                    <Login />
-                ) : localGame ? (
-                    <>
-                        <Goban size={9} />
-                    </>
-                ) : (
-                    <GameList />
-                )}
+                <Goban size={9} />
             </Content>
-            {localUser && localGame && (
+            {localGame && (
                 <Nav>
                     <NavButton onClick={handleNewGame}>
                         {localGame.gameState === GameState.ENDED
@@ -393,40 +512,4 @@ const HomePage: FC = () => {
     )
 }
 
-/*
- * If you export an async function called getStaticProps from a page,
- * Next.js will pre-render this page at build time using the props
- * returned by getStaticProps.
- */
-/*
-export const getStaticProps: GetStaticProps = async () => {
-    return {
-        props: {}, // will be passed to the page component as props
-    }
-}
-*/
-
-/*
- * If a page has dynamic routes (documentation) and uses getStaticProps it
- * needs to define a list of paths that have to be rendered to HTML at build time.
- */
-/*
-export const getStaticPaths: GetStaticPaths = async () => ({
-    paths: [], // determines which paths will be pre-rendered
-    fallback: false, // any paths not returned by getStaticPaths will return 404
-})
-*/
-
-/*
- * You should use getServerSideProps only if you need to pre-render
- * a page whose data must be fetched at request time.
- */
-/*
-export const getServerSideProps: GetServerSideProps = async () => {
-    return {
-        props: {}, // will be passed to the page component as props
-    }
-}
-*/
-
-export default HomePage
+export default GamePage

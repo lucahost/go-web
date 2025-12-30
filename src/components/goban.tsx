@@ -1,4 +1,11 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+    FC,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 import styled from 'styled-components'
 import Tile from './tile'
 import {
@@ -17,6 +24,8 @@ import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { getFieldLocationByVertex } from '../lib/board'
 import useSoundEffect from '../lib/hooks/useSoundEffect'
 import { media } from '../lib/theme'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faShare } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     size: number
@@ -108,6 +117,41 @@ const Captures = styled.div`
     }
 `
 
+const ShareContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing.sm};
+    margin-bottom: ${({ theme }) => theme.spacing.sm};
+`
+
+const ShareButton = styled.button`
+    display: flex;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing.sm};
+    background: transparent;
+    border: 2px solid ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.secondary};
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    cursor: pointer;
+    font-family: inherit;
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    min-height: ${({ theme }) => theme.touchTarget.minimum};
+    transition: all 0.2s ease;
+
+    &:hover,
+    &:active {
+        background: ${({ theme }) => theme.colors.secondary};
+        color: ${({ theme }) => theme.colors.white};
+    }
+`
+
+const ShareFeedback = styled.span`
+    font-size: ${({ theme }) => theme.typography.fontSize.xs};
+    color: ${({ theme }) => theme.colors.secondary};
+`
+
 const Goban: FC<Props> = props => {
     const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,6 +164,7 @@ const Goban: FC<Props> = props => {
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
     const [error, setError] = useState<string | null>(null)
+    const [shareStatus, setShareStatus] = useState<string | null>(null)
 
     // Ref to store latest loadGame function for service worker messages
     const loadGameRef = useRef<() => void>(() => {})
@@ -278,9 +323,61 @@ const Goban: FC<Props> = props => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localGame?.id])
 
+    const shareUrl = useMemo(() => {
+        if (typeof window === 'undefined' || !localGame) return ''
+        return `${window.location.origin}/game/${localGame.id}`
+    }, [localGame])
+
+    const copyToClipboard = useCallback((url: string) => {
+        navigator.clipboard
+            .writeText(url)
+            .then(() => {
+                setShareStatus('Link kopiert!')
+                setTimeout(() => setShareStatus(null), 2000)
+            })
+            .catch(() => {
+                setShareStatus('Fehler beim Kopieren')
+                setTimeout(() => setShareStatus(null), 2000)
+            })
+    }, [])
+
+    const handleShare = useCallback(async () => {
+        if (!shareUrl) return
+
+        const shareData = {
+            title: 'Go Spiel Einladung',
+            text: `Tritt meinem Go Spiel bei: ${localGame?.title}`,
+            url: shareUrl,
+        }
+
+        // Try Web Share API first (mobile/supported browsers)
+        if (navigator.share && navigator.canShare?.(shareData)) {
+            try {
+                await navigator.share(shareData)
+                setShareStatus('Geteilt!')
+                setTimeout(() => setShareStatus(null), 2000)
+            } catch (err) {
+                // User cancelled or error - fallback to clipboard
+                if ((err as Error).name !== 'AbortError') {
+                    copyToClipboard(shareUrl)
+                }
+            }
+        } else {
+            // Fallback: copy to clipboard
+            copyToClipboard(shareUrl)
+        }
+    }, [shareUrl, localGame?.title, copyToClipboard])
+
     return (
         <GobanContainer>
             <GameTitle>{localGame?.title}</GameTitle>
+            <ShareContainer>
+                <ShareButton onClick={handleShare} type="button">
+                    <FontAwesomeIcon icon={faShare} />
+                    Spiel teilen
+                </ShareButton>
+                {shareStatus && <ShareFeedback>{shareStatus}</ShareFeedback>}
+            </ShareContainer>
             {userPlayer &&
                 currentPlayer &&
                 userPlayer.playerColor === currentPlayer.playerColor &&

@@ -1,7 +1,7 @@
 // Simple service worker for push notifications and messaging
 // No Workbox needed - following Next.js recommendations
 
-const SW_VERSION = '1.1.0';
+const SW_VERSION = '1.2.0';
 const CACHE_NAME = `go-app-${SW_VERSION}`;
 
 // Install event
@@ -42,9 +42,10 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Notify all clients to reload game data
+      // Notify all clients - use message type from push data or default to GAME_UPDATE
+      const messageType = data.type || 'GAME_UPDATE';
       clientList.forEach((client) => {
-        client.postMessage({ type: 'GAME_UPDATE', data });
+        client.postMessage({ type: messageType, data });
       });
 
       // Check if any client window is focused/visible
