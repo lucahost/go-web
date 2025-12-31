@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { GoBoard, HttpMethod } from '../../../../../lib/types'
+import { GameState, GoBoard, HttpMethod } from '../../../../../lib/types'
 import webPush from 'web-push'
 import prisma from '../../../../../lib/db'
 import { pass } from '../../../../../lib/game'
@@ -10,6 +10,12 @@ import {
     pushNotificationsSentCounter,
     pushNotificationsFailedCounter,
 } from '../../../../../lib/telemetry'
+
+webPush.setVapidDetails(
+    `mailto:${process.env.WEB_PUSH_EMAIL}`,
+    process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
+    process.env.WEB_PUSH_PRIVATE_KEY ?? ''
+)
 
 const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const {
@@ -110,6 +116,42 @@ const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
                         })
                     })
             })
+
+            // If game ended (double pass), broadcast to global subscribers
+            if (game.gameState === GameState.ENDED) {
+                const globalSubscriptions = await prisma.subscription.findMany({
+                    where: { isGlobal: true },
+                })
+
+                globalSubscriptions.forEach(sub => {
+                    const subscription = JSON.parse(sub.subscription)
+                    webPush
+                        .sendNotification(
+                            subscription,
+                            JSON.stringify({
+                                type: 'GAME_ENDED',
+                                title: 'Spiel beendet!',
+                                message: `Das Spiel "${game.title}" ist beendet`,
+                                data: { gameId: gId },
+                            })
+                        )
+                        .then(() => {
+                            pushNotificationsSentCounter.add(1, {
+                                type: 'game_ended',
+                            })
+                        })
+                        .catch(err => {
+                            pushNotificationsFailedCounter.add(1, {
+                                type: 'game_ended',
+                            })
+                            logger.error(
+                                'Failed to send game ended notification',
+                                err,
+                                { gameId: gId, type: 'game_ended' }
+                            )
+                        })
+                })
+            }
 
             res.status(200).json(goBoard)
             return

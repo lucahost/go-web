@@ -1,11 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import webPush from 'web-push'
 import { HttpMethod, Game, GoBoard, Player } from '../../../../lib/types'
 import prisma from '../../../../lib/db'
 import {
     withTelemetry,
     logger,
     gamesDeletedCounter,
+    pushNotificationsSentCounter,
+    pushNotificationsFailedCounter,
 } from '../../../../lib/telemetry'
+
+webPush.setVapidDetails(
+    `mailto:${process.env.WEB_PUSH_EMAIL}`,
+    process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
+    process.env.WEB_PUSH_PRIVATE_KEY ?? ''
+)
 
 type GameResponse = Game | { deleted: boolean } | never
 
@@ -78,6 +87,11 @@ const GameApi = async (
                 return
             }
 
+            // Get global subscriptions before deleting
+            const globalSubs = await prisma.subscription.findMany({
+                where: { isGlobal: true },
+            })
+
             await prisma.$transaction([
                 prisma.subscription.deleteMany({ where: { gameId: gId } }),
                 prisma.userGame.deleteMany({ where: { gameId: gId } }),
@@ -86,6 +100,36 @@ const GameApi = async (
 
             logger.info('Game deleted', { gameId: gId })
             gamesDeletedCounter.add(1)
+
+            // Broadcast GAME_DELETED to all global subscribers (fire and forget)
+            globalSubs.forEach((sub: any) => {
+                const subscription = JSON.parse(sub.subscription)
+                webPush
+                    .sendNotification(
+                        subscription,
+                        JSON.stringify({
+                            type: 'GAME_DELETED',
+                            title: 'Spiel gelöscht',
+                            message: `Das Spiel "${gameToDelete.title}" wurde gelöscht`,
+                            data: { gameId: gId },
+                        })
+                    )
+                    .then(() => {
+                        pushNotificationsSentCounter.add(1, {
+                            type: 'game_deleted',
+                        })
+                    })
+                    .catch((err: any) => {
+                        pushNotificationsFailedCounter.add(1, {
+                            type: 'game_deleted',
+                        })
+                        logger.error(
+                            'Failed to send game deleted notification',
+                            err,
+                            { gameId: gId, type: 'game_deleted' }
+                        )
+                    })
+            })
 
             res.status(200).json({ deleted: true })
             break

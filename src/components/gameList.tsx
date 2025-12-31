@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
-import { Game, User } from '../lib/types'
+import { Game, GameState, User } from '../lib/types'
 import axios from 'axios'
 import styled, { css, keyframes } from 'styled-components'
 import Spinner from './spinner'
@@ -372,17 +372,55 @@ const GameList: FC = () => {
         }
     }, [localUser])
 
-    // Listen for service worker messages about new games
+    // Listen for service worker messages about game changes
     useEffect(() => {
         const handleServiceWorkerMessage = (event: globalThis.MessageEvent) => {
-            if (event.data?.type === 'NEW_GAME_CREATED') {
-                const newGame = event.data.data?.data?.game
-                if (newGame) {
-                    setGames(prev => {
-                        // Avoid duplicates
-                        if (prev.find(g => g.id === newGame.id)) return prev
-                        return [...prev, { ...newGame, isNew: true }]
-                    })
+            const { type, data } = event.data || {}
+
+            switch (type) {
+                case 'NEW_GAME_CREATED': {
+                    const newGame = data?.data?.game
+                    if (newGame) {
+                        setGames(prev => {
+                            // Avoid duplicates
+                            if (prev.find(g => g.id === newGame.id)) return prev
+                            return [...prev, { ...newGame, isNew: true }]
+                        })
+                    }
+                    break
+                }
+                case 'GAME_STARTED': {
+                    const gameId = data?.data?.gameId
+                    if (gameId) {
+                        setGames(prev =>
+                            prev.map(g =>
+                                g.id === gameId
+                                    ? { ...g, gameState: GameState.RUNNING }
+                                    : g
+                            )
+                        )
+                    }
+                    break
+                }
+                case 'GAME_ENDED': {
+                    const gameId = data?.data?.gameId
+                    if (gameId) {
+                        setGames(prev =>
+                            prev.map(g =>
+                                g.id === gameId
+                                    ? { ...g, gameState: GameState.ENDED }
+                                    : g
+                            )
+                        )
+                    }
+                    break
+                }
+                case 'GAME_DELETED': {
+                    const gameId = data?.data?.gameId
+                    if (gameId) {
+                        setGames(prev => prev.filter(g => g.id !== gameId))
+                    }
+                    break
                 }
             }
         }

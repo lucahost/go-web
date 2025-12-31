@@ -203,6 +203,7 @@ const GamePage: FC = () => {
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [passMessage, setPassMessage] = useState<string | null>(null)
     const [gameExists, setGameExists] = useState(false)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isSubscribed, setIsSubscribed] = useState(false)
@@ -342,15 +343,42 @@ const GamePage: FC = () => {
         router.push('/')
     }, [setLocalGame, router])
 
-    const handlePass = useCallback(() => {
-        if (localGame) {
-            axios
-                .post(`/api/games/${localGame.id}/pass`, {
-                    userId: localUser?.id,
-                })
-                .catch(() => {})
+    const handlePass = useCallback(async () => {
+        if (!localGame) return
+
+        // Prevent pass if it's not the user's turn
+        if (localGame.currentPlayer?.userId !== localUser?.id) {
+            setPassMessage('Warte auf den anderen Spieler')
+            setTimeout(() => setPassMessage(null), 2000)
+            return
         }
-    }, [localGame, localUser?.id])
+
+        try {
+            const response = await axios.post(
+                `/api/games/${localGame.id}/pass`,
+                {
+                    userId: localUser?.id,
+                }
+            )
+
+            if (response.status === 200) {
+                // Fetch updated game state after successful pass
+                const gameResponse = await axios.get(
+                    `/api/games/${localGame.id}`
+                )
+                if (gameResponse.status === 200) {
+                    setLocalGame(gameResponse.data)
+                }
+            }
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 400) {
+                setPassMessage('Warte auf den anderen Spieler')
+            } else {
+                setPassMessage('Fehler beim Passen')
+            }
+            setTimeout(() => setPassMessage(null), 2000)
+        }
+    }, [localGame, localUser?.id, setLocalGame])
 
     const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
 
@@ -509,7 +537,7 @@ const GamePage: FC = () => {
                         onClick={handlePass}
                         title={!isMyTurn ? 'Warte auf den anderen Spieler' : ''}
                     >
-                        {isMyTurn ? 'Passen' : 'Warten...'}
+                        {passMessage || (isMyTurn ? 'Passen' : 'Warten...')}
                     </NavButton>
                 </Nav>
             )}

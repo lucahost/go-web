@@ -103,7 +103,7 @@ const JoinApi = async (
                 where: { gameId: gId },
             })
 
-            // Send push notifications (fire and forget)
+            // Send push notifications to game subscribers (fire and forget)
             existingSubscriptions.forEach((sub: any) => {
                 const subscription = JSON.parse(sub.subscription)
                 webPush
@@ -127,6 +127,40 @@ const JoinApi = async (
                             gameId: gId,
                             type: 'join',
                         })
+                    })
+            })
+
+            // Broadcast GAME_STARTED to all global subscribers (fire and forget)
+            const globalSubscriptions = await prisma.subscription.findMany({
+                where: { isGlobal: true },
+            })
+
+            globalSubscriptions.forEach((sub: any) => {
+                const subscription = JSON.parse(sub.subscription)
+                webPush
+                    .sendNotification(
+                        subscription,
+                        JSON.stringify({
+                            type: 'GAME_STARTED',
+                            title: 'Spiel gestartet!',
+                            message: `Das Spiel "${existingGame.title}" hat begonnen`,
+                            data: { gameId: gId },
+                        })
+                    )
+                    .then(() => {
+                        pushNotificationsSentCounter.add(1, {
+                            type: 'game_started',
+                        })
+                    })
+                    .catch((err: any) => {
+                        pushNotificationsFailedCounter.add(1, {
+                            type: 'game_started',
+                        })
+                        logger.error(
+                            'Failed to send game started notification',
+                            err,
+                            { gameId: gId, type: 'game_started' }
+                        )
                     })
             })
 
