@@ -50,7 +50,7 @@ const PassApi = async (req: NextApiRequest, res: NextApiResponse) => {
             let goBoard = JSON.parse(game.board) as GoBoard
 
             try {
-                goBoard = pass(game, goBoard)
+                goBoard = pass(game, goBoard, userId)
             } catch (err) {
                 const message = err instanceof Error ? err.message : String(err)
                 logger.error('Pass failed', {

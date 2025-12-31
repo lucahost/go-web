@@ -84,7 +84,15 @@ export const move = (game: Game, move: Field): GoBoard => {
     return { ...board, status: GameState.RUNNING }
 }
 
-export const pass = (game: Game, board: GoBoard): GoBoard => {
+export const pass = (game: Game, board: GoBoard, userId: number): GoBoard => {
+    // Validate that the user attempting to pass is the current player
+    if (!board.currentPlayer) {
+        throw new Error('Cannot pass: no current player set')
+    }
+    if (board.currentPlayer.userId !== userId) {
+        throw new Error('Cannot pass: it is not your turn')
+    }
+
     if (board.pass) {
         // Double pass ends the game
         game.gameState = GameState.ENDED

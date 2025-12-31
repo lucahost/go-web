@@ -151,7 +151,7 @@ describe('Pass', () => {
         const initialBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
         const game = newGame(initialBoard)
 
-        const boardWithOnePass = pass(game, initialBoard)
+        const boardWithOnePass = pass(game, initialBoard, initialBoard.currentPlayer!.userId)
         expect(boardWithOnePass.pass).toBeTruthy()
 
         const resetPassBoard = resetPass(boardWithOnePass)
@@ -162,7 +162,7 @@ describe('Pass', () => {
         const testBoard = JSON.parse(JSON.stringify(emptyBoard)) as GoBoard
         const game = newGame(testBoard)
 
-        const boardWithOnePass = pass(game, testBoard)
+        const boardWithOnePass = pass(game, testBoard, testBoard.currentPlayer!.userId)
         expect(boardWithOnePass.pass).toBeTruthy()
 
         const initialMove = {
