@@ -197,6 +197,8 @@ const HomePage: FC = () => {
     )
     const [registration, setRegistration] =
         useState<ServiceWorkerRegistration | null>(null)
+    const [isPassing, setIsPassing] = useState(false)
+    const isPassingRef = React.useRef(false)
 
     useEffect(() => {
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -317,22 +319,34 @@ const HomePage: FC = () => {
         setLocalGame(null)
     }, [setLocalGame])
 
-    const handlePass = useCallback(() => {
-        if (localGame) {
+    const handlePass = useCallback(async () => {
+        if (localGame && !isPassingRef.current) {
+            isPassingRef.current = true
+            setIsPassing(true)
             const url = `/api/games/${localGame.id}/pass`
-            axios
-                .post<Game>(url, { userId: localUser?.id })
-                .then(r => {
-                    if (r.status !== 200) {
-                        setLocalGame(null)
+            try {
+                const r = await axios.post<Game>(url, {
+                    userId: localUser?.id,
+                })
+                if (r.status === 200) {
+                    // Fetch updated game state after successful pass
+                    const gameResponse = await axios.get(
+                        `/api/games/${localGame.id}`
+                    )
+                    if (gameResponse.status === 200) {
+                        setLocalGame(gameResponse.data)
                     }
-                })
-                .catch(() => {
-                    setLocalGame(null)
-                })
+                }
+            } catch (err) {
+                // eslint-disable-next-line no-console
+                console.error('Pass failed', err)
+            } finally {
+                isPassingRef.current = false
+                setIsPassing(false)
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setLocalGame, localGame])
+    }, [setLocalGame, localGame, localUser?.id])
 
     return (
         <>
@@ -376,16 +390,19 @@ const HomePage: FC = () => {
             </Content>
             {localUser && localGame && (
                 <Nav>
-                    <NavButton onClick={handleNewGame}>
+                    <NavButton onClick={handleNewGame} type="button">
                         {localGame.gameState === GameState.ENDED
                             ? 'Zurück'
                             : 'Neues Spiel'}
                     </NavButton>
                     <NavButton
-                        disabled={localGame.gameState === GameState.ENDED}
+                        disabled={
+                            localGame.gameState === GameState.ENDED || isPassing
+                        }
                         onClick={handlePass}
+                        type="button"
                     >
-                        Passen
+                        {isPassing ? 'Warten...' : 'Passen'}
                     </NavButton>
                 </Nav>
             )}
