@@ -213,6 +213,7 @@ const GamePage: FC = () => {
     const [registration, setRegistration] =
         useState<ServiceWorkerRegistration | null>(null)
     const [isPassing, setIsPassing] = useState(false)
+    const isPassingRef = React.useRef(false)
 
     // Register service worker
     useEffect(() => {
@@ -345,7 +346,7 @@ const GamePage: FC = () => {
     }, [setLocalGame, router])
 
     const handlePass = useCallback(async () => {
-        if (!localGame || isPassing) return
+        if (!localGame || isPassingRef.current) return
 
         // Prevent pass if it's not the user's turn
         if (localGame.currentPlayer?.userId !== localUser?.id) {
@@ -354,6 +355,7 @@ const GamePage: FC = () => {
             return
         }
 
+        isPassingRef.current = true
         setIsPassing(true)
         try {
             const response = await axios.post(
@@ -380,9 +382,10 @@ const GamePage: FC = () => {
             }
             setTimeout(() => setPassMessage(null), 2000)
         } finally {
+            isPassingRef.current = false
             setIsPassing(false)
         }
-    }, [localGame, localUser?.id, setLocalGame, isPassing])
+    }, [localGame, localUser?.id, setLocalGame])
 
     const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
 
@@ -529,7 +532,7 @@ const GamePage: FC = () => {
             </Content>
             {localGame && (
                 <Nav>
-                    <NavButton onClick={handleNewGame}>
+                    <NavButton onClick={handleNewGame} type="button">
                         {localGame.gameState === GameState.ENDED
                             ? 'Zurück'
                             : 'Neues Spiel'}
@@ -542,6 +545,7 @@ const GamePage: FC = () => {
                         }
                         onClick={handlePass}
                         title={!isMyTurn ? 'Warte auf den anderen Spieler' : ''}
+                        type="button"
                     >
                         {passMessage ||
                             (isPassing
