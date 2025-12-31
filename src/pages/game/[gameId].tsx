@@ -352,6 +352,8 @@ const GamePage: FC = () => {
         }
     }, [localGame, localUser?.id])
 
+    const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
+
     // Show login if not logged in
     if (!localUser) {
         return (
@@ -501,10 +503,13 @@ const GamePage: FC = () => {
                             : 'Neues Spiel'}
                     </NavButton>
                     <NavButton
-                        disabled={localGame.gameState === GameState.ENDED}
+                        disabled={
+                            localGame.gameState === GameState.ENDED || !isMyTurn
+                        }
                         onClick={handlePass}
+                        title={!isMyTurn ? 'Warte auf den anderen Spieler' : ''}
                     >
-                        Passen
+                        {isMyTurn ? 'Passen' : 'Warten...'}
                     </NavButton>
                 </Nav>
             )}
