@@ -359,7 +359,7 @@ const HomePage: FC = () => {
                         if (gameResponse.status === 200) {
                             setLocalGame(gameResponse.data)
                         }
-                    } catch (e) {
+                    } catch {
                         // ignore
                     }
                 } else {
@@ -371,7 +371,6 @@ const HomePage: FC = () => {
                 setIsPassing(false)
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setLocalGame, localGame, localUser?.id])
 
     return (
