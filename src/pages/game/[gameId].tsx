@@ -212,6 +212,7 @@ const GamePage: FC = () => {
     )
     const [registration, setRegistration] =
         useState<ServiceWorkerRegistration | null>(null)
+    const [isPassing, setIsPassing] = useState(false)
 
     // Register service worker
     useEffect(() => {
@@ -344,7 +345,7 @@ const GamePage: FC = () => {
     }, [setLocalGame, router])
 
     const handlePass = useCallback(async () => {
-        if (!localGame) return
+        if (!localGame || isPassing) return
 
         // Prevent pass if it's not the user's turn
         if (localGame.currentPlayer?.userId !== localUser?.id) {
@@ -353,6 +354,7 @@ const GamePage: FC = () => {
             return
         }
 
+        setIsPassing(true)
         try {
             const response = await axios.post(
                 `/api/games/${localGame.id}/pass`,
@@ -377,8 +379,10 @@ const GamePage: FC = () => {
                 setPassMessage('Fehler beim Passen')
             }
             setTimeout(() => setPassMessage(null), 2000)
+        } finally {
+            setIsPassing(false)
         }
-    }, [localGame, localUser?.id, setLocalGame])
+    }, [localGame, localUser?.id, setLocalGame, isPassing])
 
     const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
 
@@ -532,12 +536,19 @@ const GamePage: FC = () => {
                     </NavButton>
                     <NavButton
                         disabled={
-                            localGame.gameState === GameState.ENDED || !isMyTurn
+                            localGame.gameState === GameState.ENDED ||
+                            !isMyTurn ||
+                            isPassing
                         }
                         onClick={handlePass}
                         title={!isMyTurn ? 'Warte auf den anderen Spieler' : ''}
                     >
-                        {passMessage || (isMyTurn ? 'Passen' : 'Warten...')}
+                        {passMessage ||
+                            (isPassing
+                                ? 'Warten...'
+                                : isMyTurn
+                                  ? 'Passen'
+                                  : 'Warten...')}
                     </NavButton>
                 </Nav>
             )}
