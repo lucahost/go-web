@@ -1,9 +1,13 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Tile renders correctly 1`] = `
-<img
-  alt="Go board tile at 0,0"
-  class="sc-bRKDuR iyqoJW"
-  src="/Go_undefined.svg"
-/>
+<div
+  class="sc-bRKDuR dIcauQ"
+>
+  <img
+    alt="Go board tile at 0,0"
+    class="sc-hvigdm kJafbX"
+    src="/Go_undefined.svg"
+  />
+</div>
 `;
