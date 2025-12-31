@@ -198,7 +198,9 @@ const HomePage: FC = () => {
     const [registration, setRegistration] =
         useState<ServiceWorkerRegistration | null>(null)
     const [isPassing, setIsPassing] = useState(false)
+    const [passMessage, setPassMessage] = useState<string | null>(null)
     const isPassingRef = React.useRef(false)
+    const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
 
     useEffect(() => {
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -321,6 +323,13 @@ const HomePage: FC = () => {
 
     const handlePass = useCallback(async () => {
         if (localGame && !isPassingRef.current) {
+            // Prevent pass if it's not the user's turn
+            if (localGame.currentPlayer?.userId !== localUser?.id) {
+                setPassMessage('Warte auf den anderen Spieler')
+                setTimeout(() => setPassMessage(null), 2000)
+                return
+            }
+
             isPassingRef.current = true
             setIsPassing(true)
             const url = `/api/games/${localGame.id}/pass`
@@ -340,6 +349,23 @@ const HomePage: FC = () => {
             } catch (err) {
                 // eslint-disable-next-line no-console
                 console.error('Pass failed', err)
+                if (axios.isAxiosError(err) && err.response?.status === 400) {
+                    setPassMessage('Warte auf den anderen Spieler')
+                    // Fetch updated game state to sync with backend
+                    try {
+                        const gameResponse = await axios.get(
+                            `/api/games/${localGame.id}`
+                        )
+                        if (gameResponse.status === 200) {
+                            setLocalGame(gameResponse.data)
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                } else {
+                    setPassMessage('Fehler beim Passen')
+                }
+                setTimeout(() => setPassMessage(null), 2000)
             } finally {
                 isPassingRef.current = false
                 setIsPassing(false)
@@ -397,12 +423,20 @@ const HomePage: FC = () => {
                     </NavButton>
                     <NavButton
                         disabled={
-                            localGame.gameState === GameState.ENDED || isPassing
+                            localGame.gameState === GameState.ENDED ||
+                            isPassing ||
+                            !isMyTurn
                         }
                         onClick={handlePass}
+                        title={!isMyTurn ? 'Warte auf den anderen Spieler' : ''}
                         type="button"
                     >
-                        {isPassing ? 'Warten...' : 'Passen'}
+                        {passMessage ||
+                            (isPassing
+                                ? 'Warten...'
+                                : isMyTurn
+                                  ? 'Passen'
+                                  : 'Warten...')}
                     </NavButton>
                 </Nav>
             )}
