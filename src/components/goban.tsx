@@ -6,7 +6,7 @@ import React, {
     useRef,
     useState,
 } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import Tile from './tile'
 import {
     Field,
@@ -84,15 +84,60 @@ const Board = styled.div<{ $size: number }>`
     grid-template-rows: repeat(${({ $size }) => $size}, 1fr);
 `
 
-const Message = styled.div`
-    min-height: 40px;
-    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+const pulse = keyframes`
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+`
+
+const Message = styled.div<{ $isUserTurn?: boolean; $isGameOver?: boolean }>`
+    min-height: 50px;
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
     text-align: center;
-    padding: ${({ theme }) => theme.spacing.sm};
+    padding: ${({ theme }) => theme.spacing.sm}
+        ${({ theme }) => theme.spacing.md};
+    margin-bottom: ${({ theme }) => theme.spacing.md};
+    border-radius: ${({ theme }) => theme.borderRadius.full};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: ${({ theme }) => theme.spacing.sm};
+    transition: all 0.3s ease;
+    background: ${({ theme, $isUserTurn, $isGameOver }) =>
+        $isGameOver
+            ? theme.colors.error
+            : $isUserTurn
+              ? theme.colors.primary
+              : 'rgba(255, 255, 255, 0.1)'};
+    color: ${({ theme, $isUserTurn, $isGameOver }) =>
+        $isUserTurn || $isGameOver ? theme.colors.white : theme.colors.text};
+    font-weight: ${({ $isUserTurn, $isGameOver }) =>
+        $isUserTurn || $isGameOver ? 'bold' : 'normal'};
+    box-shadow: ${({ theme, $isUserTurn }) =>
+        $isUserTurn ? `0 0 15px ${theme.colors.primary}66` : 'none'};
+    animation: ${({ $isUserTurn }) => ($isUserTurn ? pulse : 'none')} 2s
+        infinite ease-in-out;
 
     ${media.md} {
-        font-size: ${({ theme }) => theme.typography.fontSize.base};
-        min-height: 50px;
+        font-size: ${({ theme }) => theme.typography.fontSize.lg};
+        min-height: 60px;
+        padding: ${({ theme }) => theme.spacing.md}
+            ${({ theme }) => theme.spacing.xl};
+    }
+`
+
+const TurnStone = styled.div<{ $color: PlayerColor }>`
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: ${({ $color }) =>
+        $color === PlayerColor.BLACK ? '#000' : '#fff'};
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    ${media.md} {
+        width: 20px;
+        height: 20px;
     }
 `
 
@@ -291,10 +336,11 @@ const Goban: FC<Props> = props => {
     const [error, setError] = useState<string | null>(null)
     const [shareStatus, setShareStatus] = useState<string | null>(null)
 
-    // Animation state
+    // Animation and marker state
     const [lastPlacedVertex, setLastPlacedVertex] = useState<string | null>(
         null
     )
+    const [lastMove, setLastMove] = useState<string | null>(null)
     const [capturingFields, setCapturingFields] = useState<Map<string, Field>>(
         new Map()
     )
@@ -344,16 +390,24 @@ const Goban: FC<Props> = props => {
 
                             // A new move was made
                             if (newHistoryLen > prevHistoryLen) {
-                                const lastMove =
+                                const lastMoveData =
                                     parsedBoard.history[newHistoryLen - 1]
-                                if (lastMove) {
-                                    const key = vertexKey(lastMove.vertex)
+                                if (lastMoveData) {
+                                    const key = vertexKey(lastMoveData.vertex)
                                     setLastPlacedVertex(key)
+                                    setLastMove(key)
                                     // Clear animation after it completes
                                     setTimeout(
                                         () => setLastPlacedVertex(null),
                                         300
                                     )
+                                }
+                            } else if (newHistoryLen > 0) {
+                                // Initialize lastMove if it's not set but history exists
+                                const lastMoveData =
+                                    parsedBoard.history[newHistoryLen - 1]
+                                if (lastMoveData) {
+                                    setLastMove(vertexKey(lastMoveData.vertex))
                                 }
                             }
 
@@ -571,13 +625,17 @@ const Goban: FC<Props> = props => {
     return (
         <GobanContainer>
             <GameTitle>{localGame?.title}</GameTitle>
-            <ShareContainer>
-                <ShareButton onClick={handleShare} type="button">
-                    <FontAwesomeIcon icon={faShare} />
-                    Spiel teilen
-                </ShareButton>
-                {shareStatus && <ShareFeedback>{shareStatus}</ShareFeedback>}
-            </ShareContainer>
+            {localGame?.gameState === GameState.INITIALIZED && (
+                <ShareContainer>
+                    <ShareButton onClick={handleShare} type="button">
+                        <FontAwesomeIcon icon={faShare} />
+                        Spiel teilen
+                    </ShareButton>
+                    {shareStatus && (
+                        <ShareFeedback>{shareStatus}</ShareFeedback>
+                    )}
+                </ShareContainer>
+            )}
             {userPlayer &&
                 currentPlayer &&
                 userPlayer.playerColor === currentPlayer.playerColor &&
@@ -588,24 +646,45 @@ const Goban: FC<Props> = props => {
             {localGame?.gameState === GameState.RUNNING &&
                 currentPlayer &&
                 userPlayer && (
-                    <Message>
-                        {userPlayer.playerColor === currentPlayer.playerColor
-                            ? `Du bist am Zug (${
-                                  userPlayer.playerColor === PlayerColor.BLACK
-                                      ? 'Schwarz'
-                                      : 'Weiss'
-                              })`
-                            : `Gegner am Zug (${
-                                  currentPlayer.playerColor ===
-                                  PlayerColor.BLACK
-                                      ? 'Schwarz'
-                                      : 'Weiss'
-                              })`}
+                    <Message
+                        $isUserTurn={
+                            userPlayer.playerColor === currentPlayer.playerColor
+                        }
+                    >
+                        <TurnStone $color={currentPlayer.playerColor} />
+                        <span>
+                            {userPlayer.playerColor ===
+                            currentPlayer.playerColor
+                                ? `Du bist am Zug`
+                                : `Gegner am Zug`}
+                            {` (${
+                                currentPlayer.playerColor === PlayerColor.BLACK
+                                    ? 'Schwarz'
+                                    : 'Weiss'
+                            })`}
+                        </span>
                     </Message>
                 )}
 
             {localGame?.gameState === GameState.ENDED && (
-                <Message>GAME OVER</Message>
+                <Message $isGameOver>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    <span>
+                        GAME OVER
+                        {dominance && (
+                            <>
+                                {' - '}
+                                {dominance.whitePercentage >
+                                dominance.blackPercentage
+                                    ? 'Weiss gewinnt!'
+                                    : dominance.blackPercentage >
+                                        dominance.whitePercentage
+                                      ? 'Schwarz gewinnt!'
+                                      : 'Unentschieden!'}
+                            </>
+                        )}
+                    </span>
+                </Message>
             )}
 
             <BoardWrapper>
@@ -635,6 +714,7 @@ const Goban: FC<Props> = props => {
                                 currentPlayer={currentPlayer?.playerColor}
                                 field={displayField}
                                 isBeingCaptured={isBeingCaptured}
+                                isLastMove={lastMove === key}
                                 isNewlyPlaced={isNewlyPlaced}
                                 location={
                                     displayColor === PlayerColor.EMPTY

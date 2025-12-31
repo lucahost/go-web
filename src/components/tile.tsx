@@ -9,6 +9,7 @@ interface Props {
     currentPlayer?: PlayerColor
     userPlayer?: PlayerColor
     isNewlyPlaced?: boolean
+    isLastMove?: boolean
     isBeingCaptured?: boolean
 }
 
@@ -38,6 +39,12 @@ const stoneCaptureAnimation = keyframes`
     }
 `
 
+const TileWrapper = styled.div`
+    position: relative;
+    width: 100%;
+    height: 100%;
+`
+
 const TileContainer = styled.img<{
     $isNewlyPlaced?: boolean
     $isBeingCaptured?: boolean
@@ -48,6 +55,7 @@ const TileContainer = styled.img<{
     transition: transform 0.1s ease;
     user-select: none;
     -webkit-user-drag: none;
+    display: block;
 
     &:active {
         transform: scale(0.95);
@@ -66,6 +74,23 @@ const TileContainer = styled.img<{
         `}
 `
 
+const LastMoveMarker = styled.div<{ $color: PlayerColor }>`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25%;
+    height: 25%;
+    border-radius: 50%;
+    border: 1.5px solid
+        ${({ $color }) =>
+            $color === PlayerColor.BLACK
+                ? 'rgba(255, 255, 255, 0.7)'
+                : 'rgba(0, 0, 0, 0.6)'};
+    pointer-events: none;
+    z-index: 2;
+`
+
 const Tile = memo(
     ({
         field,
@@ -74,6 +99,7 @@ const Tile = memo(
         currentPlayer,
         userPlayer,
         isNewlyPlaced,
+        isLastMove,
         isBeingCaptured,
     }: Props) => {
         const [isHover, setIsHover] = useState(false)
@@ -92,24 +118,30 @@ const Tile = memo(
             clickHandler(field.vertex)
         }, [clickHandler, field.vertex])
 
+        const showLastMoveMarker =
+            isLastMove && field.color !== PlayerColor.EMPTY
+
         return (
-            <TileContainer
-                $isBeingCaptured={isBeingCaptured}
-                $isNewlyPlaced={isNewlyPlaced}
-                alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
-                onClick={handleClick}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                src={`/Go_${
-                    isHover &&
-                    currentPlayer === userPlayer &&
-                    field.color === PlayerColor.EMPTY
-                        ? userPlayer == PlayerColor.BLACK
-                            ? FieldLocation.BLACK_STONE_HOVER
-                            : FieldLocation.WHITE_STONE_HOVER
-                        : location
-                }.svg`}
-            />
+            <TileWrapper>
+                <TileContainer
+                    $isBeingCaptured={isBeingCaptured}
+                    $isNewlyPlaced={isNewlyPlaced}
+                    alt={`Go board tile at ${field.vertex[0]},${field.vertex[1]}`}
+                    onClick={handleClick}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    src={`/Go_${
+                        isHover &&
+                        currentPlayer === userPlayer &&
+                        field.color === PlayerColor.EMPTY
+                            ? userPlayer == PlayerColor.BLACK
+                                ? FieldLocation.BLACK_STONE_HOVER
+                                : FieldLocation.WHITE_STONE_HOVER
+                            : location
+                    }.svg`}
+                />
+                {showLastMoveMarker && <LastMoveMarker $color={field.color} />}
+            </TileWrapper>
         )
     }
 )
