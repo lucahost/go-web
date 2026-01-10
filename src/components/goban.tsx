@@ -709,6 +709,7 @@ const Goban: FC<Props> = props => {
                         return (
                             <Tile
                                 key={i}
+                                // eslint-disable-next-line react/jsx-no-bind
                                 clickHandler={handleClick}
                                 currentPlayer={currentPlayer?.playerColor}
                                 field={displayField}

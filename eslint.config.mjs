@@ -156,7 +156,7 @@ export default [
 
             // General rules
             'no-case-declarations': 'off',
-            'no-console': 'warn',
+            'no-console': ['warn', { allow: ['warn', 'error'] }],
             'no-shadow': 'off',
 
             // Prettier

@@ -280,7 +280,7 @@ const GamePage: FC = () => {
         if (localUser && localUser?.subscription === undefined) {
             onLogin()
         }
-    }, [localUser, setLocalUser, registration?.pushManager])
+    }, [localUser, registration?.pushManager, setLocalUser])
 
     // Check if game exists
     useEffect(() => {
@@ -361,13 +361,13 @@ const GamePage: FC = () => {
         setStoredGameId(null)
         setLocalGame(null)
         router.push('/')
-    }, [subscription, setLocalUser, setStoredGameId, router])
+    }, [subscription, router, setLocalUser, setStoredGameId])
 
     const handleNewGame = useCallback(() => {
         setStoredGameId(null)
         setLocalGame(null)
         router.push('/')
-    }, [setStoredGameId, router])
+    }, [router, setStoredGameId])
 
     const handlePass = useCallback(async () => {
         if (!localGame || isPassingRef.current) return

@@ -20,11 +20,13 @@ let sdk: NodeSDK | null = null
 
 export function initTelemetry(): void {
     if (!config.enabled) {
+        // eslint-disable-next-line no-console
         console.log('OpenTelemetry disabled')
         return
     }
 
     if (sdk) {
+        // eslint-disable-next-line no-console
         console.log('OpenTelemetry already initialized')
         return
     }
@@ -73,12 +75,14 @@ export function initTelemetry(): void {
     })
 
     sdk.start()
+    // eslint-disable-next-line no-console
     console.log(
         `OpenTelemetry initialized for ${config.serviceName} -> ${config.otlpEndpoint}`
     )
 
     const shutdown = () => {
         sdk?.shutdown()
+            // eslint-disable-next-line no-console
             .then(() => console.log('OpenTelemetry shut down'))
             .catch(err => console.error('OpenTelemetry shutdown error', err))
             .finally(() => process.exit(0))

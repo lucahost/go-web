@@ -294,7 +294,7 @@ const HomePage: FC = () => {
         if (localUser && localUser?.subscription === undefined) {
             onLogin()
         }
-    }, [localUser, setLocalUser, registration?.pushManager])
+    }, [localUser, registration?.pushManager, setLocalUser])
 
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
@@ -324,7 +324,7 @@ const HomePage: FC = () => {
                     setGameId(null)
                 })
         }
-    }, [localUser, setLocalUser, gameId, setGameId])
+    }, [localUser, gameId, setLocalUser, setGameId])
 
     // Listen for service worker messages about deleted games
     useEffect(() => {
@@ -357,7 +357,7 @@ const HomePage: FC = () => {
         }
     }, [gameId, setGameId])
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         // Save username before logout
         if (localUser?.name) {
             setSavedUsername(localUser.name)
@@ -367,7 +367,13 @@ const HomePage: FC = () => {
         setIsSubscribed(false)
         setLocalUser(null)
         setGameId(null)
-    }
+    }, [
+        localUser?.name,
+        subscription,
+        setSavedUsername,
+        setLocalUser,
+        setGameId,
+    ])
 
     const handleNewGame = useCallback(() => {
         setGameId(null)
