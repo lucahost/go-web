@@ -1,3 +1,4 @@
+/* global HTMLInputElement */
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { Game, GameState, User } from '../lib/types'
@@ -34,6 +35,14 @@ const GameListTitle = styled.h1`
     ${media.md} {
         font-size: ${({ theme }) => theme.typography.fontSize.xxl};
     }
+`
+
+const WelcomeUserMessage = styled.p`
+    color: ${({ theme }) => theme.colors.secondary};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
 `
 
 const NewGame = styled.div`
@@ -345,9 +354,8 @@ const GameListItem: FC<GameListItemProps> = React.memo(
 )
 
 const GameList: FC = () => {
-    const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [gameId, setGameId] = useLocalStorage<number | null>('gameId', null)
+    const [localUser] = useLocalStorage<User | null>('user', null)
 
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
@@ -365,8 +373,7 @@ const GameList: FC = () => {
                     }
                 })
                 .catch(e => {
-                    // eslint-disable-next-line no-console
-                    console.log(e)
+                    console.error('Failed to fetch games:', e)
                     setGames([])
                 })
         }
@@ -416,9 +423,15 @@ const GameList: FC = () => {
                     break
                 }
                 case 'GAME_DELETED': {
-                    const gameId = data?.data?.gameId
-                    if (gameId) {
-                        setGames(prev => prev.filter(g => g.id !== gameId))
+                    const deletedGameId = data?.data?.gameId
+                    if (deletedGameId) {
+                        setGames(prev =>
+                            prev.filter(g => g.id !== deletedGameId)
+                        )
+                        // Clear gameId if it matches deleted game
+                        if (gameId === deletedGameId) {
+                            setGameId(null)
+                        }
                     }
                     break
                 }
@@ -440,10 +453,9 @@ const GameList: FC = () => {
                 )
             }
         }
-    }, [])
+    }, [gameId, setGameId])
 
     const handleGameTitleInput = useCallback(
-        // eslint-disable-next-line no-undef
         (event: React.ChangeEvent<HTMLInputElement>) =>
             setGameTitle(event.target.value),
         []
@@ -463,22 +475,21 @@ const GameList: FC = () => {
                     .then(r => {
                         if (r.status === 200) {
                             setGames([...games, r.data])
-                            setLocalGame(r.data)
+                            setGameId(r.data.id)
                         }
                         setError(null)
                         setLoading(false)
                     })
                     .catch(e => {
-                        // eslint-disable-next-line no-console
-                        console.log(e)
+                        console.error('Failed to join game:', e)
                         setError('Fehler beim Spiel erstellen')
                         setLoading(false)
                     })
-                setLocalGame(game)
+                setGameId(game.id)
             }
         },
 
-        [setLocalGame, localUser, gameTitle, games]
+        [setGameId, localUser, gameTitle, games]
     )
 
     const handleCreateGame = useCallback(() => {
@@ -494,46 +505,44 @@ const GameList: FC = () => {
                 .then(r => {
                     if (r.status === 200) {
                         setGames([...games, r.data])
-                        setLocalGame(r.data)
+                        setGameId(r.data.id)
                     }
                     setError(null)
                     setLoading(false)
                 })
                 .catch(e => {
-                    // eslint-disable-next-line no-console
-                    console.log(e)
+                    console.error('Failed to create game:', e)
                     setError('Fehler beim Spiel erstellen')
                     setLoading(false)
                 })
         }
-    }, [gameTitle, games, localUser, setLocalGame])
+    }, [gameTitle, games, localUser, setGameId])
 
     const handleDeleteGame = useCallback(
-        (e: React.MouseEvent, gameId: number) => {
+        (e: React.MouseEvent, deletedGameId: number) => {
             e.stopPropagation()
             if (!window.confirm('Spiel wirklich löschen?')) return
 
             setLoading(true)
             axios
-                .delete(`/api/games/${gameId}`)
+                .delete(`/api/games/${deletedGameId}`)
                 .then(r => {
                     if (r.status === 200) {
-                        setGames(games.filter(g => g.id !== gameId))
-                        if (localGame?.id === gameId) {
-                            setLocalGame(null)
+                        setGames(games.filter(g => g.id !== deletedGameId))
+                        if (gameId === deletedGameId) {
+                            setGameId(null)
                         }
                     }
                     setError(null)
                     setLoading(false)
                 })
                 .catch(e => {
-                    // eslint-disable-next-line no-console
-                    console.log(e)
+                    console.error('Failed to delete game:', e)
                     setError('Fehler beim Löschen')
                     setLoading(false)
                 })
         },
-        [games, localGame, setLocalGame]
+        [games, gameId, setGameId]
     )
 
     const handleAnimationEnd = useCallback((gameId: number) => {
@@ -545,6 +554,11 @@ const GameList: FC = () => {
     return (
         <GameListContainer>
             <GameListTitle>Games</GameListTitle>
+            {localUser && (
+                <WelcomeUserMessage>
+                    Willkommen, {localUser.name}
+                </WelcomeUserMessage>
+            )}
             <NewGame>
                 <NewGameTitleField
                     onChange={handleGameTitleInput}

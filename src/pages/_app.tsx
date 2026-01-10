@@ -1,5 +1,5 @@
 import { AppProps } from 'next/app'
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import Head from 'next/head'
 import { ThemeProvider } from 'styled-components'
 import { GlobalStyle, theme } from '../lib/theme'
@@ -14,6 +14,29 @@ const Layout = styled.div`
 `
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
+    // Migrate from old 'game' key to new 'gameId' key (backward compatibility)
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const oldGame = window.localStorage.getItem('game')
+            if (oldGame) {
+                try {
+                    const parsed = JSON.parse(oldGame)
+                    if (parsed?.id) {
+                        window.localStorage.setItem(
+                            'gameId',
+                            JSON.stringify(parsed.id)
+                        )
+                    }
+                    // Clean up old key
+                    window.localStorage.removeItem('game')
+                } catch {
+                    // Invalid data, just remove old key
+                    window.localStorage.removeItem('game')
+                }
+            }
+        }
+    }, [])
+
     return (
         <ThemeProvider theme={theme}>
             <Layout>

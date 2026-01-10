@@ -1,3 +1,4 @@
+/* global HTMLInputElement */
 import React, { FC, FormEvent, useCallback, useState } from 'react'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
 import { User } from '../lib/types'
@@ -109,16 +110,43 @@ const ErrorMessage = styled.p`
     text-align: center;
 `
 
+const WelcomeMessage = styled.p`
+    color: ${({ theme }) => theme.colors.secondary};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+`
+
+const DifferentUserButton = styled.button`
+    background: transparent;
+    color: ${({ theme }) => theme.colors.textMuted};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    border: none;
+    cursor: pointer;
+    padding: ${({ theme }) => theme.spacing.sm};
+    text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+        color: ${({ theme }) => theme.colors.secondary};
+    }
+`
+
 const Login: FC = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [savedUsername, setSavedUsername] = useLocalStorage<string | null>(
+        'savedUsername',
+        null
+    )
 
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
-    const [name, setName] = useState<string>('')
+    const [name, setName] = useState<string>(savedUsername || '')
+    const [showWelcomeBack, setShowWelcomeBack] =
+        useState<boolean>(!!savedUsername)
 
     const handleNameInput = useCallback(
-        // eslint-disable-next-line no-undef
         (event: React.ChangeEvent<HTMLInputElement>) =>
             setName(event.target.value),
         []
@@ -138,8 +166,7 @@ const Login: FC = () => {
                     setLoading(false)
                 })
                 .catch(e => {
-                    // eslint-disable-next-line no-console
-                    console.log(e)
+                    console.error('Login failed:', e)
                     setError('Fehler bei Anmeldung')
                     setLoading(false)
                 })
@@ -154,11 +181,22 @@ const Login: FC = () => {
         [handleLogin]
     )
 
+    const handleDifferentUser = useCallback(() => {
+        setSavedUsername(null)
+        setName('')
+        setShowWelcomeBack(false)
+    }, [setSavedUsername])
+
     return loading ? (
         <Spinner />
     ) : (
         <LoginForm onSubmit={handleSubmit}>
             <LoginTitle>Bitte anmelden</LoginTitle>
+            {showWelcomeBack && savedUsername && (
+                <WelcomeMessage>
+                    Willkommen zurück, {savedUsername}!
+                </WelcomeMessage>
+            )}
             {error && <ErrorMessage>{error}</ErrorMessage>}
             <FieldInput
                 autoComplete="name"
@@ -166,8 +204,17 @@ const Login: FC = () => {
                 onChange={handleNameInput}
                 placeholder="Name eingeben"
                 type="text"
+                value={name}
             />
             <LoginButton type="submit">Go</LoginButton>
+            {showWelcomeBack && (
+                <DifferentUserButton
+                    onClick={handleDifferentUser}
+                    type="button"
+                >
+                    Login als anderer Benutzer
+                </DifferentUserButton>
+            )}
         </LoginForm>
     )
 }

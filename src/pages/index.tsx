@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-bind */
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import Goban from '../components/goban'
 import styled from 'styled-components'
@@ -188,10 +187,14 @@ const base64ToUint8Array = (base64: string) => {
 
 const HomePage: FC = () => {
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
-    const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
+    const [gameId, setGameId] = useLocalStorage<number | null>('gameId', null)
+    const [game, setGame] = useState<Game | null>(null)
+    const [, setSavedUsername] = useLocalStorage<string | null>(
+        'savedUsername',
+        null
+    )
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [isSubscribed, setIsSubscribed] = useState(false)
+    const [, setIsSubscribed] = useState(false)
     const [subscription, setSubscription] = useState<PushSubscription | null>(
         null
     )
@@ -200,13 +203,12 @@ const HomePage: FC = () => {
     const [isPassing, setIsPassing] = useState(false)
     const [passMessage, setPassMessage] = useState<string | null>(null)
     const isPassingRef = React.useRef(false)
-    const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
+    const isMyTurn = game?.currentPlayer?.userId === localUser?.id
 
     useEffect(() => {
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             // Register service worker
             navigator.serviceWorker.register('/sw.js').catch(err => {
-                // eslint-disable-next-line no-console
                 console.error('Service worker registration failed:', err)
             })
 
@@ -233,8 +235,25 @@ const HomePage: FC = () => {
                 setRegistration(reg)
             })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [localUser, setLocalUser])
+
+    useEffect(() => {
+        if (gameId) {
+            axios
+                .get<Game>(`/api/games/${gameId}`)
+                .then(r => {
+                    if (r.status === 200) {
+                        setGame(r.data)
+                    }
+                })
+                .catch(() => {
+                    setGame(null)
+                    setGameId(null) // Clear invalid gameId
+                })
+        } else {
+            setGame(null)
+        }
+    }, [gameId, setGameId])
 
     useEffect(() => {
         const onLogin = async () => {
@@ -261,7 +280,6 @@ const HomePage: FC = () => {
                         isGlobal: true,
                     })
                     .catch(err => {
-                        // eslint-disable-next-line no-console
                         console.error(
                             'Failed to register global subscription:',
                             err
@@ -293,38 +311,72 @@ const HomePage: FC = () => {
                     setLocalUser(null)
                 })
         }
-        if (localGame) {
-            const url = `/api/games/${localGame.id}`
+        if (gameId) {
+            const url = `/api/games/${gameId}`
             axios
                 .get<Game>(url)
                 .then(r => {
                     if (r.status !== 200) {
-                        setLocalGame(null)
+                        setGameId(null)
                     }
                 })
                 .catch(() => {
-                    setLocalGame(null)
+                    setGameId(null)
                 })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [localUser, setLocalUser, gameId, setGameId])
+
+    // Listen for service worker messages about deleted games
+    useEffect(() => {
+        const handleServiceWorkerMessage = (event: globalThis.MessageEvent) => {
+            const { type, data } = event.data || {}
+
+            if (type === 'GAME_DELETED') {
+                const deletedGameId = data?.data?.gameId
+                if (deletedGameId && gameId === deletedGameId) {
+                    setGameId(null)
+                    setGame(null)
+                }
+            }
+        }
+
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener(
+                'message',
+                handleServiceWorkerMessage
+            )
+        }
+
+        return () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.removeEventListener(
+                    'message',
+                    handleServiceWorkerMessage
+                )
+            }
+        }
+    }, [gameId, setGameId])
 
     const handleLogout = async () => {
+        // Save username before logout
+        if (localUser?.name) {
+            setSavedUsername(localUser.name)
+        }
         await subscription?.unsubscribe()
         setSubscription(null)
         setIsSubscribed(false)
         setLocalUser(null)
-        setLocalGame(null)
+        setGameId(null)
     }
 
     const handleNewGame = useCallback(() => {
-        setLocalGame(null)
-    }, [setLocalGame])
+        setGameId(null)
+    }, [setGameId])
 
     const handlePass = useCallback(async () => {
-        if (localGame && !isPassingRef.current) {
+        if (gameId && game && !isPassingRef.current) {
             // Prevent pass if it's not the user's turn
-            if (localGame.currentPlayer?.userId !== localUser?.id) {
+            if (game.currentPlayer?.userId !== localUser?.id) {
                 setPassMessage('Warte auf den anderen Spieler')
                 setTimeout(() => setPassMessage(null), 2000)
                 return
@@ -332,32 +384,29 @@ const HomePage: FC = () => {
 
             isPassingRef.current = true
             setIsPassing(true)
-            const url = `/api/games/${localGame.id}/pass`
+            const url = `/api/games/${gameId}/pass`
             try {
                 const r = await axios.post<Game>(url, {
                     userId: localUser?.id,
                 })
                 if (r.status === 200) {
                     // Fetch updated game state after successful pass
-                    const gameResponse = await axios.get(
-                        `/api/games/${localGame.id}`
-                    )
+                    const gameResponse = await axios.get(`/api/games/${gameId}`)
                     if (gameResponse.status === 200) {
-                        setLocalGame(gameResponse.data)
+                        setGame(gameResponse.data)
                     }
                 }
             } catch (err) {
-                // eslint-disable-next-line no-console
                 console.error('Pass failed', err)
                 if (axios.isAxiosError(err) && err.response?.status === 400) {
                     setPassMessage('Warte auf den anderen Spieler')
                     // Fetch updated game state to sync with backend
                     try {
                         const gameResponse = await axios.get(
-                            `/api/games/${localGame.id}`
+                            `/api/games/${gameId}`
                         )
                         if (gameResponse.status === 200) {
-                            setLocalGame(gameResponse.data)
+                            setGame(gameResponse.data)
                         }
                     } catch {
                         // ignore
@@ -371,7 +420,7 @@ const HomePage: FC = () => {
                 setIsPassing(false)
             }
         }
-    }, [setLocalGame, localGame, localUser?.id])
+    }, [gameId, game, localUser?.id])
 
     return (
         <>
@@ -405,7 +454,7 @@ const HomePage: FC = () => {
             <Content>
                 {!localUser ? (
                     <Login />
-                ) : localGame ? (
+                ) : game ? (
                     <>
                         <Goban size={9} />
                     </>
@@ -413,16 +462,16 @@ const HomePage: FC = () => {
                     <GameList />
                 )}
             </Content>
-            {localUser && localGame && (
+            {localUser && game && (
                 <Nav>
                     <NavButton onClick={handleNewGame} type="button">
-                        {localGame.gameState === GameState.ENDED
+                        {game.gameState === GameState.ENDED
                             ? 'Zurück'
                             : 'Neues Spiel'}
                     </NavButton>
                     <NavButton
                         disabled={
-                            localGame.gameState === GameState.ENDED ||
+                            game.gameState === GameState.ENDED ||
                             isPassing ||
                             !isMyTurn
                         }

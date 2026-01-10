@@ -199,14 +199,17 @@ const GamePage: FC = () => {
     const { gameId } = router.query
 
     const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
-    const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
+    const [storedGameId, setStoredGameId] = useLocalStorage<number | null>(
+        'gameId',
+        null
+    )
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [passMessage, setPassMessage] = useState<string | null>(null)
     const [gameExists, setGameExists] = useState(false)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [isSubscribed, setIsSubscribed] = useState(false)
+    const [localGame, setLocalGame] = useState<Game | null>(null)
+    const [, setIsSubscribed] = useState(false)
     const [subscription, setSubscription] = useState<PushSubscription | null>(
         null
     )
@@ -219,7 +222,6 @@ const GamePage: FC = () => {
     useEffect(() => {
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(err => {
-                // eslint-disable-next-line no-console
                 console.error('Service worker registration failed:', err)
             })
 
@@ -245,8 +247,7 @@ const GamePage: FC = () => {
                 setRegistration(reg)
             })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [localUser, setLocalUser])
 
     // Subscribe to push after login
     useEffect(() => {
@@ -300,14 +301,34 @@ const GamePage: FC = () => {
         checkGame()
     }, [gameId])
 
+    // Fetch game data
+    useEffect(() => {
+        if (!gameId || typeof gameId !== 'string' || !gameExists) return
+
+        const fetchGame = async () => {
+            setLoading(true)
+            try {
+                const response = await axios.get(`/api/games/${gameId}`)
+                if (response.status === 200) {
+                    setLocalGame(response.data)
+                }
+            } catch {
+                setError('Fehler beim Laden des Spiels')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchGame()
+    }, [gameId, gameExists])
+
     // Auto-join after login
     useEffect(() => {
         if (!localUser || !gameId || typeof gameId !== 'string' || !gameExists)
             return
 
         // Already in this game
-        if (localGame && localGame.id === Number(gameId)) {
-            setLoading(false)
+        if (storedGameId && storedGameId === Number(gameId)) {
             return
         }
 
@@ -319,6 +340,7 @@ const GamePage: FC = () => {
                     subscription: localUser.subscription,
                 })
                 if (response.status === 200) {
+                    setStoredGameId(response.data.id)
                     setLocalGame(response.data)
                 }
             } catch {
@@ -329,21 +351,23 @@ const GamePage: FC = () => {
         }
 
         joinGame()
-    }, [localUser, gameId, gameExists, localGame, setLocalGame])
+    }, [localUser, gameId, gameExists, storedGameId, setStoredGameId])
 
     const handleLogout = useCallback(async () => {
         await subscription?.unsubscribe()
         setSubscription(null)
         setIsSubscribed(false)
         setLocalUser(null)
+        setStoredGameId(null)
         setLocalGame(null)
         router.push('/')
-    }, [subscription, setLocalUser, setLocalGame, router])
+    }, [subscription, setLocalUser, setStoredGameId, router])
 
     const handleNewGame = useCallback(() => {
+        setStoredGameId(null)
         setLocalGame(null)
         router.push('/')
-    }, [setLocalGame, router])
+    }, [setStoredGameId, router])
 
     const handlePass = useCallback(async () => {
         if (!localGame || isPassingRef.current) return
@@ -385,7 +409,7 @@ const GamePage: FC = () => {
             isPassingRef.current = false
             setIsPassing(false)
         }
-    }, [localGame, localUser?.id, setLocalGame])
+    }, [localGame, localUser?.id])
 
     const isMyTurn = localGame?.currentPlayer?.userId === localUser?.id
 

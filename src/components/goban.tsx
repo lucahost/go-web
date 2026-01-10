@@ -321,13 +321,12 @@ const InfoIconWrapper = styled.div`
 `
 
 const Goban: FC<Props> = props => {
-    const [localGame, setLocalGame] = useLocalStorage<Game | null>('game', null)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [localUser, setLocalUser] = useLocalStorage<User | null>('user', null)
+    const [gameId] = useLocalStorage<number | null>('gameId', null)
+    const [localUser] = useLocalStorage<User | null>('user', null)
     const [clickSound] = useSoundEffect('click.mp3')
 
+    const [game, setGame] = useState<Game | null>(null)
     const [currentPlayer, setCurrentPlayer] = useState<Player>()
-    const [userPlayer, setUserPlayer] = useState<Player>()
     const [board, setBoard] = useState<GoBoard>()
     const [whiteCaptures, setWhiteCaptures] = useState<number>(0)
     const [blackCaptures, setBlackCaptures] = useState<number>(0)
@@ -355,23 +354,21 @@ const Goban: FC<Props> = props => {
         return () => clearTimeout(timer)
     }
 
-    useEffect(() => {
-        if (localGame && localUser) {
-            const userPlayer = localGame.players?.find(
-                u => u.userId === localUser.id
-            )
-            setUserPlayer(userPlayer)
+    const userPlayer = useMemo(() => {
+        if (game && localUser) {
+            return game.players?.find(u => u.userId === localUser.id)
         }
-    }, [localUser, localGame])
+        return undefined
+    }, [game, localUser])
 
-    const loadGame = async () => {
-        if (localGame) {
-            const url = `/api/games/${localGame.id}`
+    const loadGame = useCallback(async () => {
+        if (gameId) {
+            const url = `/api/games/${gameId}`
             axios
                 .get<Game>(url)
                 .then(r => {
                     if (r.status === 200) {
-                        setLocalGame(r.data)
+                        setGame(r.data)
 
                         // Parse board if it's a string (backwards compatibility)
                         const boardData =
@@ -473,19 +470,20 @@ const Goban: FC<Props> = props => {
                     }
                 })
                 .catch(e => {
-                    // eslint-disable-next-line no-console
-                    console.error(e)
+                    console.error('Failed to load game:', e)
                 })
         }
-    }
+    }, [gameId])
 
     // Keep ref updated with latest loadGame function
-    loadGameRef.current = loadGame
+    useEffect(() => {
+        loadGameRef.current = loadGame
+    }, [loadGame])
 
     const handleTileClick = useCallback(
         (field: Field) => {
             {
-                if (localGame?.gameState === GameState.ENDED) {
+                if (game?.gameState === GameState.ENDED) {
                     addErrorMessage('Game finished')
                     return
                 }
@@ -515,8 +513,8 @@ const Goban: FC<Props> = props => {
                     return
                 }
                 clickSound()
-                if (localGame) {
-                    const url = `/api/games/${localGame.id}/moves`
+                if (gameId) {
+                    const url = `/api/games/${gameId}/moves`
                     axios
                         .post<Game>(url, {
                             field: {
@@ -533,13 +531,14 @@ const Goban: FC<Props> = props => {
                 }
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [
             currentPlayer,
-            userPlayer?.playerColor,
+            userPlayer,
             board,
-            localGame,
+            game?.gameState,
+            gameId,
             localUser?.id,
+            clickSound,
             loadGame,
         ]
     )
@@ -569,18 +568,17 @@ const Goban: FC<Props> = props => {
         }
     }, [])
 
-    // Load game data when localGame changes (handles async localStorage initialization)
+    // Load game data when gameId changes (handles async localStorage initialization)
     useEffect(() => {
-        if (localGame?.id) {
+        if (gameId) {
             loadGame()
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [localGame?.id])
+    }, [gameId, loadGame])
 
     const shareUrl = useMemo(() => {
-        if (typeof window === 'undefined' || !localGame) return ''
-        return `${window.location.origin}/game/${localGame.id}`
-    }, [localGame])
+        if (typeof window === 'undefined' || !gameId) return ''
+        return `${window.location.origin}/game/${gameId}`
+    }, [gameId])
 
     const copyToClipboard = useCallback((url: string) => {
         navigator.clipboard
@@ -600,7 +598,7 @@ const Goban: FC<Props> = props => {
 
         const shareData = {
             title: 'Go Spiel Einladung',
-            text: `Tritt meinem Go Spiel bei: ${localGame?.title}`,
+            text: `Tritt meinem Go Spiel bei: ${game?.title}`,
             url: shareUrl,
         }
 
@@ -620,12 +618,12 @@ const Goban: FC<Props> = props => {
             // Fallback: copy to clipboard
             copyToClipboard(shareUrl)
         }
-    }, [shareUrl, localGame?.title, copyToClipboard])
+    }, [shareUrl, game?.title, copyToClipboard])
 
     return (
         <GobanContainer>
-            <GameTitle>{localGame?.title}</GameTitle>
-            {localGame?.gameState === GameState.INITIALIZED && (
+            <GameTitle>{game?.title}</GameTitle>
+            {game?.gameState === GameState.INITIALIZED && (
                 <ShareContainer>
                     <ShareButton onClick={handleShare} type="button">
                         <FontAwesomeIcon icon={faShare} />
@@ -639,11 +637,11 @@ const Goban: FC<Props> = props => {
             {userPlayer &&
                 currentPlayer &&
                 userPlayer.playerColor === currentPlayer.playerColor &&
-                (localGame?.board as GoBoard)?.pass && (
+                (game?.board as GoBoard)?.pass && (
                     <PassNotice>Der andere Spieler hat gepasst</PassNotice>
                 )}
 
-            {localGame?.gameState === GameState.RUNNING &&
+            {game?.gameState === GameState.RUNNING &&
                 currentPlayer &&
                 userPlayer && (
                     <Message
@@ -666,7 +664,7 @@ const Goban: FC<Props> = props => {
                     </Message>
                 )}
 
-            {localGame?.gameState === GameState.ENDED && (
+            {game?.gameState === GameState.ENDED && (
                 <Message $isGameOver>
                     <FontAwesomeIcon icon={faInfoCircle} />
                     <span>
@@ -706,11 +704,12 @@ const Goban: FC<Props> = props => {
                             : field
                         const displayColor = displayField.color
 
+                        const handleClick = () => handleTileClick(field)
+
                         return (
                             <Tile
                                 key={i}
-                                // eslint-disable-next-line react/jsx-no-bind
-                                clickHandler={() => handleTileClick(field)}
+                                clickHandler={handleClick}
                                 currentPlayer={currentPlayer?.playerColor}
                                 field={displayField}
                                 isBeingCaptured={isBeingCaptured}
