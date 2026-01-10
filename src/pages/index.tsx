@@ -298,7 +298,7 @@ const HomePage: FC = () => {
 
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {
-        if (localUser) {
+        if (localUser?.id) {
             const url = `/api/users/${localUser.id}`
             axios
                 .get<User>(url)
@@ -324,7 +324,7 @@ const HomePage: FC = () => {
                     setGameId(null)
                 })
         }
-    }, [localUser, gameId, setLocalUser, setGameId])
+    }, [localUser?.id, gameId, setLocalUser, setGameId])
 
     // Listen for service worker messages about deleted games
     useEffect(() => {
