@@ -236,7 +236,7 @@ const GamePage: FC = () => {
                     ) {
                         setSubscription(sub)
                         setIsSubscribed(true)
-                        if (localUser) {
+                        if (localUser && !localUser.subscription) {
                             setLocalUser({
                                 ...localUser,
                                 subscription: JSON.stringify(sub),
@@ -247,7 +247,8 @@ const GamePage: FC = () => {
                 setRegistration(reg)
             })
         }
-    }, [localUser, setLocalUser])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setLocalUser])
 
     // Subscribe to push after login
     useEffect(() => {
@@ -280,7 +281,8 @@ const GamePage: FC = () => {
         if (localUser && localUser?.subscription === undefined) {
             onLogin()
         }
-    }, [localUser, registration?.pushManager, setLocalUser])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localUser?.subscription, registration?.pushManager, setLocalUser])
 
     // Check if game exists
     useEffect(() => {

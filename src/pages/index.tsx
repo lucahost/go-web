@@ -224,7 +224,7 @@ const HomePage: FC = () => {
                     ) {
                         setSubscription(sub)
                         setIsSubscribed(true)
-                        if (localUser) {
+                        if (localUser && !localUser.subscription) {
                             setLocalUser({
                                 ...localUser,
                                 subscription: JSON.stringify(sub),
@@ -235,7 +235,8 @@ const HomePage: FC = () => {
                 setRegistration(reg)
             })
         }
-    }, [localUser, setLocalUser])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setLocalUser])
 
     useEffect(() => {
         if (gameId) {
@@ -294,7 +295,8 @@ const HomePage: FC = () => {
         if (localUser && localUser?.subscription === undefined) {
             onLogin()
         }
-    }, [localUser, registration?.pushManager, setLocalUser])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localUser?.subscription, registration?.pushManager, setLocalUser])
 
     // if there is a user/game already in the local storage: check if it is still valid
     useEffect(() => {

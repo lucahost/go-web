@@ -363,7 +363,7 @@ const GameList: FC = () => {
     const [games, setGames] = useState<GameWithAnimation[]>([])
 
     useEffect(() => {
-        if (localUser) {
+        if (localUser?.id) {
             const url = `/api/games`
             axios
                 .get<Game[]>(url)
@@ -377,7 +377,7 @@ const GameList: FC = () => {
                     setGames([])
                 })
         }
-    }, [localUser])
+    }, [localUser?.id])
 
     // Listen for service worker messages about game changes
     useEffect(() => {
