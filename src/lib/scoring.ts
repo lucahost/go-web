@@ -1,5 +1,5 @@
 import { GoBoard, PlayerColor, Vertex } from './types'
-import { getDirectNeighborFields } from './game'
+import { getDirectNeighborFields } from './board'
 
 export interface Dominance {
     black: number
