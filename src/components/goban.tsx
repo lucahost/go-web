@@ -19,10 +19,10 @@ import {
     User,
     Vertex,
 } from '../lib/types'
-import { isKo, isOccupied, isSuicide } from '../lib/game'
+import { isKo, isOccupied, isSuicide } from '../lib/rules'
 import axios from 'axios'
 import useLocalStorage from '../lib/hooks/useLocalStorage'
-import { getFieldLocationByVertex } from '../lib/board'
+import { getFieldLocationByVertex } from '../lib/board-queries'
 import useSoundEffect from '../lib/hooks/useSoundEffect'
 import { media } from '../lib/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

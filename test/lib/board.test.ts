@@ -1,8 +1,8 @@
 import {
     generateBoardLayout,
-    getFieldLocationByVertex,
     withNewFieldColor,
-} from '../../src/lib/board'
+} from '../../src/lib/board-commands'
+import { getFieldLocationByVertex } from '../../src/lib/board-queries'
 import { Field, FieldLocation, PlayerColor } from '../../src/lib/types'
 
 describe('generate a 9x9 board', () => {

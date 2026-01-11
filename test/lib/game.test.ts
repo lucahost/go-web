@@ -6,21 +6,27 @@ import {
     PlayerColor,
 } from '../../src/lib/types'
 import {
-    addHistory,
+    move,
+    pass,
+    start,
+} from '../../src/lib/game'
+import {
     getDirectNeighborFields,
     getGroupByVertex,
     getGroupLiberties,
     getLiberties,
+} from '../../src/lib/board-queries'
+import {
+    addHistory,
     handleCapture,
+    resetPass,
+    setStone,
+} from '../../src/lib/board-commands'
+import {
     isKo,
     isOccupied,
     isSuicide,
-    move,
-    pass,
-    resetPass,
-    setStone,
-    start,
-} from '../../src/lib/game'
+} from '../../src/lib/rules'
 import { createPlayer } from '../../src/lib/player'
 
 import { board as emptyBoard } from '../boards/1_empty_9x9_board.json'
