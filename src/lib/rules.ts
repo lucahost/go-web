@@ -2,9 +2,11 @@ import { Field, GoBoard, PlayerColor, Vertex } from './types'
 import {
     findFieldOnBoardByVertex,
     getGroupLiberties,
+} from './board-queries'
+import {
     handleCapture,
     setStone,
-} from './board'
+} from './board-commands'
 
 export const isInBounds = (board: GoBoard, move: Field): boolean => {
     return (

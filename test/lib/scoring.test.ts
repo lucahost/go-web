@@ -1,6 +1,6 @@
 import { calculateDominance, calculateInfluence } from '../../src/lib/scoring'
 import { start } from '../../src/lib/game'
-import { setStone } from '../../src/lib/board'
+import { setStone } from '../../src/lib/board-commands'
 import { PlayerColor } from '../../src/lib/types'
 
 describe('Dominance Calculation', () => {

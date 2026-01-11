@@ -6,7 +6,7 @@ import {
     resetPass,
     setStone,
     switchPlayer,
-} from './board'
+} from './board-commands'
 import { isInBounds, isKo, isOccupied, isSuicide } from './rules'
 
 export const start = (): GoBoard => {

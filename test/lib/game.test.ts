@@ -11,15 +11,17 @@ import {
     start,
 } from '../../src/lib/game'
 import {
-    addHistory,
     getDirectNeighborFields,
     getGroupByVertex,
     getGroupLiberties,
     getLiberties,
+} from '../../src/lib/board-queries'
+import {
+    addHistory,
     handleCapture,
     resetPass,
     setStone,
-} from '../../src/lib/board'
+} from '../../src/lib/board-commands'
 import {
     isKo,
     isOccupied,
