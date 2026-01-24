@@ -4,9 +4,9 @@ import { handleCapture, setStone } from './board-commands'
 
 export const isInBounds = (board: GoBoard, move: Field): boolean => {
     return (
-        move.vertex[0] >= 0 &&
+        move.vertex[0] > 0 &&
         move.vertex[0] - 1 < board.height &&
-        move.vertex[1] >= 0 &&
+        move.vertex[1] > 0 &&
         move.vertex[1] - 1 < board.width
     )
 }
