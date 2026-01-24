@@ -1,10 +1,10 @@
 module.exports = {
-    processors: ['stylelint-processor-styled-components'],
+    customSyntax: 'postcss-styled-syntax',
     extends: [
         'stylelint-config-recommended',
-        'stylelint-config-styled-components',
     ],
     rules: {
         'no-descending-specificity': null,
+        'nesting-selector-no-missing-scoping-root': null,
     },
 }
