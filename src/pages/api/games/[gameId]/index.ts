@@ -93,6 +93,12 @@ const GameApi = async (
             })
 
             await prisma.$transaction([
+                // Clear the compound currentPlayer FK first — with ON DELETE
+                // RESTRICT it blocks deleting the referenced UserGame rows
+                prisma.game.update({
+                    where: { id: gId },
+                    data: { currentPlayerId: null, currentPlayerColor: null },
+                }),
                 prisma.subscription.deleteMany({ where: { gameId: gId } }),
                 prisma.userGame.deleteMany({ where: { gameId: gId } }),
                 prisma.game.delete({ where: { id: gId } }),
