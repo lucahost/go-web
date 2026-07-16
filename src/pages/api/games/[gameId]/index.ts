@@ -112,11 +112,7 @@ const GameApi = async (
                     prisma.game.delete({ where: { id: gId } }),
                 ])
             } catch (err) {
-                const message = err instanceof Error ? err.message : String(err)
-                logger.error('Game deletion failed', {
-                    gameId: gId,
-                    error: message,
-                })
+                logger.error('Game deletion failed', err, { gameId: gId })
                 res.status(500).json({
                     error: 'Failed to delete game',
                     gameId: gId,
