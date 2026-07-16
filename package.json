@@ -25,18 +25,18 @@
         "@fortawesome/free-regular-svg-icons": "^7.1.0",
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
-        "@opentelemetry/api": "^1.9.0",
-        "@opentelemetry/auto-instrumentations-node": "^0.67.3",
-        "@opentelemetry/exporter-logs-otlp-grpc": "^0.208.0",
-        "@opentelemetry/exporter-metrics-otlp-grpc": "^0.208.0",
-        "@opentelemetry/exporter-trace-otlp-grpc": "^0.208.0",
-        "@opentelemetry/instrumentation-http": "^0.208.0",
-        "@opentelemetry/resources": "^2.2.0",
-        "@opentelemetry/sdk-logs": "^0.208.0",
-        "@opentelemetry/sdk-metrics": "^2.2.0",
-        "@opentelemetry/sdk-node": "^0.208.0",
-        "@opentelemetry/sdk-trace-node": "^2.2.0",
-        "@opentelemetry/semantic-conventions": "^1.38.0",
+        "@opentelemetry/api": "^1.9.1",
+        "@opentelemetry/auto-instrumentations-node": "^0.78.0",
+        "@opentelemetry/exporter-logs-otlp-grpc": "^0.220.0",
+        "@opentelemetry/exporter-metrics-otlp-grpc": "^0.220.0",
+        "@opentelemetry/exporter-trace-otlp-grpc": "^0.220.0",
+        "@opentelemetry/instrumentation-http": "^0.220.0",
+        "@opentelemetry/resources": "^2.9.0",
+        "@opentelemetry/sdk-logs": "^0.220.0",
+        "@opentelemetry/sdk-metrics": "^2.9.0",
+        "@opentelemetry/sdk-node": "^0.220.0",
+        "@opentelemetry/sdk-trace-node": "^2.9.0",
+        "@opentelemetry/semantic-conventions": "^1.43.0",
         "@prisma/adapter-better-sqlite3": "^7.2.0",
         "@prisma/client": "^7.2.0",
         "@prisma/instrumentation": "^7.2.0",
@@ -89,6 +89,9 @@
         "jsdom": "^27.4.0",
         "test-exclude": "^7.0.1",
         "chevrotain": "^11.1.0",
-        "lodash-es": "^4.17.23"
+        "lodash-es": "^4.17.23",
+        "@opentelemetry/otlp-transformer": {
+            "protobufjs": "^8.7.1"
+        }
     }
 }

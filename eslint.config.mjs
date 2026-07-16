@@ -149,6 +149,11 @@ export default [
 
             // React Hooks rules
             ...reactHooksPlugin.configs.recommended.rules,
+            // New React Compiler-powered advisory rules (added in
+            // eslint-plugin-react-hooks 7.1): keep as warnings for now,
+            // the flagged patterns predate this config change.
+            'react-hooks/set-state-in-effect': 'warn',
+            'react-hooks/preserve-manual-memoization': 'warn',
 
             // Next.js rules
             ...nextPlugin.configs.recommended.rules,

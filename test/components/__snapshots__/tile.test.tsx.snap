@@ -2,11 +2,11 @@
 
 exports[`Tile renders correctly 1`] = `
 <div
-  class="sc-beySbL bUhYxN"
+  class="sc-bdvvNz cLGPPk"
 >
   <img
     alt="Go board tile at 0,0"
-    class="sc-guDLRU gDwjFN"
+    class="sc-gsDLFA kGoqtV"
     src="/Go_undefined.svg"
   />
 </div>

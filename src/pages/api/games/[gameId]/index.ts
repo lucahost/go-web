@@ -16,7 +16,8 @@ webPush.setVapidDetails(
     process.env.WEB_PUSH_PRIVATE_KEY ?? ''
 )
 
-type GameResponse = Game | { deleted: boolean } | never
+type GameResponse =
+    Game | { deleted: boolean } | { error: string; gameId: number } | never
 
 const GameApi = async (
     req: NextApiRequest,
@@ -92,11 +93,29 @@ const GameApi = async (
                 where: { isGlobal: true },
             })
 
-            await prisma.$transaction([
-                prisma.subscription.deleteMany({ where: { gameId: gId } }),
-                prisma.userGame.deleteMany({ where: { gameId: gId } }),
-                prisma.game.delete({ where: { id: gId } }),
-            ])
+            try {
+                await prisma.$transaction([
+                    // Clear the compound currentPlayer FK first — with ON DELETE
+                    // RESTRICT it blocks deleting the referenced UserGame rows
+                    prisma.game.update({
+                        where: { id: gId },
+                        data: {
+                            currentPlayerId: null,
+                            currentPlayerColor: null,
+                        },
+                    }),
+                    prisma.subscription.deleteMany({ where: { gameId: gId } }),
+                    prisma.userGame.deleteMany({ where: { gameId: gId } }),
+                    prisma.game.delete({ where: { id: gId } }),
+                ])
+            } catch (err) {
+                logger.error('Game deletion failed', err, { gameId: gId })
+                res.status(500).json({
+                    error: 'Failed to delete game',
+                    gameId: gId,
+                })
+                return
+            }
 
             logger.info('Game deleted', { gameId: gId })
             gamesDeletedCounter.add(1)
