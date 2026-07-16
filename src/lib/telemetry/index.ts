@@ -40,15 +40,17 @@ export function initTelemetry(): void {
 
     // Create log processors - use BatchLogRecordProcessor for better performance
     const logProcessors = [
-        new BatchLogRecordProcessor(
-            new OTLPLogExporter({ url: config.otlpEndpoint })
-        ),
+        new BatchLogRecordProcessor({
+            exporter: new OTLPLogExporter({ url: config.otlpEndpoint }),
+        }),
     ]
 
     // Add console exporter in development for debugging
     if (config.deploymentEnvironment === 'development') {
         logProcessors.push(
-            new BatchLogRecordProcessor(new ConsoleLogRecordExporter())
+            new BatchLogRecordProcessor({
+                exporter: new ConsoleLogRecordExporter(),
+            })
         )
     }
 

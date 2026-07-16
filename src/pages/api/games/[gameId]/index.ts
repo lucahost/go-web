@@ -17,10 +17,7 @@ webPush.setVapidDetails(
 )
 
 type GameResponse =
-    | Game
-    | { deleted: boolean }
-    | { error: string; gameId: number }
-    | never
+    Game | { deleted: boolean } | { error: string; gameId: number } | never
 
 const GameApi = async (
     req: NextApiRequest,
