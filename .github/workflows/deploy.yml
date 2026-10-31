@@ -81,6 +81,13 @@ jobs:
     environment:
       name: production
       url: ${{ vars.DEPLOY_URL }}
+    # The VPS only accepts SSH over Tailscale (public :22 is closed at the
+    # Hetzner firewall). Join the tailnet as an ephemeral tagged node and use
+    # Tailscale SSH (authn/authz via the tailnet ACL); no SSH key secrets needed.
+    env:
+      TS_HOSTNAME: 100.102.93.2
+      SSH_USERNAME: dp-ubuntu-16gb
+      SSH_OPTS: -o StrictHostKeyChecking=no
 
     steps:
       - name: Download build artifacts
@@ -98,41 +105,49 @@ jobs:
           echo "Checking BUILD_ID:"
           cat app/.next/BUILD_ID || echo "WARNING: BUILD_ID not found!"
 
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:prod-hetzner
+
+      - name: Render .env.local
+        env:
+          WEB_PUSH_PRIVATE_KEY: ${{ secrets.WEB_PUSH_PRIVATE_KEY }}
+          WEB_PUSH_EMAIL: ${{ secrets.WEB_PUSH_EMAIL }}
+        run: |
+          # Production overrides (take precedence over .env); shipped with the
+          # bundle instead of being interpolated into a remote shell script.
+          umask 077
+          {
+            printf 'DATABASE_URL="file:/opt/go-web/go.db"\n'
+            printf 'WEB_PUSH_PRIVATE_KEY=%s\n' "$WEB_PUSH_PRIVATE_KEY"
+            printf 'WEB_PUSH_EMAIL=%s\n' "$WEB_PUSH_EMAIL"
+          } > app/.env.local
+
       - name: Deploy to Server
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete --exclude='prisma/db/'
-          path: app/
-          remote_path: ${{ secrets.DEPLOY_PATH }}/
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USERNAME }}
-          remote_key: ${{ secrets.SSH_KEY }}
-          remote_key_pass: ${{ secrets.SSH_KEY_PASSPHRASE }}
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync -avz --delete --exclude='prisma/db/' -e "ssh $SSH_OPTS" \
+            app/ "${SSH_USERNAME}@${TS_HOSTNAME}:${DEPLOY_PATH}/"
 
-      - name: Inject secrets and restart
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-          script: |
-            cd ${{ secrets.DEPLOY_PATH }}
-            echo "Checking .next directory..."
-            ls -la .next/ || { echo "ERROR: .next directory not found!"; exit 1; }
-            test -f .next/BUILD_ID || { echo "ERROR: BUILD_ID not found in .next!"; exit 1; }
-
-            # Create .env.local with production overrides (takes precedence over .env)
-            cat > .env.local << EOF
-            DATABASE_URL="file:/opt/go-web/go.db"
-            WEB_PUSH_PRIVATE_KEY=${{ secrets.WEB_PUSH_PRIVATE_KEY }}
-            WEB_PUSH_EMAIL=${{ secrets.WEB_PUSH_EMAIL }}
-            EOF
-            # Remove leading whitespace from .env.local
-            sed -i 's/^[[:space:]]*//' .env.local
-
-            echo "Build verified. Installing dependencies..."
-            npm ci --omit=dev
-            npx prisma generate
-            npx prisma migrate deploy
-            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+      - name: Install dependencies and restart
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          # Unquoted heredoc: DEPLOY_PATH expands on the runner.
+          ssh $SSH_OPTS "${SSH_USERNAME}@${TS_HOSTNAME}" bash -s <<EOF
+          set -euo pipefail
+          cd "${DEPLOY_PATH}"
+          echo "Checking .next directory..."
+          ls -la .next/ || { echo "ERROR: .next directory not found!"; exit 1; }
+          test -f .next/BUILD_ID || { echo "ERROR: BUILD_ID not found in .next!"; exit 1; }
+          echo "Build verified. Installing dependencies..."
+          npm ci --omit=dev
+          npx prisma generate
+          npx prisma migrate deploy
+          pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+          pm2 save
+          EOF
