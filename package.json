@@ -92,6 +92,7 @@
         "lodash-es": "^4.17.23",
         "@opentelemetry/otlp-transformer": {
             "protobufjs": "^8.7.1"
-        }
+        },
+        "effect": "^3.22.1"
     }
 }
