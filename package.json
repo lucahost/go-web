@@ -26,7 +26,7 @@
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
         "@opentelemetry/api": "^1.9.1",
-        "@opentelemetry/auto-instrumentations-node": "^0.78.0",
+        "@opentelemetry/auto-instrumentations-node": "^0.83.0",
         "@opentelemetry/exporter-logs-otlp-grpc": "^0.220.0",
         "@opentelemetry/exporter-metrics-otlp-grpc": "^0.220.0",
         "@opentelemetry/exporter-trace-otlp-grpc": "^0.220.0",
