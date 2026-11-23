@@ -77,7 +77,8 @@ jobs:
     name: Deploy to Production
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 10 min of work + up to 10 min waiting for the host-wide deploy lock
+    timeout-minutes: 20
     environment:
       name: production
       url: ${{ vars.DEPLOY_URL }}
@@ -138,7 +139,9 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           # Unquoted heredoc: DEPLOY_PATH expands on the runner.
-          ssh $SSH_OPTS "${SSH_USERNAME}@${TS_HOSTNAME}" bash -s <<EOF
+          # One deploy at a time on the VPS, across all repos (see the 2026-11-23 freeze):
+          # wait up to 10 min for /run/lock/vps-deploy.lock; exit code 75 = lock timeout.
+          ssh $SSH_OPTS "${SSH_USERNAME}@${TS_HOSTNAME}" flock -w 600 -E 75 /run/lock/vps-deploy.lock bash -s <<EOF
           set -euo pipefail
           cd "${DEPLOY_PATH}"
           echo "Checking .next directory..."
