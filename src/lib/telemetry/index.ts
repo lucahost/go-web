@@ -59,12 +59,14 @@ export function initTelemetry(): void {
         traceExporter: new OTLPTraceExporter({
             url: config.otlpEndpoint,
         }),
-        metricReader: new PeriodicExportingMetricReader({
-            exporter: new OTLPMetricExporter({
-                url: config.otlpEndpoint,
+        metricReaders: [
+            new PeriodicExportingMetricReader({
+                exporter: new OTLPMetricExporter({
+                    url: config.otlpEndpoint,
+                }),
+                exportIntervalMillis: 60000,
             }),
-            exportIntervalMillis: 60000,
-        }),
+        ],
         logRecordProcessors: logProcessors,
         instrumentations: [
             getNodeAutoInstrumentations({
