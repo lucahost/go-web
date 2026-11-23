@@ -86,7 +86,7 @@
         "node": ">=22"
     },
     "overrides": {
-        "jsdom": "^27.4.0",
+        "jsdom": "^31.0.0",
         "test-exclude": "^7.0.1",
         "chevrotain": "^11.1.0",
         "lodash-es": "^4.17.23",
