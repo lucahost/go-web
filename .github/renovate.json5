@@ -138,5 +138,20 @@
       matchUpdateTypes: ['major'],
       groupName: 'dotnet monorepo',
     },
+
+    // ---- go-web only -----------------------------------------------------
+    // Not part of the deploy-actions source: keep these rules when the shared
+    // policy above is mirrored again.
+    {
+      // go-web doesn't use effect itself; it only arrives through Prisma
+      // (@prisma/config pins effect 3.x). The package.json override forces a
+      // patched 3.x for GHSA-7589-6fvf-x4pw, and Renovate tracks that override
+      // line. effect 4 breaks Prisma's config loader (PR #19 failed CI), so
+      // drop this rule once Prisma itself moves to effect 4.
+      description: 'Keep effect on 3.x until Prisma supports effect 4',
+      matchDatasources: ['npm'],
+      matchPackageNames: ['effect'],
+      allowedVersions: '<4',
+    },
   ],
 }
