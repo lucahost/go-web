@@ -91,7 +91,7 @@
         "chevrotain": "^11.1.0",
         "lodash-es": "^4.17.23",
         "@opentelemetry/otlp-transformer": {
-            "protobufjs": "^8.7.1"
+            "protobufjs": "^7.6.5"
         },
         "effect": "^3.22.1"
     }
