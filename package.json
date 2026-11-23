@@ -75,7 +75,7 @@
         "postcss-styled-syntax": "^0.7.1",
         "prettier": "^3.5.3",
         "prisma": "^7.2.0",
-        "stylelint": "^16.20.0",
+        "stylelint": "^18.0.0",
         "stylelint-config-recommended": "^17.0.0",
         "stylelint-config-styled-components": "^0.1.1",
         "ts-node": "^10.9.2",
