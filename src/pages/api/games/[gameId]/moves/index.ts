@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../../../lib/db'
-import webPush from 'web-push'
+import * as webPush from 'web-push'
 import { GoBoard, HttpMethod } from '../../../../../lib/types'
 import { move } from '../../../../../lib/game'
 import {

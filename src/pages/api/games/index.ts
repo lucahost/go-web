@@ -1,6 +1,6 @@
 import { Game } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import webPush from 'web-push'
+import * as webPush from 'web-push'
 import prisma from '../../../lib/db'
 import { start } from '../../../lib/game'
 import { HttpMethod, PlayerColor } from '../../../lib/types'

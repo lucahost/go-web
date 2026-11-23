@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import webPush from 'web-push'
+import * as webPush from 'web-push'
 import { HttpMethod, Game, GoBoard, Player } from '../../../../lib/types'
 import prisma from '../../../../lib/db'
 import {
