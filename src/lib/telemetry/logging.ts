@@ -1,6 +1,8 @@
 import pino, { Logger as PinoLogger } from 'pino'
-import { trace, context } from '@opentelemetry/api'
-import { logs, SeverityNumber } from '@opentelemetry/api-logs'
+// The Logs API lives in @opentelemetry/api since 1.10 (OTel JS SDK 3). NodeSDK
+// registers its LoggerProvider there, so importing `logs` from the legacy
+// @opentelemetry/api-logs package would silently return a no-op logger.
+import { trace, context, logs, SeverityNumber } from '@opentelemetry/api'
 import { config } from './config'
 
 function getTraceContext(): { trace_id?: string; span_id?: string } {
