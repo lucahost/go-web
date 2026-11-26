@@ -1,6 +1,20 @@
-﻿Dockerfile
+Dockerfile
 .dockerignore
 node_modules
 npm-debug.log
 README.md
 .next
+# Not needed to build the image. prisma/db is a local database: it must never end up in it;
+# deploy/secrets is for the artifact (vps-deploy.yml packs it), not the image.
+.git
+.github
+.beads
+.idea
+.vscode
+coverage
+docs
+test
+prisma/db
+deploy/secrets
+.env.local
+.env.*.local
