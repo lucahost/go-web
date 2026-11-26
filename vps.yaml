@@ -1,0 +1,27 @@
+# go-web on the VPS cluster (Onboarding v2; what the platform allows it: lucahost/vps-gitops
+# tenants/go-web.yaml). One component: Next's standalone server (Dockerfile) with its SQLite
+# database on the tenant's volume `data`. The platform exposes it on 10.43.0.37:3000, and host
+# nginx keeps TLS, the Cloudflare gate, gzip, the security headers and the /_next/static caching.
+app: go-web
+components:
+  web:
+    build: {context: .}
+    port: 3000
+    uid: 1001                  # owns go.db today (dp-ubuntu-16gb); `vps cutover` copies it as is
+    memory: 512Mi              # pm2's process: ~120 MB RSS; the start also runs prisma migrate deploy
+    memoryRequest: 192Mi
+    health: /                  # the index page is prerendered: no database query
+    strategy: Recreate         # one SQLite writer: the old pod stops before the new one migrates
+    env:
+      DATABASE_URL: file:/data/go.db
+      # As pm2's ecosystem.config.js sets them; only the endpoint differs (pods reach SigNoz's
+      # ingester on docker0, tenant egress otlp).
+      OTEL_ENABLED: "true"
+      OTEL_SERVICE_NAME: go-web
+      OTEL_SERVICE_VERSION: 0.1.0
+      OTEL_DEPLOYMENT_ENVIRONMENT: production
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://172.17.0.1:4317
+      OTEL_LOG_LEVEL: info
+    secretEnv: [web-env]       # deploy/secrets/web-env/: WEB_PUSH_PRIVATE_KEY, WEB_PUSH_EMAIL
+    writable: [/app/.next/cache]
+    volumes: {data: /data}     # go.db and its journal: SQLite needs the directory writable

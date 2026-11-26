@@ -1,4 +1,8 @@
 module.exports = {
+    // The VPS cluster's image (Dockerfile) builds with NEXT_OUTPUT=standalone and runs
+    // .next/standalone/server.js. Without it the build is as before, for deploy.yml's
+    // `next start` on the host.
+    output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
     compiler: {
         styledComponents: true,
     },

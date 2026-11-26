@@ -1,8 +1,10 @@
 name: Deploy
 
+# pm2 on the host, over SSH. It goes after `sudo vps cutover go-web` (vps.yml deploys from then on).
+# Until then both run on every push to main, so pm2 and the published artifact are the same commit.
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
     inputs:
       skip_cache:
@@ -113,7 +115,27 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:prod-hetzner
 
+      # Onboarding v2: once `sudo vps cutover go-web` has switched the host site to the cluster
+      # (the generated site proxies to web's ClusterIP 10.43.0.37:3000), this deploy steps aside:
+      # no rsync into /var/www/go and no pm2 restart. pm2 stays stopped, and the old SQLite file
+      # stays as the cutover left it for a rollback. A rollback restores today's site, and with it
+      # this deploy. The check holds the deploy lock the cutover holds; the restart step checks again.
+      - name: Check where go-web runs
+        id: where
+        run: |
+          set +e
+          ssh $SSH_OPTS "${SSH_USERNAME}@${TS_HOSTNAME}" flock -w 600 -E 75 /run/lock/vps-deploy.lock \
+            grep -qF "'proxy_pass http://10.43.0.37:3000'" /etc/nginx/sites-available/go.hostettler.io
+          rc=$?
+          set -e
+          case $rc in
+            0) echo "go-web runs in the VPS cluster (vps.yml deploys it): skipping pm2"; echo "pm2=false" >> "$GITHUB_OUTPUT";;
+            1) echo "pm2=true" >> "$GITHUB_OUTPUT";;
+            *) echo "::error::can't tell where go-web runs (exit $rc)"; exit 1;;
+          esac
+
       - name: Render .env.local
+        if: steps.where.outputs.pm2 == 'true'
         env:
           WEB_PUSH_PRIVATE_KEY: ${{ secrets.WEB_PUSH_PRIVATE_KEY }}
           WEB_PUSH_EMAIL: ${{ secrets.WEB_PUSH_EMAIL }}
@@ -128,6 +150,7 @@ jobs:
           } > app/.env.local
 
       - name: Deploy to Server
+        if: steps.where.outputs.pm2 == 'true'
         env:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
@@ -135,6 +158,7 @@ jobs:
             app/ "${SSH_USERNAME}@${TS_HOSTNAME}:${DEPLOY_PATH}/"
 
       - name: Install dependencies and restart
+        if: steps.where.outputs.pm2 == 'true'
         env:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
@@ -143,6 +167,11 @@ jobs:
           # wait up to 10 min for /run/lock/vps-deploy.lock; exit code 75 = lock timeout.
           ssh $SSH_OPTS "${SSH_USERNAME}@${TS_HOSTNAME}" flock -w 600 -E 75 /run/lock/vps-deploy.lock bash -s <<EOF
           set -euo pipefail
+          # Again under the lock: a cutover may have switched the site since the check above.
+          if grep -qF 'proxy_pass http://10.43.0.37:3000' /etc/nginx/sites-available/go.hostettler.io; then
+            echo "go-web runs in the VPS cluster (vps.yml deploys it): not restarting pm2"
+            exit 0
+          fi
           cd "${DEPLOY_PATH}"
           echo "Checking .next directory..."
           ls -la .next/ || { echo "ERROR: .next directory not found!"; exit 1; }
