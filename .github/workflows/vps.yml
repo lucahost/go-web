@@ -1,11 +1,10 @@
 name: VPS cluster
 
-# Onboarding v2 (lucahost/vps-gitops tenants/go-web.yaml): builds vps.yaml's web image
-# (Dockerfile), pushes it to the box's registry as the zot user go-web and publishes the rendered
-# artifact go-web/manifests:<sha>. Until `sudo vps cutover go-web` creates the live tag, a run
-# only publishes and deploy.yml still deploys to pm2. From the cutover on, a run moves live to its
-# artifact, calls the Receiver and waits until Flux has applied it and it is Ready. While live is
-# parked (a rollback), a run only publishes again.
+# go-web's deploy (Onboarding v2; lucahost/vps-gitops tenants/go-web.yaml): builds vps.yaml's web
+# image (Dockerfile), pushes it to the box's registry as the zot user go-web and publishes the
+# rendered artifact go-web/manifests:<sha>. It then moves live to that artifact, calls the
+# Receiver and waits until Flux has applied it and it is Ready. While live is parked (a rollback),
+# a run only publishes.
 on:
   push:
     branches: [main]
@@ -20,7 +19,6 @@ jobs:
     uses: lucahost/deploy-actions/.github/workflows/vps-deploy.yml@366a7d0c452f1b0d323cdb32ed7ab1e1df4142d6   # vps-deploy, 2026-11-26
     with:
       file: vps.yaml
-    # The Environment vps's two secrets reach the called job only this way. It also passes this
-    # repo's other secrets (deploy.yml's TS_OAUTH_*, DEPLOY_PATH and WEB_PUSH_*), which
-    # vps-deploy.yml never reads; they go with deploy.yml after the cutover.
+    # The Environment vps's two secrets reach the called job only this way. It would also pass
+    # any repository secret, which vps-deploy.yml never reads.
     secrets: inherit

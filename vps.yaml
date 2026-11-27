@@ -7,15 +7,15 @@ components:
   web:
     build: {context: .}
     port: 3000
-    uid: 1001                  # owns go.db today (dp-ubuntu-16gb); `vps cutover` copies it as is
-    memory: 512Mi              # pm2's process: ~120 MB RSS; the start also runs prisma migrate deploy
+    uid: 1001                  # owns go.db on the volume (1001:1001, as `vps cutover` copied it)
+    memory: 512Mi              # the server: ~120 MB RSS; the start also runs prisma migrate deploy
     memoryRequest: 192Mi
     health: /                  # the index page is prerendered: no database query
     strategy: Recreate         # one SQLite writer: the old pod stops before the new one migrates
     env:
       DATABASE_URL: file:/data/go.db
-      # As pm2's ecosystem.config.js sets them; only the endpoint differs (pods reach SigNoz's
-      # ingester on docker0, tenant egress otlp).
+      # Set here, so .env's development defaults (also in the image) never apply. Pods reach
+      # SigNoz's ingester on docker0 (tenant egress otlp).
       OTEL_ENABLED: "true"
       OTEL_SERVICE_NAME: go-web
       OTEL_SERVICE_VERSION: 0.1.0
