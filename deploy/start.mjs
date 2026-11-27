@@ -1,6 +1,6 @@
 // The web container's entrypoint in the VPS cluster (Dockerfile, vps.yaml):
 //  1. the empty-DB guard: refuse to start without the SQLite file the cutover copied;
-//  2. `prisma migrate deploy`, as deploy.yml runs it on the host before every restart;
+//  2. `prisma migrate deploy`, on every start (the old pm2 deploy ran it before every restart);
 //  3. Next's standalone server.
 //
 // Why the guard: better-sqlite3 (and `prisma migrate deploy`) create a missing database file.
